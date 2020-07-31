@@ -17,7 +17,7 @@ class CategoryDao extends DatabaseAccessor<LocalDatabase> with _$CategoryDaoMixi
 
   Stream<List<category>> getCategories(bool isIncome, int bookId) {
     return (select(_database.category)
-      ..where((tbl) => tbl.isIncome.equals(isIncome) & tbl.bookId.equals(bookId)))
+      ..where((tbl) => tbl.isIncome.equals(isIncome)))
         .get().asStream();
   }
 
@@ -45,11 +45,17 @@ class CategoryDao extends DatabaseAccessor<LocalDatabase> with _$CategoryDaoMixi
     return into(_database.tag).insert(tag).asStream();
   }
 
+  Stream<void> insertTags(List<tag> tag) {
+    return batch((batch) {
+      batch.insertAll(_database.tag, tag);
+    }).asStream();
+  }
+
   Stream<int> insertCategory(category category) {
     return into(_database.category).insert(category).asStream();
   }
 
-  Stream<int> insertCategories(List<category> categories) {
+  Stream<List<int>> insertCategories(List<category> categories) {
     return batch((batch) {
       batch.insertAll(_database.category, categories);
     }).asStream();

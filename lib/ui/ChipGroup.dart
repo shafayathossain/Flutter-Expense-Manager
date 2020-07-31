@@ -2,29 +2,27 @@ import 'package:flutter/material.dart';
 
 class ChipGroup extends StatefulWidget {
 
-  final int _selectedIndex = -1;
+  int _selectedIndex = -1;
   final List<String> chipTexts;
   List<int> chipColors = [];
 
-  ChipGroup({this.chipTexts, this.chipColors});
+  ChipGroup(this.chipTexts, {this.chipColors}){
+    print(chipTexts);
+  }
 
   @override
   State createState() {
-    return ChipGroupState(
-      chipTexts: chipTexts,
-      chipColors: chipColors,
-      selectedIndex: _selectedIndex
-    );
+    print("Create chip group state ${chipTexts}");
+    return ChipGroupState();
   }
 }
 
 class ChipGroupState extends State<ChipGroup> {
 
-  int selectedIndex = -1;
-  final List<String> chipTexts;
-  List<int> chipColors = [];
+//  int selectedIndex = -1;
+//  final List<String> chipTexts;
+//  List<int> chipColors = [];
 
-  ChipGroupState({this.chipTexts, this.chipColors, this.selectedIndex});
 
   @override
   Widget build(BuildContext context) {
@@ -32,21 +30,22 @@ class ChipGroupState extends State<ChipGroup> {
       spacing: 5,
       runSpacing: 5,
       children: List<Widget>.generate(
-        chipTexts.length,
+        widget.chipTexts.length,
         (int index) {
+          print(index);
           return FilterChip(
             label: Text(
-              '${chipTexts[index]}',
+              '${widget.chipTexts[index]}',
               style: TextStyle(color: Colors.white),
             ),
-            selected: selectedIndex == index,
+            selected: widget._selectedIndex == index,
             checkmarkColor: Colors.white,
-            selectedColor: chipColors != null && index < chipColors.length ? Color(chipColors[0]) : Colors.pink,
-            backgroundColor: chipColors != null && index < chipColors.length ? Color(chipColors[0]) : Colors.pink,
-            avatar: selectedIndex == index ? CircleAvatar( backgroundColor: Colors.black38,) : null,
+            selectedColor: widget.chipColors != null && index < widget.chipColors.length ? Color(widget.chipColors[index]) : Colors.pink,
+            backgroundColor: widget.chipColors != null && index < widget.chipColors.length ? Color(widget.chipColors[index]) : Colors.pink,
+            avatar: widget._selectedIndex == index ? CircleAvatar( backgroundColor: Colors.black38,) : null,
             onSelected: (bool selected) {
               setState(() {
-                selectedIndex = index;
+                widget._selectedIndex = index;
               });
             },
           );

@@ -1,3 +1,5 @@
+import 'package:expense_manager/data/localdb/LocalDatabase.dart';
+
 class AddEntryState {}
 
 class FormulaValueState extends AddEntryState {
@@ -5,3 +7,8 @@ class FormulaValueState extends AddEntryState {
 }
 
 class FormulaErrorState extends AddEntryState {}
+
+class CategoriesFetchedState extends AddEntryState {
+  CategoriesFetchedState(this.categories);
+  List<category> categories = [];
+}
