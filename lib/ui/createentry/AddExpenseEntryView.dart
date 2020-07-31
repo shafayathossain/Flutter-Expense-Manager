@@ -11,7 +11,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'AddEntryEvents.dart';
-import 'dialogs/CraateCategoryDialog.dart';
+import 'dialogs/CreateCategoryDialog.dart';
+import 'dialogs/CreateTagDialog.dart';
 
 class AddExpenseFormWidget extends StatelessWidget {
 
@@ -267,7 +268,13 @@ class AddExpenseState extends State<AddExpenseStatefulFormWidget> with SingleTic
                           stream: BlocProvider.of<AddEntryBloc>(context).categories,
                           builder: (context, AsyncSnapshot<List<category>> snapshot) {
                             if(snapshot.hasData) {
-                              return ChipGroup(snapshot.data.map((e) => e.name).toList())..createElement();
+                              return ChipGroup(
+                                snapshot.data.map((e) => e.name).toList(),
+                                chipColors: snapshot.data.map((e) => e.color).toList(),
+                                onChipSelectedCallback: (int index) {
+                                  BlocProvider.of<AddEntryBloc>(context)..add(GetTagsEvent(snapshot.data[index].id));
+                                }
+                              );
                             } else {
                               return ChipGroup([]);
                             }
@@ -368,7 +375,65 @@ class AddExpenseState extends State<AddExpenseStatefulFormWidget> with SingleTic
                             top: 10.0,
                             right: 10.0,
                             bottom: 0.0),
-                        child: ChipGroup(["Cash"])
+                        child: StreamBuilder(
+                          stream: BlocProvider.of<AddEntryBloc>(context).tags,
+                          builder: (context, AsyncSnapshot<List<tag>> snapshot) {
+                            if(snapshot.hasData) {
+                              return ChipGroup(
+                                snapshot.data.map((e) => e.name).toList(),
+                                chipColors: snapshot.data.map((e) => e.color).toList(),
+                              );
+                            } else {
+                              return ChipGroup([]);
+                            }
+                          },
+                        )
+                    ),
+                    Container(
+                      height: 45,
+                      margin: EdgeInsets.only(
+                          left: 10.0,
+                          top: 10.0,
+                          right: 10.0,
+                          bottom: 0.0),
+                      child: RaisedButton(
+                        color: Colors.white,
+                        disabledColor: Colors.white,
+                        highlightColor: Colors.white70,
+                        splashColor: Colors.blue.withOpacity(0.2),
+                        elevation: 0,
+                        onPressed: (){
+                          _showAddTagDialog();
+                        },
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(2),
+                          side: BorderSide(
+                              color: Colors.blue,
+                              width: 2
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Image.asset(
+                              "assets/images/ic_add.png",
+                              width: 24,
+                              height: 24,
+                              alignment: Alignment.centerLeft,
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Center(
+                                child: Text(
+                                  "add tag".toUpperCase(),
+                                  style: TextStyle(
+                                      color: Colors.blue
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
                     ),
                     Container(
                         width: double.maxFinite,
@@ -463,6 +528,21 @@ class AddExpenseState extends State<AddExpenseStatefulFormWidget> with SingleTic
           (name, color) {
             print(name);
             BlocProvider.of<AddEntryBloc>(context)..add(CreateCategoryEvent(
+                name, color
+            ));
+          },
+        )
+    );
+  }
+
+  void _showAddTagDialog() {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder:(contextC) => CreateTagDialog(
+              (name, color) {
+            print(name);
+            BlocProvider.of<AddEntryBloc>(context)..add(CreateTagEvent(
                 name, color
             ));
           },

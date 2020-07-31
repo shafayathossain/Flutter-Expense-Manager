@@ -31,6 +31,34 @@ class EntryRepositoryImpl extends EntryRepository {
       bookId: 1,
       isIncome: false
     );
-    return _categoryDao.insertCategory(cat);
+    return _categoryDao.insertCategory(cat)
+        .flatMap((value) {
+          tag mTag = tag(
+            name: name,
+            color: color,
+            canDelete: true,
+            bookId: 1,
+            categoryId: value
+          );
+          return _categoryDao.insertTag(mTag);
+        });
   }
+
+  @override
+  Stream<List<tag>> getAllTags(int categoryId) {
+    return _categoryDao.getTagsForACategory(categoryId);
+  }
+
+  @override
+  Stream<int> createTag(String name, int color, int categoryId) {
+    tag mTag = tag(
+        name: name,
+        color: color,
+        canDelete: true,
+        bookId: 1,
+        categoryId: categoryId
+    );
+    return _categoryDao.insertTag(mTag);
+  }
+
 }

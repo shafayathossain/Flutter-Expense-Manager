@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 
+typedef void OnChipSelected(int position);
+
 class ChipGroup extends StatefulWidget {
 
   int _selectedIndex = -1;
   final List<String> chipTexts;
+  OnChipSelected onChipSelectedCallback = (_){};
   List<int> chipColors = [];
 
-  ChipGroup(this.chipTexts, {this.chipColors}){
+  ChipGroup(this.chipTexts, {this.chipColors, this.onChipSelectedCallback}){
     print(chipTexts);
   }
 
   @override
   State createState() {
-    print("Create chip group state ${chipTexts}");
+    print("Create chip group state $chipTexts");
     return ChipGroupState();
   }
 }
@@ -40,12 +43,14 @@ class ChipGroupState extends State<ChipGroup> {
             ),
             selected: widget._selectedIndex == index,
             checkmarkColor: Colors.white,
+            showCheckmark: true,
             selectedColor: widget.chipColors != null && index < widget.chipColors.length ? Color(widget.chipColors[index]) : Colors.pink,
             backgroundColor: widget.chipColors != null && index < widget.chipColors.length ? Color(widget.chipColors[index]) : Colors.pink,
             avatar: widget._selectedIndex == index ? CircleAvatar( backgroundColor: Colors.black38,) : null,
             onSelected: (bool selected) {
               setState(() {
                 widget._selectedIndex = index;
+                widget.onChipSelectedCallback.call(index);
               });
             },
           );

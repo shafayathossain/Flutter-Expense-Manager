@@ -13,3 +13,14 @@ class CreateCategoryEvent extends AddEntryEvent {
   String name;
   int color;
 }
+
+class GetTagsEvent extends AddEntryEvent {
+  GetTagsEvent(this.categoryId);
+  int categoryId;
+}
+
+class CreateTagEvent extends AddEntryEvent {
+  CreateTagEvent(this.name, this.color);
+  String name;
+  int color;
+}

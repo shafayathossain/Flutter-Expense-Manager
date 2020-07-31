@@ -4,5 +4,7 @@ abstract class EntryRepository {
 
   Stream<List<category>> getAllCategories();
   Stream<int> createCategory(String name, int color);
+  Stream<List<tag>> getAllTags(int categoryId);
+  Stream<int> createTag(String name, int color, int categoryId);
 
 }

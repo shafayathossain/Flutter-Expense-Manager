@@ -16,8 +16,10 @@ class AddEntryBloc extends Bloc<AddEntryEvent, AddEntryState> {
   EntryRepository _repository;
   BehaviorSubject<String> amountValidator = BehaviorSubject();
   BehaviorSubject<List<category>> categorySubject = BehaviorSubject();
+  BehaviorSubject<List<tag>> tagSubject = BehaviorSubject();
   Stream<String> get amountFormula => amountValidator.stream.transform(validateFormula);
   Stream<List<category>> get categories => categorySubject.stream;
+  Stream<List<tag>> get tags => tagSubject.stream;
 
   final validateFormula =
   StreamTransformer<String, String>.fromHandlers(handleData: (formulaString, sink) {
@@ -39,6 +41,10 @@ class AddEntryBloc extends Bloc<AddEntryEvent, AddEntryState> {
       yield* getCategories().map((event) => CategoriesFetchedState(event));
     } else if(event is CreateCategoryEvent) {
       yield* createCategory(event.name, event.color);
+    } else if(event is GetTagsEvent) {
+      yield* getTags(event.categoryId).map((event) => TagsFetchedState(event));
+    } else if(event is CreateTagEvent) {
+
     }
   }
 
@@ -53,6 +59,21 @@ class AddEntryBloc extends Bloc<AddEntryEvent, AddEntryState> {
         })
         .map((event) {
           print("ADD ENTRY 54 -> ${event}");
+          categorySubject.sink.add(event);
+          return CategoriesFetchedState(event);
+        });
+  }
+
+  Stream<List<tag>> getTags(int categoryId) async* {
+    yield* _repository.getAllTags(categoryId).doOnData((event) {tagSubject.sink.add(event);});
+  }
+
+  Stream<AddEntryState> createTag(String name, int color, int categoryId) async* {
+    yield* _repository.createTag(name, color, categoryId)
+        .flatMap((value) {
+          return getCategories();
+        })
+        .map((event) {
           categorySubject.sink.add(event);
           return CategoriesFetchedState(event);
         });

@@ -12,3 +12,8 @@ class CategoriesFetchedState extends AddEntryState {
   CategoriesFetchedState(this.categories);
   List<category> categories = [];
 }
+
+class TagsFetchedState extends AddEntryState {
+  TagsFetchedState(this.tags);
+  List<tag> tags = [];
+}
