@@ -2,6 +2,7 @@ import 'package:expense_manager/data/localdb/AccountBookDao.dart';
 import 'package:expense_manager/data/localdb/CategoryDao.dart';
 import 'package:expense_manager/data/localdb/EntryDao.dart';
 import 'package:expense_manager/data/localdb/LocalDatabase.dart';
+import 'package:expense_manager/data/localdb/WalletDao.dart';
 import 'package:expense_manager/data/models/AccountBook.dart';
 import 'package:expense_manager/data/repositories/AccountBookRepository.dart';
 import 'package:expense_manager/utils.dart';
@@ -14,11 +15,13 @@ class AccountBookRepositoryImpl extends AccountBookRepository {
   AccountBookRepositoryImpl(this.context) {
     _accountBookDao = AccountBookDao(context.read<LocalDatabase>());
     _categoryDao = CategoryDao(context.read<LocalDatabase>());
+    _walletDao = WalletDao(context.read<LocalDatabase>());
   }
 
   final BuildContext context;
   AccountBookDao _accountBookDao;
   CategoryDao _categoryDao;
+  WalletDao _walletDao;
 
   @override
   Stream<List<account_book>> getAllAccountBooks() {
@@ -179,6 +182,7 @@ class AccountBookRepositoryImpl extends AccountBookRepository {
       bookId: accountBookId,
       canDelete: false
     );
+    streams.add(_walletDao.insertWallet(mWallet));
     return ZipStream(streams, (values) => values.length);
   }
 }

@@ -13,6 +13,10 @@ class WalletDao extends DatabaseAccessor<LocalDatabase> with _$WalletDaoMixin {
     this._database = attachedDatabase;
   }
 
+  Stream<int> insertWallet(wallet mWallet) {
+    return into(_database.wallet).insert(mWallet).asStream();
+  }
+
   Stream<List<wallet>> getWallets(int bookId) {
     return (select(_database.wallet))
         .get().asStream();

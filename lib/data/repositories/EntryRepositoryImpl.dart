@@ -12,6 +12,7 @@ class EntryRepositoryImpl extends EntryRepository {
   EntryRepositoryImpl(this._context) {
     _entryDao = EntryDao(_context.read<LocalDatabase>());
     _categoryDao = CategoryDao(_context.read<LocalDatabase>());
+    _walletDao = WalletDao(_context.read<LocalDatabase>());
   }
 
   BuildContext _context;
