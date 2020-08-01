@@ -6,5 +6,6 @@ abstract class EntryRepository {
   Stream<int> createCategory(String name, int color);
   Stream<List<tag>> getAllTags(int categoryId);
   Stream<int> createTag(String name, int color, int categoryId);
+  Stream<List<wallet>> getAllWallets();
 
 }

@@ -173,6 +173,12 @@ class AccountBookRepositoryImpl extends AccountBookRepository {
             })
       );
     });
+    wallet mWallet = wallet(
+      name: "Cash",
+      color: 0xFFFF6F00,
+      bookId: accountBookId,
+      canDelete: false
+    );
     return ZipStream(streams, (values) => values.length);
   }
 }

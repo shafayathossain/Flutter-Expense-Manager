@@ -17,3 +17,8 @@ class TagsFetchedState extends AddEntryState {
   TagsFetchedState(this.tags);
   List<tag> tags = [];
 }
+
+class WalletsFetchedState extends AddEntryState {
+  WalletsFetchedState(this.wallets);
+  List<wallet> wallets = [];
+}

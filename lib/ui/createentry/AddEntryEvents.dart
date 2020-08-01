@@ -8,6 +8,8 @@ class CheckFormulaEvent extends AddEntryEvent {
 
 class GetCategoriesEvent extends AddEntryEvent {}
 
+class GetWalletsEvent extends AddEntryEvent {}
+
 class CreateCategoryEvent extends AddEntryEvent {
   CreateCategoryEvent(this.name, this.color);
   String name;
@@ -20,7 +22,8 @@ class GetTagsEvent extends AddEntryEvent {
 }
 
 class CreateTagEvent extends AddEntryEvent {
-  CreateTagEvent(this.name, this.color);
+  CreateTagEvent(this.name, this.color, this.categoryId);
   String name;
   int color;
+  int categoryId;
 }

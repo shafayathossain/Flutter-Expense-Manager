@@ -25,6 +25,7 @@ class AddExpenseFormWidget extends StatelessWidget {
         builder: (contextB) {
           print("Calling block add event");
           BlocProvider.of<AddEntryBloc>(contextB)..add(GetCategoriesEvent());
+          BlocProvider.of<AddEntryBloc>(contextB)..add(GetWalletsEvent());
           return AddExpenseStatefulFormWidget();
         }
       ),
@@ -47,6 +48,8 @@ class AddExpenseState extends State<AddExpenseStatefulFormWidget> with SingleTic
   Animation<Offset> _offsetAnimation;
   TextEditingController _amountTextController = TextEditingController();
   List<category> _categories = [];
+  category _selectedCategory;
+  wallet _selectedWallet;
 
 
   @override
@@ -272,6 +275,7 @@ class AddExpenseState extends State<AddExpenseStatefulFormWidget> with SingleTic
                                 snapshot.data.map((e) => e.name).toList(),
                                 chipColors: snapshot.data.map((e) => e.color).toList(),
                                 onChipSelectedCallback: (int index) {
+                                  _selectedCategory = snapshot.data[index];
                                   BlocProvider.of<AddEntryBloc>(context)..add(GetTagsEvent(snapshot.data[index].id));
                                 }
                               );
@@ -350,38 +354,17 @@ class AddExpenseState extends State<AddExpenseStatefulFormWidget> with SingleTic
                             top: 10.0,
                             right: 10.0,
                             bottom: 0.0),
-                        child: ChipGroup(["Cash"])
-                    ),
-                    Container(
-                        width: double.maxFinite,
-                        margin: EdgeInsets.only(
-                            left: 10.0,
-                            top: 20.0,
-                            right: 0.0,
-                            bottom: 0.0),
-                        child: Text(
-                          "Tag",
-                          textAlign: TextAlign.start,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16.0,
-                          ),
-                        )
-                    ),
-                    Container(
-                        width: double.maxFinite,
-                        margin: EdgeInsets.only(
-                            left: 10.0,
-                            top: 10.0,
-                            right: 10.0,
-                            bottom: 0.0),
                         child: StreamBuilder(
-                          stream: BlocProvider.of<AddEntryBloc>(context).tags,
-                          builder: (context, AsyncSnapshot<List<tag>> snapshot) {
+                          stream: BlocProvider.of<AddEntryBloc>(context).wallets,
+                          builder: (context, AsyncSnapshot<List<wallet>> snapshot) {
                             if(snapshot.hasData) {
                               return ChipGroup(
-                                snapshot.data.map((e) => e.name).toList(),
-                                chipColors: snapshot.data.map((e) => e.color).toList(),
+                                  snapshot.data.map((e) => e.name).toList(),
+                                  chipColors: snapshot.data.map((e) => e.color).toList(),
+                                  onChipSelectedCallback: (int index) {
+                                    _selectedWallet = snapshot.data[index];
+                                    BlocProvider.of<AddEntryBloc>(context)..add(GetTagsEvent(snapshot.data[index].id));
+                                  }
                               );
                             } else {
                               return ChipGroup([]);
@@ -389,51 +372,92 @@ class AddExpenseState extends State<AddExpenseStatefulFormWidget> with SingleTic
                           },
                         )
                     ),
-                    Container(
-                      height: 45,
-                      margin: EdgeInsets.only(
-                          left: 10.0,
-                          top: 10.0,
-                          right: 10.0,
-                          bottom: 0.0),
-                      child: RaisedButton(
-                        color: Colors.white,
-                        disabledColor: Colors.white,
-                        highlightColor: Colors.white70,
-                        splashColor: Colors.blue.withOpacity(0.2),
-                        elevation: 0,
-                        onPressed: (){
-                          _showAddTagDialog();
-                        },
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(2),
-                          side: BorderSide(
-                              color: Colors.blue,
-                              width: 2
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Image.asset(
-                              "assets/images/ic_add.png",
-                              width: 24,
-                              height: 24,
-                              alignment: Alignment.centerLeft,
-                            ),
-                            Expanded(
-                              flex: 1,
-                              child: Center(
-                                child: Text(
-                                  "add tag".toUpperCase(),
-                                  style: TextStyle(
-                                      color: Colors.blue
+                    StreamBuilder(
+                      stream: BlocProvider.of<AddEntryBloc>(context).tags,
+                      builder: (context, AsyncSnapshot<List<tag>> snapshot) {
+                        if(snapshot.hasData) {
+                          return Column(
+                            children: [
+                              Container(
+                                  width: double.maxFinite,
+                                  margin: EdgeInsets.only(
+                                      left: 10.0,
+                                      top: 20.0,
+                                      right: 0.0,
+                                      bottom: 0.0),
+                                  child: Text(
+                                    "Tag",
+                                    textAlign: TextAlign.start,
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 16.0,
+                                    ),
+                                  )
+                              ),
+                              Container(
+                                  width: double.maxFinite,
+                                  margin: EdgeInsets.only(
+                                      left: 10.0,
+                                      top: 10.0,
+                                      right: 10.0,
+                                      bottom: 0.0),
+                                  child: ChipGroup(
+                                    snapshot.data.map((e) => e.name).toList(),
+                                    chipColors: snapshot.data.map((e) => e.color).toList(),
+                                  )
+                              ),
+                              Container(
+                                height: 45,
+                                margin: EdgeInsets.only(
+                                    left: 10.0,
+                                    top: 10.0,
+                                    right: 10.0,
+                                    bottom: 0.0),
+                                child: RaisedButton(
+                                  color: Colors.white,
+                                  disabledColor: Colors.white,
+                                  highlightColor: Colors.white70,
+                                  splashColor: Colors.blue.withOpacity(0.2),
+                                  elevation: 0,
+                                  onPressed: (){
+                                    _showAddTagDialog();
+                                  },
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(2),
+                                    side: BorderSide(
+                                        color: Colors.blue,
+                                        width: 2
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Image.asset(
+                                        "assets/images/ic_add.png",
+                                        width: 24,
+                                        height: 24,
+                                        alignment: Alignment.centerLeft,
+                                      ),
+                                      Expanded(
+                                        flex: 1,
+                                        child: Center(
+                                          child: Text(
+                                            "add tag".toUpperCase(),
+                                            style: TextStyle(
+                                                color: Colors.blue
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    ],
                                   ),
                                 ),
                               ),
-                            )
-                          ],
-                        ),
-                      ),
+                            ],
+                          );
+                        } else {
+                          return Container();
+                        }
+                      },
                     ),
                     Container(
                         width: double.maxFinite,
@@ -443,7 +467,7 @@ class AddExpenseState extends State<AddExpenseStatefulFormWidget> with SingleTic
                             right: 0.0,
                             bottom: 0.0),
                         child: Text(
-                          "Date",
+                          "Description",
                           textAlign: TextAlign.start,
                           style: TextStyle(
                             color: Colors.black,
@@ -543,7 +567,7 @@ class AddExpenseState extends State<AddExpenseStatefulFormWidget> with SingleTic
               (name, color) {
             print(name);
             BlocProvider.of<AddEntryBloc>(context)..add(CreateTagEvent(
-                name, color
+                name, color, _selectedCategory.id
             ));
           },
         )

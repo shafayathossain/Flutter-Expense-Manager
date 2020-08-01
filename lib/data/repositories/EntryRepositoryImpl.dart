@@ -1,6 +1,7 @@
 import 'package:expense_manager/data/localdb/CategoryDao.dart';
 import 'package:expense_manager/data/localdb/EntryDao.dart';
 import 'package:expense_manager/data/localdb/LocalDatabase.dart';
+import 'package:expense_manager/data/localdb/WalletDao.dart';
 import 'package:expense_manager/data/repositories/EntryRepository.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +17,7 @@ class EntryRepositoryImpl extends EntryRepository {
   BuildContext _context;
   EntryDao _entryDao;
   CategoryDao _categoryDao;
+  WalletDao _walletDao;
 
   @override
   Stream<List<category>> getAllCategories() {
@@ -61,4 +63,8 @@ class EntryRepositoryImpl extends EntryRepository {
     return _categoryDao.insertTag(mTag);
   }
 
+  @override
+  Stream<List<wallet>> getAllWallets() {
+    return _walletDao.getWallets(0);
+  }
 }

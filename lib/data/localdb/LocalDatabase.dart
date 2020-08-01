@@ -1,9 +1,9 @@
 import 'package:expense_manager/data/localdb/AccountBookDao.dart';
 import 'package:expense_manager/data/localdb/CategoryDao.dart';
 import 'package:expense_manager/data/localdb/EntryDao.dart';
+import 'package:expense_manager/data/localdb/WalletDao.dart';
 import 'package:expense_manager/data/models/AccountBook.dart';
 import 'package:expense_manager/data/models/Category.dart';
-import 'package:expense_manager/data/models/CategoryWithTag.dart';
 import 'package:expense_manager/data/models/Entry.dart';
 import 'package:expense_manager/data/models/Tag.dart';
 import 'package:expense_manager/data/models/Wallet.dart';
@@ -13,7 +13,7 @@ part 'LocalDatabase.g.dart';
 
 @UseMoor(
   tables: [AccountBook, Category, Entry, Tag, Wallet],
-  daos: [AccountBookDao, ParentCategoryDao, CategoryDao, EntryDao]
+  daos: [AccountBookDao, CategoryDao, EntryDao, WalletDao]
 )
 class LocalDatabase extends _$LocalDatabase {
 
@@ -54,9 +54,4 @@ class LocalDatabase extends _$LocalDatabase {
 //            "description TEXT DEFAULT NULL, book_id INTEGER NOT NULL)");
 //  }
 
-}
-
-@UseDao(tables: [category, tag])
-class ParentCategoryDao extends DatabaseAccessor<LocalDatabase> {
-  ParentCategoryDao(LocalDatabase database): super(database);
 }

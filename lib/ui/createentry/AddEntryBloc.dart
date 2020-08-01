@@ -1,6 +1,7 @@
 
 import 'dart:async';
 
+import 'package:expense_manager/data/localdb/AccountBookDao.dart';
 import 'package:expense_manager/data/repositories/EntryRepository.dart';
 import 'package:expense_manager/ui/createentry/AddEntryEvents.dart';
 import 'package:expense_manager/ui/createentry/AddEntryStates.dart';
@@ -17,9 +18,11 @@ class AddEntryBloc extends Bloc<AddEntryEvent, AddEntryState> {
   BehaviorSubject<String> amountValidator = BehaviorSubject();
   BehaviorSubject<List<category>> categorySubject = BehaviorSubject();
   BehaviorSubject<List<tag>> tagSubject = BehaviorSubject();
+  BehaviorSubject<List<wallet>> walletSubject = BehaviorSubject();
   Stream<String> get amountFormula => amountValidator.stream.transform(validateFormula);
   Stream<List<category>> get categories => categorySubject.stream;
   Stream<List<tag>> get tags => tagSubject.stream;
+  Stream<List<wallet>> get wallets => walletSubject.stream;
 
   final validateFormula =
   StreamTransformer<String, String>.fromHandlers(handleData: (formulaString, sink) {
@@ -44,7 +47,9 @@ class AddEntryBloc extends Bloc<AddEntryEvent, AddEntryState> {
     } else if(event is GetTagsEvent) {
       yield* getTags(event.categoryId).map((event) => TagsFetchedState(event));
     } else if(event is CreateTagEvent) {
-
+      yield* createTag(event.name, event.color, event.categoryId);
+    } else if(event is GetWalletsEvent) {
+      yield* getWallets().map((event) => WalletsFetchedState(event));
     }
   }
 
@@ -71,12 +76,16 @@ class AddEntryBloc extends Bloc<AddEntryEvent, AddEntryState> {
   Stream<AddEntryState> createTag(String name, int color, int categoryId) async* {
     yield* _repository.createTag(name, color, categoryId)
         .flatMap((value) {
-          return getCategories();
+          return getTags(categoryId);
         })
         .map((event) {
-          categorySubject.sink.add(event);
-          return CategoriesFetchedState(event);
+          tagSubject.sink.add(event);
+          return TagsFetchedState(event);
         });
+  }
+
+  Stream<List<wallet>> getWallets() async* {
+    yield* _repository.getAllWallets().doOnData((event) {walletSubject.sink.add(event);});
   }
 }
 

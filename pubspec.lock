@@ -14,7 +14,7 @@ packages:
       name: analyzer
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.39.15"
+    version: "0.39.14"
   analyzer_plugin:
     dependency: transitive
     description:
@@ -84,14 +84,14 @@ packages:
       name: build_runner
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.10.0"
+    version: "1.10.1"
   build_runner_core:
     dependency: transitive
     description:
       name: build_runner_core
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.2.0"
+    version: "6.0.0"
   built_collection:
     dependency: transitive
     description:
@@ -260,7 +260,7 @@ packages:
       name: fluttertoast
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "7.0.1"
+    version: "7.0.2"
   glob:
     dependency: transitive
     description:
