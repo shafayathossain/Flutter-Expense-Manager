@@ -68,4 +68,19 @@ class EntryRepositoryImpl extends EntryRepository {
   Stream<List<wallet>> getAllWallets() {
     return _walletDao.getWallets(0);
   }
+
+  @override
+  Stream<int> addEntry(num amount, int time, category category, wallet wallet,
+      String description, tag tag) {
+    entry mEntry = entry(
+      amount: amount,
+      date: time,
+      bookId: 0,
+      categoryId: category.id,
+      walletId: wallet.id,
+      description: description,
+      tagId: tag == null ? null : tag.id
+    );
+    return _entryDao.insertEntry(mEntry);
+  }
 }

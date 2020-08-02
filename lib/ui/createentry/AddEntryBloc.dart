@@ -7,6 +7,7 @@ import 'package:expense_manager/ui/createentry/AddEntryEvents.dart';
 import 'package:expense_manager/ui/createentry/AddEntryStates.dart';
 import 'package:expense_manager/data/localdb/LocalDatabase.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:math_expressions/math_expressions.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -19,10 +20,12 @@ class AddEntryBloc extends Bloc<AddEntryEvent, AddEntryState> {
   BehaviorSubject<List<category>> categorySubject = BehaviorSubject();
   BehaviorSubject<List<tag>> tagSubject = BehaviorSubject();
   BehaviorSubject<List<wallet>> walletSubject = BehaviorSubject();
+  PublishSubject<String> errorSubject = PublishSubject();
   Stream<String> get amountFormula => amountValidator.stream.transform(validateFormula);
   Stream<List<category>> get categories => categorySubject.stream;
   Stream<List<tag>> get tags => tagSubject.stream;
   Stream<List<wallet>> get wallets => walletSubject.stream;
+  Stream<String> get error => errorSubject.stream;
 
   final validateFormula =
   StreamTransformer<String, String>.fromHandlers(handleData: (formulaString, sink) {
@@ -50,6 +53,15 @@ class AddEntryBloc extends Bloc<AddEntryEvent, AddEntryState> {
       yield* createTag(event.name, event.color, event.categoryId);
     } else if(event is GetWalletsEvent) {
       yield* getWallets().map((event) => WalletsFetchedState(event));
+    } else if(event is SaveEvent) {
+      yield* saveEntry(event.amountString, event.date, event.selectedCategory,
+          event.selectedWallet, event.selectedTag, event.description,
+          event.isIncome).map((event) {
+            if(event is EntryErrorState) {
+              errorSubject.add(event.error);
+            }
+            return event;
+      });
     }
   }
 
@@ -86,6 +98,49 @@ class AddEntryBloc extends Bloc<AddEntryEvent, AddEntryState> {
 
   Stream<List<wallet>> getWallets() async* {
     yield* _repository.getAllWallets().doOnData((event) {walletSubject.sink.add(event);});
+  }
+
+  Stream<AddEntryState> saveEntry(String amountString, String date,
+      category selectedCategory, wallet selectedWallet, tag selectedTag,
+      String description, bool isIncome) async* {
+
+    Parser parser = Parser();
+    double value;
+    bool hasError = false;
+    try {
+      Expression exp = parser.parse(amountString);
+      value = exp.evaluate(EvaluationType.REAL, ContextModel());
+    } catch(e) {
+      hasError = true;
+      yield* Stream.value(EntryErrorState("Enter a valid amount"));
+    }
+    int time;
+    if(!hasError) {
+      final formatter = DateFormat("dd-MM-yyyy");
+      try {
+         time = formatter
+            .parse(date)
+            .millisecondsSinceEpoch;
+        print(time);
+      } catch (e) {
+        hasError = true;
+        yield* Stream.value(EntryErrorState("Select a date"));
+      }
+    }
+    if(selectedCategory == null && !hasError) {
+      hasError = true;
+      yield* Stream.value(EntryErrorState("Select a category"));
+    } else if(selectedWallet == null && !hasError) {
+      hasError = true;
+      yield* Stream.value(EntryErrorState("Select a wallet"));
+    } else {
+      value = isIncome ? value.abs() : -1 * value.abs();
+      yield* _repository
+          .addEntry(value, time, selectedCategory, selectedWallet, description,
+          selectedTag)
+          .map((event) => EntrySavedState());
+    }
+
   }
 }
 

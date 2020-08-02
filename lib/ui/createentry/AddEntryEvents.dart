@@ -1,7 +1,20 @@
 
+import 'package:expense_manager/data/localdb/LocalDatabase.dart';
+
 class AddEntryEvent {}
 
-class SaveEvent extends AddEntryEvent {}
+class SaveEvent extends AddEntryEvent {
+  String amountString;
+  String date;
+  category selectedCategory;
+  wallet selectedWallet;
+  tag selectedTag;
+  String description;
+  bool isIncome;
+
+  SaveEvent({this.amountString, this.date, this.selectedCategory, this.selectedWallet,
+    this.selectedTag, this.description, this.isIncome});
+}
 
 class CheckFormulaEvent extends AddEntryEvent {
   String formula;

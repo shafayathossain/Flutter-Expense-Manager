@@ -22,3 +22,10 @@ class WalletsFetchedState extends AddEntryState {
   WalletsFetchedState(this.wallets);
   List<wallet> wallets = [];
 }
+
+class EntrySavedState extends AddEntryState {}
+
+class EntryErrorState extends AddEntryState {
+  String error;
+  EntryErrorState(this.error);
+}
