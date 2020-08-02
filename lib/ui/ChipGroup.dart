@@ -10,12 +10,10 @@ class ChipGroup extends StatefulWidget {
   List<int> chipColors = [];
 
   ChipGroup(this.chipTexts, {this.chipColors, this.onChipSelectedCallback}){
-    print(chipTexts);
   }
 
   @override
   State createState() {
-    print("Create chip group state $chipTexts");
     return ChipGroupState();
   }
 }
@@ -35,7 +33,6 @@ class ChipGroupState extends State<ChipGroup> {
       children: List<Widget>.generate(
         widget.chipTexts.length,
         (int index) {
-          print(index);
           return FilterChip(
             label: Text(
               '${widget.chipTexts[index]}',

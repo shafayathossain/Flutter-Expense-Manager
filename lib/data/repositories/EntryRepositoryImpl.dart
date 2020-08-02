@@ -21,8 +21,8 @@ class EntryRepositoryImpl extends EntryRepository {
   WalletDao _walletDao;
 
   @override
-  Stream<List<category>> getAllCategories() {
-    return _categoryDao.getCategories(false, 0);
+  Stream<List<category>> getAllCategories(bool isIncome) {
+    return _categoryDao.getCategories(isIncome, 0);
   }
 
   @override

@@ -41,9 +41,9 @@ class AddEntryBloc extends Bloc<AddEntryEvent, AddEntryState> {
   @override
   Stream<AddEntryState> mapEventToState(AddEntryEvent event) async* {
     if(event is GetCategoriesEvent) {
-      yield* getCategories().map((event) => CategoriesFetchedState(event));
+      yield* getCategories(event.isIncome).map((event) => CategoriesFetchedState(event));
     } else if(event is CreateCategoryEvent) {
-      yield* createCategory(event.name, event.color);
+      yield* createCategory(event.name, event.color, event.isIncome);
     } else if(event is GetTagsEvent) {
       yield* getTags(event.categoryId).map((event) => TagsFetchedState(event));
     } else if(event is CreateTagEvent) {
@@ -53,14 +53,14 @@ class AddEntryBloc extends Bloc<AddEntryEvent, AddEntryState> {
     }
   }
 
-  Stream<List<category>> getCategories() async* {
-    yield* _repository.getAllCategories().doOnData((event) {categorySubject.sink.add(event);});
+  Stream<List<category>> getCategories(bool isIncome) async* {
+    yield* _repository.getAllCategories(isIncome).doOnData((event) {categorySubject.sink.add(event);});
   }
 
-  Stream<AddEntryState> createCategory(String name, int color) async* {
+  Stream<AddEntryState> createCategory(String name, int color, bool isIncome) async* {
     yield* _repository.createCategory(name, color)
         .flatMap((value) {
-          return getCategories();
+          return getCategories(isIncome);
         })
         .map((event) {
           print("ADD ENTRY 54 -> ${event}");

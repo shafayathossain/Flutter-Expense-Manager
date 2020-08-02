@@ -171,6 +171,8 @@ class AccountBookRepositoryImpl extends AccountBookRepository {
                     bookId: accountBookId,
                     canDelete: false,
                     categoryId: categoryId));
+              } else {
+                tags.clear();
               }
               return _categoryDao.insertTags(tags);
             })

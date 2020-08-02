@@ -104,7 +104,7 @@ class CalculatorKeyBoardView extends StatelessWidget {
                             child: Icon(Icons.backspace),
                           ),
                           onPressed: () {
-
+                            _clearText();
                           },
                         ),
                       ),
@@ -485,5 +485,16 @@ class CalculatorKeyBoardView extends StatelessWidget {
         textController.text.toString()
             .substring(end, textController.text.length);
     textController.selection = TextSelection.collapsed(offset: start+1);
+  }
+
+  void _clearText() {
+    int start = max<int>(textController.selection.start, 0);
+    int end = max<int>(textController.selection.end, 0);
+    start = start == end ? max<int>(start - 1, 0) : start;
+    textController.text = textController.text.toString()
+        .substring(0, start) +
+        textController.text.toString()
+            .substring(end, textController.text.length);
+    textController.selection = TextSelection.collapsed(offset: start);
   }
 }
