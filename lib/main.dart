@@ -20,8 +20,9 @@ class ExpenseManagerApp extends StatelessWidget {
         title: 'Expense Manager',
         theme: ThemeData.light(),
         onGenerateRoute: Router.generateRoute,
-        initialRoute: CreateEntryRout,
+//        initialRoute: CreateEntryRout,
 //        initialRoute: AccountBookRoute,
+        initialRoute: HomeRoute,
       ),
       dispose: (context, db) => db.close(),
     );

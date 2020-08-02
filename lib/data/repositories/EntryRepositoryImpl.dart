@@ -75,7 +75,7 @@ class EntryRepositoryImpl extends EntryRepository {
     entry mEntry = entry(
       amount: amount,
       date: time,
-      bookId: 0,
+      bookId: 1,
       categoryId: category.id,
       walletId: wallet.id,
       description: description,
