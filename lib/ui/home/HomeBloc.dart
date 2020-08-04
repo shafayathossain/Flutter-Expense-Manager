@@ -1,3 +1,4 @@
+import 'package:expense_manager/data/models/CashFlowOfDay.dart';
 import 'package:expense_manager/data/models/WalletWithBalance.dart';
 import 'package:expense_manager/data/repositories/HomeRepository.dart';
 import 'package:expense_manager/ui/home/HomeEvent.dart';
@@ -9,6 +10,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   HomeRepository _repository;
   PublishSubject<List<WalletWithBalance>> wallets = PublishSubject();
+  PublishSubject<List<double>> incomeAndExpenses = PublishSubject()..add([0, 0]);
 
   HomeBloc(this._repository): super(null);
 
@@ -16,6 +18,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   Stream<HomeState> mapEventToState(HomeEvent event) async* {
     if(event is GetWalletsEvent) {
       yield* _getWalletsWithBalance();
+    } else if(event is GetThisMonthBalanceEvent) {
+      yield* _getCashFlow(event.startTime, event.endTime)
+          .doOnData((event) {print(event);});
     }
   }
 
@@ -27,6 +32,25 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         return (e..balancePercent = percent);
       }).toList());
       return HomeState();
+    });
+  }
+
+  Stream<HomeState> _getCashFlow(int startTime, int endTime) async* {
+    yield* _repository.getCashFlow(startTime, endTime)
+      .map((event) {
+        double income = 0;
+        double expense = 0;
+        event.forEach((element) {
+          if(element.income != null && element.expense != null) {
+            income += element.income.abs();
+            expense += element.expense.abs();
+          }
+        });
+        incomeAndExpenses.add([income, expense]);
+        return CashFlowState(income, expense);
+      })
+    .doOnError((e) {
+      print(e);
     });
   }
 }

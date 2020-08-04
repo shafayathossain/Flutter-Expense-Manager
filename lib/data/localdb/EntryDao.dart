@@ -152,8 +152,8 @@ class EntryDao extends DatabaseAccessor<LocalDatabase> with _$EntryDaoMixin {
   }
 
   Stream<List<CashFlowOfDay>> getCashFlow(int startDate, int endDate, int bookId) {
-    final income = (_database.entry.amount..isBiggerThan(CustomExpression("0"))).sum();
-    final expense = (_database.entry.amount..isSmallerOrEqual(CustomExpression("0"))).sum();
+    final income = CustomExpression<double>("SUM(CASE WHEN entry.amount>=0 THEN entry.amount ELSE 0 END)");
+    final expense = CustomExpression<double>("SUM(CASE WHEN entry.amount<=0 THEN entry.amount ELSE 0 END)");
     final date = _database.entry.date;
 
     final query = select(_database.entry)

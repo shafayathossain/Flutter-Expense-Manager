@@ -1,6 +1,8 @@
 
 import 'package:expense_manager/data/models/WalletWithBalance.dart';
 import 'package:expense_manager/data/repositories/HomeRepositoryImpl.dart';
+import 'package:expense_manager/ui/home/CashFlowView.dart';
+import 'package:expense_manager/ui/home/DayRangeChip.dart';
 import 'package:expense_manager/ui/home/HomeBloc.dart';
 import 'package:expense_manager/ui/home/HomeEvent.dart';
 import 'package:expense_manager/ui/home/WalletItemView.dart';
@@ -15,6 +17,7 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFE5EAEC),
       appBar: AppBar(
         backgroundColor: Colors.blue,
         title: Text(
@@ -92,7 +95,11 @@ class HomeBodyState extends State<HomeBodyView> {
                     );
                   },
                 ),
-              )
+              ),
+              BlocProvider(
+                create: (context) => HomeBloc(HomeRepositoryImpl(context)),
+                child: CashFlowView(),
+              ),
             ],
           ),
         );
