@@ -9,19 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class CashFlowView extends StatelessWidget {
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => HomeBloc(HomeRepositoryImpl(context)),
-      child: CashFlowStateView(),
-    );
-  }
-}
-
-class CashFlowStateView extends StatefulWidget {
-
+class CashFlowView extends StatefulWidget {
 
   @override
   State createState() {
@@ -29,7 +17,7 @@ class CashFlowStateView extends StatefulWidget {
   }
 }
 
-class CashFlowState extends State<CashFlowStateView> {
+class CashFlowState extends State<CashFlowView> {
 
   String _customChipName = "Custom";
   int _selectedPosition = 0;
