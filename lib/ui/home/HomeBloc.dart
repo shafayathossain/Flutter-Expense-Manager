@@ -16,11 +16,15 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   @override
   Stream<HomeState> mapEventToState(HomeEvent event) async* {
+    print("-------> $event");
     if(event is GetWalletsEvent) {
       yield* _getWalletsWithBalance();
     } else if(event is GetThisMonthBalanceEvent) {
-      yield* _getCashFlow(event.startTime, event.endTime)
-          .doOnData((event) {print(event);});
+      yield* _getCashFlow(event.startTime, event.endTime);
+    } else if(event is InitialEvent) {
+      yield* Stream.value(InitState());
+    } else if(event is ResetEvent) {
+      yield* Stream.value(ResetState());
     }
   }
 

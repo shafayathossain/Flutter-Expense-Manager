@@ -1,5 +1,7 @@
 class HomeEvent{}
 
+class InitialEvent extends HomeEvent {}
+
 class GetWalletsEvent extends HomeEvent{}
 class GetThisMonthBalanceEvent extends HomeEvent {
   int startTime;
@@ -12,3 +14,5 @@ class GetThisYearBalanceEvent extends HomeEvent {
   int endTime;
   GetThisYearBalanceEvent(this.startTime, this.endTime);
 }
+
+class ResetEvent extends HomeEvent {}

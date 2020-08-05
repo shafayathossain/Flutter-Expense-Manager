@@ -4,6 +4,7 @@ import 'package:date_range_picker/date_range_picker.dart' as DateRagePicker;
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:expense_manager/ui/home/HomeBloc.dart';
 import 'package:expense_manager/ui/home/HomeEvent.dart';
+import 'package:expense_manager/ui/home/HomeState.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -29,7 +30,9 @@ class CashFlowState extends State<CashFlowView> {
     return BlocBuilder(
         bloc: BlocProvider.of<HomeBloc>(context),
         builder: (context, state) {
-          print("-----> $state");
+          if(!(state is ResetState || state is InitState)) {
+            BlocProvider.of<HomeBloc>(context).add(ResetEvent());
+          }
           return Container(
             child: Column(
               children: [
@@ -53,6 +56,7 @@ class CashFlowState extends State<CashFlowView> {
                           onChipSelectedCallback: (index) {
                             print(index);
                             _selectedPosition = index;
+                            BlocProvider.of<HomeBloc>(context).add(InitialEvent());
                             BlocProvider.of<HomeBloc>(context).add(
                                 GetThisMonthBalanceEvent(
                                   DateTime(DateTime

@@ -19,7 +19,7 @@ version: 1.0.0+1
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
-  flutter: 1.20.0-7.3.pre
+  flutter: 1.17.5
 
 dependencies:
   flutter:
@@ -34,7 +34,7 @@ dependencies:
   moor_flutter: ^3.1.0
   sqlite3_flutter_libs: ^0.2.0
   path_provider: ^1.6.11
-  path: ^1.7.0
+  path: ^1.6.4
   table_calendar: ^2.2.3
   intl: ^0.16.1
   percent_indicator: ^2.1.5
@@ -60,7 +60,7 @@ dev_dependencies:
   moor_generator: ^3.2.0
   sqlite3_flutter_libs: ^0.2.0
   path_provider: ^1.6.11
-  path: ^1.7.0
+  path: ^1.6.4
   build_runner: ^1.10.0
   table_calendar: ^2.2.3
   intl: ^0.16.1

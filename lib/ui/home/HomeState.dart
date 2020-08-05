@@ -1,6 +1,6 @@
 class HomeState {}
 
-class InitState {}
+class InitState extends HomeState {}
 
 class LoadingState extends HomeState {}
 
@@ -10,4 +10,4 @@ class CashFlowState extends HomeState {
   CashFlowState(this.income, this.expense);
 }
 
-class ResetState {}
+class ResetState extends HomeState {}
