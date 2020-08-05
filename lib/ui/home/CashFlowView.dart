@@ -77,7 +77,14 @@ class CashFlowState extends State<CashFlowView> {
                             domainFn: (_, index) => index == 0 ? "Income" : "Expense",
                             measureFn: (_, index) => snapshot.data[index],
                             labelAccessorFn: (_, index) => "${snapshot.data[index]}",
-                            colorFn: (_, index) => index == 0 ? charts.Color(r: Colors.blue.red, g: Colors.blue.green, b: Colors.blue.blue) : charts.Color(r: Colors.red.red, g: Colors.red.green, b: Colors.red.blue),
+                            colorFn: (_, index) => index == 0 ? charts.Color(
+                                r: Colors.blue.red,
+                                g: Colors.blue.green,
+                                b: Colors.blue.blue) :
+                            charts.Color(
+                                r: Colors.red.red,
+                                g: Colors.red.green,
+                                b: Colors.red.blue),
                             id: "Balance"
                         )
                       ];
@@ -88,7 +95,11 @@ class CashFlowState extends State<CashFlowView> {
                             tickProviderSpec: charts.BasicNumericTickProviderSpec(desiredTickCount: 3),
                             renderSpec: charts.GridlineRendererSpec(
                                 labelJustification: charts.TickLabelJustification.outside,
-                                axisLineStyle: charts.LineStyleSpec(color: charts.Color(r: Colors.blueGrey.red, g: Colors.blueGrey.green, b: Colors.blueGrey.blue))
+                                axisLineStyle: charts.LineStyleSpec(
+                                    color: charts.Color(
+                                        r: Colors.blueGrey.red,
+                                        g: Colors.blueGrey.green,
+                                        b: Colors.blueGrey.blue))
                             )
                         ),
                         secondaryMeasureAxis: new charts.NumericAxisSpec(
@@ -96,7 +107,11 @@ class CashFlowState extends State<CashFlowView> {
                             new charts.BasicNumericTickProviderSpec(desiredTickCount: 3),
                             renderSpec: charts.GridlineRendererSpec(
                                 labelJustification: charts.TickLabelJustification.outside,
-                                axisLineStyle: charts.LineStyleSpec(color: charts.Color(r: Colors.blueGrey.red, g: Colors.blueGrey.green, b: Colors.blueGrey.blue))
+                                axisLineStyle: charts.LineStyleSpec(
+                                    color: charts.Color(
+                                        r: Colors.blueGrey.red,
+                                        g: Colors.blueGrey.green,
+                                        b: Colors.blueGrey.blue))
                             )
                         ),
                       );
@@ -106,8 +121,6 @@ class CashFlowState extends State<CashFlowView> {
             ],
           ),
         );
-      },
-    );
   }
 
   void _showDatePickerDialog() async {
