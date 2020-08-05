@@ -2,6 +2,7 @@ import 'package:expense_manager/data/localdb/EntryDao.dart';
 import 'package:expense_manager/data/localdb/LocalDatabase.dart';
 import 'package:expense_manager/data/localdb/WalletDao.dart';
 import 'package:expense_manager/data/models/CashFlowOfDay.dart';
+import 'package:expense_manager/data/models/ExpenseOfCategory.dart';
 import 'package:expense_manager/data/models/WalletWithBalance.dart';
 import 'package:expense_manager/data/repositories/HomeRepository.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,13 @@ class HomeRepositoryImpl extends HomeRepository {
   }
 
   @override
-  Stream<List<CashFlowOfDay>> getCashFlow(int startTime, int endTime) {
+  Future<List<CashFlowOfDay>> getCashFlow(int startTime, int endTime) {
     return _entryDao.getCashFlow(startTime, endTime, 1);
+  }
+
+  @override
+  Future<List<ExpenseOfCategory>> getTotalExpenseForAllCategories(
+      int startTime, int endTime) {
+    return _entryDao.getTotalExpenseForAllCategories(startTime, endTime, 1);
   }
 }

@@ -40,7 +40,8 @@ dependencies:
   percent_indicator: ^2.1.5
   date_range_picker: ^1.0.5
   charts_flutter: ^0.9.0
-  equatable: ^1.2.3
+  get: ^3.4.3
+  mp_chart: ^0.2.2
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -68,7 +69,8 @@ dev_dependencies:
   syncfusion_flutter_datepicker: ^18.2.47-beta
   date_range_picker: ^1.0.5
   charts_flutter: ^0.9.0
-  equatable: ^1.2.3
+  get: ^3.4.3
+  mp_chart: ^0.2.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -121,7 +121,7 @@ class EntryDao extends DatabaseAccessor<LocalDatabase> with _$EntryDaoMixin {
     )).asStream();
   }
 
-  Stream<List<ExpenseOfCategory>> getTotalExpenseForAllCategories(int startTime, int endTime, int bookId) {
+  Future<List<ExpenseOfCategory>> getTotalExpenseForAllCategories(int startTime, int endTime, int bookId) {
 
     final total = _database.entry.amount.sum();
     final name = _database.category.name;
@@ -140,18 +140,16 @@ class EntryDao extends DatabaseAccessor<LocalDatabase> with _$EntryDaoMixin {
       ..where(_database.entry.bookId.equals(bookId) & _database.entry.date.isBetweenValues(startTime, endTime))
       ..orderBy([OrderingTerm.desc(_database.entry.amount)]);
 
-    return query.watch().map((event) {
-      return event.map((e) {
-        return ExpenseOfCategory(
-          e.read(total),
-          e.read(name),
-          e.read(color)
-        );
-      }).toList();
-    });
+    return query.map((event) {
+      return ExpenseOfCategory(
+        event.read(total),
+        event.read(name),
+        event.read(color)
+      );
+    }).get();
   }
 
-  Stream<List<CashFlowOfDay>> getCashFlow(int startDate, int endDate, int bookId) {
+  Future<List<CashFlowOfDay>> getCashFlow(int startDate, int endDate, int bookId) {
     final income = CustomExpression<double>("SUM(CASE WHEN entry.amount>=0 THEN entry.amount ELSE 0 END)");
     final expense = CustomExpression<double>("SUM(CASE WHEN entry.amount<=0 THEN entry.amount ELSE 0 END)");
     final date = _database.entry.date;
@@ -169,15 +167,13 @@ class EntryDao extends DatabaseAccessor<LocalDatabase> with _$EntryDaoMixin {
       ..where(_database.entry.bookId.equals(bookId) & _database.entry.date.isBetweenValues(startDate, endDate))
       ..orderBy([OrderingTerm.desc(_database.entry.amount)]);
 
-    return query.watch().map((event) {
-      return event.map((e) {
+    return query.map((event) {
         return CashFlowOfDay(
-            e.read(income),
-            e.read(expense),
-            e.read(date)
+            event.read(income),
+            event.read(expense),
+            event.read(date)
         );
-      }).toList();
-    });
+    }).get();
 
   }
 
