@@ -27,100 +27,130 @@ class CashFlowState extends State<CashFlowView> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder(
-      bloc: BlocProvider.of<HomeBloc>(context),
-      builder: (context, state) {
-        print("-----> $state");
-        return Container(
-          child: Column(
-            children: [
-              Container(
-                  margin: EdgeInsets.only(left: 10, top: 10, right: 10),
-                  height: 50,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    controller: _scrollController,
-                    key: _dateRangeListViewKey,
-                    children: [
-                      DayRangeChipGroup(
-                        ["This month", "Last month", "This year", "Last year", _customChipName],
-                        selectedIndex: _selectedPosition,
-                        onChipSelectedCallback: (index) {
-                          print(index);
-                          _selectedPosition = index;
-                          BlocProvider.of<HomeBloc>(context).add(GetThisMonthBalanceEvent(
-                            DateTime(DateTime.now().year, DateTime.now().month, 1).millisecondsSinceEpoch,
-                            DateTime(DateTime.now().year, DateTime.now().month + 1, 1).subtract(Duration(days: index)).millisecondsSinceEpoch,
-                          ));
-                          if(index == 4) {
-                            _showDatePickerDialog();
-                          } else {
-                            if(_customChipName != "Custom") {
-                              setState(() {
-                                _customChipName = "Custom";
-                              });
+        bloc: BlocProvider.of<HomeBloc>(context),
+        builder: (context, state) {
+          print("-----> $state");
+          return Container(
+            child: Column(
+              children: [
+                Container(
+                    margin: EdgeInsets.only(left: 10, top: 10, right: 10),
+                    height: 50,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      controller: _scrollController,
+                      key: _dateRangeListViewKey,
+                      children: [
+                        DayRangeChipGroup(
+                          [
+                            "This month",
+                            "Last month",
+                            "This year",
+                            "Last year",
+                            _customChipName
+                          ],
+                          selectedIndex: _selectedPosition,
+                          onChipSelectedCallback: (index) {
+                            print(index);
+                            _selectedPosition = index;
+                            BlocProvider.of<HomeBloc>(context).add(
+                                GetThisMonthBalanceEvent(
+                                  DateTime(DateTime
+                                      .now()
+                                      .year, DateTime
+                                      .now()
+                                      .month, 1).millisecondsSinceEpoch,
+                                  DateTime(DateTime
+                                      .now()
+                                      .year, DateTime
+                                      .now()
+                                      .month + 1, 1)
+                                      .subtract(Duration(days: index))
+                                      .millisecondsSinceEpoch,
+                                ));
+                            if (index == 4) {
+                              _showDatePickerDialog();
+                            } else {
+                              if (_customChipName != "Custom") {
+                                setState(() {
+                                  _customChipName = "Custom";
+                                });
+                              }
                             }
-                          }
-                        },
-                      ),
-                    ],
-                  )
-              ),
-              Container(
-                  margin: EdgeInsets.only(left: 10, top: 10, right: 10),
-                  height: 300,
-                  child: StreamBuilder(
-                    stream: BlocProvider.of<HomeBloc>(context).incomeAndExpenses,
-                    builder: (context, AsyncSnapshot<List<double>> snapshot) {
-                      List<charts.Series<double, String>> series = [
-                        charts.Series(
-                            data: snapshot.data,
-                            domainFn: (_, index) => index == 0 ? "Income" : "Expense",
-                            measureFn: (_, index) => snapshot.data[index],
-                            labelAccessorFn: (_, index) => "${snapshot.data[index]}",
-                            colorFn: (_, index) => index == 0 ? charts.Color(
-                                r: Colors.blue.red,
-                                g: Colors.blue.green,
-                                b: Colors.blue.blue) :
-                            charts.Color(
-                                r: Colors.red.red,
-                                g: Colors.red.green,
-                                b: Colors.red.blue),
-                            id: "Balance"
-                        )
-                      ];
-                      return charts.BarChart(
-                        series,
-                        domainAxis: charts.OrdinalAxisSpec(),
-                        primaryMeasureAxis: new charts.NumericAxisSpec(
-                            tickProviderSpec: charts.BasicNumericTickProviderSpec(desiredTickCount: 3),
-                            renderSpec: charts.GridlineRendererSpec(
-                                labelJustification: charts.TickLabelJustification.outside,
-                                axisLineStyle: charts.LineStyleSpec(
-                                    color: charts.Color(
-                                        r: Colors.blueGrey.red,
-                                        g: Colors.blueGrey.green,
-                                        b: Colors.blueGrey.blue))
-                            )
+                          },
                         ),
-                        secondaryMeasureAxis: new charts.NumericAxisSpec(
-                            tickProviderSpec:
-                            new charts.BasicNumericTickProviderSpec(desiredTickCount: 3),
-                            renderSpec: charts.GridlineRendererSpec(
-                                labelJustification: charts.TickLabelJustification.outside,
-                                axisLineStyle: charts.LineStyleSpec(
-                                    color: charts.Color(
-                                        r: Colors.blueGrey.red,
-                                        g: Colors.blueGrey.green,
-                                        b: Colors.blueGrey.blue))
-                            )
-                        ),
-                      );
-                    },
-                  )
-              ),
-            ],
-          ),
-        );
+                      ],
+                    )
+                ),
+                Container(
+                    margin: EdgeInsets.only(left: 10, top: 10, right: 10),
+                    height: 300,
+                    child: StreamBuilder(
+                      stream: BlocProvider
+                          .of<HomeBloc>(context)
+                          .incomeAndExpenses,
+                      builder: (context, AsyncSnapshot<List<double>> snapshot) {
+                        List<charts.Series<double, String>> series = [
+                          charts.Series(
+                              data: snapshot.data,
+                              domainFn: (_, index) =>
+                              index == 0
+                                  ? "Income"
+                                  : "Expense",
+                              measureFn: (_, index) => snapshot.data[index],
+                              labelAccessorFn: (_, index) => "${snapshot
+                                  .data[index]}",
+                              colorFn: (_, index) =>
+                              index == 0 ? charts.Color(
+                                  r: Colors.blue.red,
+                                  g: Colors.blue.green,
+                                  b: Colors.blue.blue) :
+                              charts.Color(
+                                  r: Colors.red.red,
+                                  g: Colors.red.green,
+                                  b: Colors.red.blue),
+                              id: "Balance"
+                          )
+                        ];
+                        return charts.BarChart(
+                          series,
+                          domainAxis: charts.OrdinalAxisSpec(),
+                          primaryMeasureAxis: new charts.NumericAxisSpec(
+                              tickProviderSpec: charts
+                                  .BasicNumericTickProviderSpec(
+                                  desiredTickCount: 3),
+                              renderSpec: charts.GridlineRendererSpec(
+                                  labelJustification: charts
+                                      .TickLabelJustification.outside,
+                                  axisLineStyle: charts.LineStyleSpec(
+                                      color: charts.Color(
+                                          r: Colors.blueGrey.red,
+                                          g: Colors.blueGrey.green,
+                                          b: Colors.blueGrey.blue))
+                              )
+                          ),
+                          secondaryMeasureAxis: new charts.NumericAxisSpec(
+                              tickProviderSpec:
+                              new charts.BasicNumericTickProviderSpec(
+                                  desiredTickCount: 3),
+                              renderSpec: charts.GridlineRendererSpec(
+                                  labelJustification: charts
+                                      .TickLabelJustification.outside,
+                                  axisLineStyle: charts.LineStyleSpec(
+                                      color: charts.Color(
+                                          r: Colors.blueGrey.red,
+                                          g: Colors.blueGrey.green,
+                                          b: Colors.blueGrey.blue))
+                              )
+                          ),
+                        );
+                      },
+                    )
+                ),
+              ],
+            ),
+          );
+        });
   }
 
   void _showDatePickerDialog() async {
