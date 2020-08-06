@@ -86,7 +86,10 @@ class HomeBodyState extends State<HomeBodyView> {
               },
             ),
           ),
-          CashFlowView()
+          BlocProvider(
+            create: (context) => HomeBloc(HomeRepositoryImpl(context)),
+            child: CashFlowView(),
+          ),
         ],
       ),
     );
