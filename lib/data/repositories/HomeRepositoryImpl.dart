@@ -28,18 +28,19 @@ class HomeRepositoryImpl extends HomeRepository {
   @override
   Future<List<WalletWithBalance>> getWalletsWithBalance() async {
     return getBook().then((value) {
+      print(value.id);
       return _walletDao.getWalletsWithBalance(value.id);
     });
   }
 
   @override
   Future<List<CashFlowOfDay>> getCashFlow(int startTime, int endTime) {
-    return _entryDao.getCashFlow(startTime, endTime, 1);
+    return getBook().then((value) => _entryDao.getCashFlow(startTime, endTime, value.id));
   }
 
   @override
   Future<List<ExpenseOfCategory>> getTotalExpenseForAllCategories(
       int startTime, int endTime) {
-    return _entryDao.getTotalExpenseForAllCategories(startTime, endTime, 1);
+    return getBook().then((value) => _entryDao.getTotalExpenseForAllCategories(startTime, endTime, value.id));
   }
 }

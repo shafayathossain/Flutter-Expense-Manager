@@ -15,7 +15,7 @@ Future<account_book> getBook() async {
 Future<int> setBook(account_book book) async {
   try {
     final preference = await SharedPreferences.getInstance();
-    final bookString = book.toString();
+    final bookString = book.toJsonString();
     preference.setString(BOOK, bookString);
     return 1;
   } catch(e) {
