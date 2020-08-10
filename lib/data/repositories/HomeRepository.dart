@@ -1,4 +1,4 @@
-import 'package:expense_manager/data/localdb/LocalDatabase.dart';
+import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 import 'package:expense_manager/data/models/CashFlowOfDay.dart';
 import 'package:expense_manager/data/models/ExpenseOfCategory.dart';
 import 'package:expense_manager/data/models/WalletWithBalance.dart';

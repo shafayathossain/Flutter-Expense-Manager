@@ -1,7 +1,7 @@
-import 'package:expense_manager/data/localdb/AccountBookDao.dart';
-import 'package:expense_manager/data/localdb/CategoryDao.dart';
-import 'package:expense_manager/data/localdb/EntryDao.dart';
-import 'package:expense_manager/data/localdb/WalletDao.dart';
+import 'package:expense_manager/data/datasources/localdb/AccountBookDao.dart';
+import 'package:expense_manager/data/datasources/localdb/CategoryDao.dart';
+import 'package:expense_manager/data/datasources/localdb/EntryDao.dart';
+import 'package:expense_manager/data/datasources/localdb/WalletDao.dart';
 import 'package:expense_manager/data/models/AccountBook.dart';
 import 'package:expense_manager/data/models/Category.dart';
 import 'package:expense_manager/data/models/Entry.dart';

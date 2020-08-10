@@ -1,11 +1,11 @@
 
 import 'dart:async';
 
-import 'package:expense_manager/data/localdb/AccountBookDao.dart';
+import 'package:expense_manager/data/datasources/localdb/AccountBookDao.dart';
 import 'package:expense_manager/data/repositories/EntryRepository.dart';
 import 'package:expense_manager/ui/createentry/AddEntryEvents.dart';
 import 'package:expense_manager/ui/createentry/AddEntryStates.dart';
-import 'package:expense_manager/data/localdb/LocalDatabase.dart';
+import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:math_expressions/math_expressions.dart';

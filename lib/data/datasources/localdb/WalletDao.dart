@@ -1,4 +1,4 @@
-import 'package:expense_manager/data/localdb/LocalDatabase.dart';
+import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 import 'package:expense_manager/data/models/Wallet.dart';
 import 'package:expense_manager/data/models/WalletWithBalance.dart';
 import 'package:moor_flutter/moor_flutter.dart';

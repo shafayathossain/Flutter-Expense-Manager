@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:expense_manager/data/localdb/LocalDatabase.dart';
+import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 import 'package:expense_manager/data/repositories/EntryRepositoryImpl.dart';
 import 'package:expense_manager/ui/ChipGroup.dart';
 import 'package:expense_manager/ui/createentry/AddEntryBloc.dart';

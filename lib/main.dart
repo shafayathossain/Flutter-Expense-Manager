@@ -1,4 +1,4 @@
-import 'package:expense_manager/data/localdb/LocalDatabase.dart';
+import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 import 'package:expense_manager/ui/Router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -22,7 +22,7 @@ class ExpenseManagerApp extends StatelessWidget {
         onGenerateRoute: Router.generateRoute,
 //        initialRoute: CreateEntryRout,
 //        initialRoute: AccountBookRoute,
-        initialRoute: HomeRoute,
+        initialRoute: AccountBookRoute,
       ),
       dispose: (context, db) => db.close(),
     );

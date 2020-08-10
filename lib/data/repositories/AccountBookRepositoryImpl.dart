@@ -1,14 +1,16 @@
-import 'package:expense_manager/data/localdb/AccountBookDao.dart';
-import 'package:expense_manager/data/localdb/CategoryDao.dart';
-import 'package:expense_manager/data/localdb/EntryDao.dart';
-import 'package:expense_manager/data/localdb/LocalDatabase.dart';
-import 'package:expense_manager/data/localdb/WalletDao.dart';
+import 'package:expense_manager/data/datasources/app_preference.dart';
+import 'package:expense_manager/data/datasources/localdb/AccountBookDao.dart';
+import 'package:expense_manager/data/datasources/localdb/CategoryDao.dart';
+import 'package:expense_manager/data/datasources/localdb/EntryDao.dart';
+import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
+import 'package:expense_manager/data/datasources/localdb/WalletDao.dart';
 import 'package:expense_manager/data/models/AccountBook.dart';
 import 'package:expense_manager/data/repositories/AccountBookRepository.dart';
 import 'package:expense_manager/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AccountBookRepositoryImpl extends AccountBookRepository {
 
@@ -34,6 +36,12 @@ class AccountBookRepositoryImpl extends AccountBookRepository {
         .flatMap((value) {
           return _initializeDataForAccountBook(value);
         });
+  }
+
+
+  @override
+  Future<int> saveCurrentAccountBook(account_book book) {
+    return setBook(book);
   }
 
   Stream<int> _initializeDataForAccountBook(int accountBookId) {

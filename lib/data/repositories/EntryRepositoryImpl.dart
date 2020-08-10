@@ -1,7 +1,7 @@
-import 'package:expense_manager/data/localdb/CategoryDao.dart';
-import 'package:expense_manager/data/localdb/EntryDao.dart';
-import 'package:expense_manager/data/localdb/LocalDatabase.dart';
-import 'package:expense_manager/data/localdb/WalletDao.dart';
+import 'package:expense_manager/data/datasources/localdb/CategoryDao.dart';
+import 'package:expense_manager/data/datasources/localdb/EntryDao.dart';
+import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
+import 'package:expense_manager/data/datasources/localdb/WalletDao.dart';
 import 'package:expense_manager/data/repositories/EntryRepository.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

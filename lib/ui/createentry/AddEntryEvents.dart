@@ -1,5 +1,5 @@
 
-import 'package:expense_manager/data/localdb/LocalDatabase.dart';
+import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 
 class AddEntryEvent {}
 

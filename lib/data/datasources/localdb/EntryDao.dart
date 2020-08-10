@@ -1,5 +1,5 @@
 
-import 'package:expense_manager/data/localdb/LocalDatabase.dart';
+import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 import 'package:expense_manager/data/models/CashFlowOfDay.dart';
 import 'package:expense_manager/data/models/Category.dart';
 import 'package:expense_manager/data/models/Entry.dart';

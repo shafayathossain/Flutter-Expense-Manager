@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:expense_manager/data/localdb/AccountBookDao.dart';
-import 'package:expense_manager/data/localdb/LocalDatabase.dart';
+import 'package:expense_manager/data/datasources/localdb/AccountBookDao.dart';
+import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 import 'package:expense_manager/data/models/AccountBook.dart';
 import 'package:expense_manager/data/repositories/AccountBookRepository.dart';
 import 'package:expense_manager/ui/accountbook/AccountBookEvents.dart';
@@ -22,6 +22,8 @@ class AccountBookBloc extends Bloc<AccountBookEvents, AccountBookStates> {
      yield* _createABook(event.name, event.color);
     } else if(event is LoadAccountBookEvent) {
       yield* _getAllBooks();
+    } else if(event is ViewAccountBookEvent) {
+      yield* _saveCurrentAccountBook(event.book);
     }
   }
 
@@ -49,6 +51,11 @@ class AccountBookBloc extends Bloc<AccountBookEvents, AccountBookStates> {
       print(event);
       yield* _getAllBooks();
     }
+  }
+
+  Stream<AccountBookStates> _saveCurrentAccountBook(account_book book) async* {
+    int result = await repository.saveCurrentAccountBook(book);
+    yield* Stream.value(ViewBookState());
   }
 
 }

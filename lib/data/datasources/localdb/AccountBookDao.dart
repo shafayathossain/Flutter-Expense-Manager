@@ -1,5 +1,5 @@
 
-import 'package:expense_manager/data/localdb/LocalDatabase.dart';
+import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 import 'package:expense_manager/data/models/AccountBook.dart';
 import 'package:moor_flutter/moor_flutter.dart';
 import 'package:rxdart/rxdart.dart';

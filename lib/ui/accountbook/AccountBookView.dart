@@ -1,7 +1,8 @@
 
-import 'package:expense_manager/data/localdb/LocalDatabase.dart';
+import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 import 'package:expense_manager/data/models/AccountBook.dart';
 import 'package:expense_manager/data/repositories/AccountBookRepositoryImpl.dart';
+import 'package:expense_manager/ui/Router.dart';
 import 'package:expense_manager/ui/accountbook/AccountBookBloc.dart';
 import 'package:expense_manager/ui/accountbook/AccountBookEvents.dart';
 import 'package:expense_manager/ui/accountbook/AccountBookStates.dart';
@@ -72,7 +73,18 @@ class AccountBookViewStates extends State<AccountBookView> {
   @override
   Widget build(BuildContext context) {
 
-    return BlocBuilder<AccountBookBloc, AccountBookStates>(
+    return BlocConsumer<AccountBookBloc, AccountBookStates>(
+      listenWhen: (previousState, currentState) {
+        return (currentState is ViewBookState);
+      },
+      listener: (context, state) {
+        if(state is ViewBookState) {
+          Navigator.pushReplacementNamed(context, HomeRoute);
+        }
+      },
+      buildWhen: (previousState, currentState) {
+        return !(currentState is ViewBookState);
+      },
       builder: (context, state) {
         if(state is AccountBookLoadedState && state.accountBooks.length > 0) {
           return ListView.builder(
@@ -176,7 +188,7 @@ class AccountBookItemView extends StatelessWidget {
                                 ),
                               ),
                               onPressed: () {
-
+                                BlocProvider.of<AccountBookBloc>(context)..add(ViewAccountBookEvent(context.read<account_book>()));
                               },
                             ),
                             RawMaterialButton(
