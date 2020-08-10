@@ -137,7 +137,9 @@ class EntryDao extends DatabaseAccessor<LocalDatabase> with _$EntryDaoMixin {
           leftOuterJoin(_database.tag, _database.tag.id.equalsExp(_database.entry.tagId))
         ])
       ..addColumns([total, name, color])
-      ..where(_database.entry.bookId.equals(bookId) & _database.entry.date.isBetweenValues(startTime, endTime))
+      ..where(_database.entry.bookId.equals(bookId) &
+          _database.entry.date.isBetweenValues(startTime, endTime) &
+          _database.category.isIncome.equals(false))
       ..orderBy([OrderingTerm.desc(_database.entry.amount)]);
 
     return query.map((event) {

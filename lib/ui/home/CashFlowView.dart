@@ -31,9 +31,13 @@ import 'package:mp_chart/mp/core/entry/bar_entry.dart';
 import 'package:mp_chart/mp/core/entry/entry.dart';
 import 'package:mp_chart/mp/core/entry/pie_entry.dart';
 import 'package:mp_chart/mp/core/enums/axis_dependency.dart';
+import 'package:mp_chart/mp/core/enums/legend_horizontal_alignment.dart';
+import 'package:mp_chart/mp/core/enums/legend_orientation.dart';
+import 'package:mp_chart/mp/core/enums/legend_vertical_alignment.dart';
 import 'package:mp_chart/mp/core/enums/mode.dart';
 import 'package:mp_chart/mp/core/enums/value_position.dart';
 import 'package:mp_chart/mp/core/enums/x_axis_position.dart';
+import 'package:mp_chart/mp/core/render/pie_chart_renderer.dart';
 import 'package:mp_chart/mp/core/utils/color_utils.dart';
 import 'package:mp_chart/mp/core/value_formatter/value_formatter.dart';
 import 'package:provider/provider.dart';
@@ -78,7 +82,6 @@ class _CashFlowState extends State<CashFlowView> {
                           ],
                           selectedIndex: _selectedPosition,
                           onChipSelectedCallback: (index) {
-                            print(index);
                             _selectedPosition = index;
                             BlocProvider.of<HomeBloc>(context).add(
                                 GetThisMonthBalanceEvent(
@@ -114,7 +117,6 @@ class _CashFlowState extends State<CashFlowView> {
                               _showDatePickerDialog();
                             } else {
                               if (_customChipName != "Custom") {
-                                print("Set state");
                                 setState(() {
                                   _customChipName = "Custom";
                                 });
@@ -227,8 +229,8 @@ class _CashFlowState extends State<CashFlowView> {
                                 total += element.total.abs();
                                 entries.add(
                                     PieEntry(
-                                        value: element.total.abs(),
-                                        label: element.name
+                                      value: element.total.abs(),
+                                      label: element.name,
                                     )
                                 );
                                 colors.add(Color(element.color));
@@ -237,21 +239,40 @@ class _CashFlowState extends State<CashFlowView> {
                             final dataSet = PieDataSet(entries, "");
                             dataSet.setColors1(colors);
                             dataSet.setValueTextColor(Colors.white);
-                            dataSet.setXValuePosition(ValuePosition.OUTSIDE_SLICE);
+                            dataSet.setXValuePosition(ValuePosition.INSIDE_SLICE);
+                            dataSet.setYValuePosition(ValuePosition.OUTSIDE_SLICE);
+                            dataSet.setSelectionShift(0);
                             dataSet.setValueLineColor(Colors.black);
                             dataSet.setValueTextSize(10.0);
+                            dataSet.setValueLinePart1Length(.5);
+                            dataSet.setValueLinePart2Length(.2);
+                            dataSet.setValueLinePart1OffsetPercentage(80.0);
                             final controller = PieChartController(
-                                legendSettingFunction: (legend, controller) {
-                                  legend.enabled = false;
-                                },
-                                description: Description()..enabled = false,
-                                centerTextTypeface: TypeFace()..fontWeight = FontWeight.bold,
-                                extraBottomOffset: 2,
-                                extraTopOffset: 2,
-                                holeRadiusPercent: 17,
-                                centerText: "Total/n${total}"
+                              legendSettingFunction: (legend, controller) {
+                                legend
+                                  ..verticalAlignment = (LegendVerticalAlignment.TOP)
+                                  ..horizontalAlignment = (LegendHorizontalAlignment.RIGHT)
+                                  ..orientation = (LegendOrientation.VERTICAL)
+                                  ..drawInside = (false)
+                                  ..enabled = (false);
+                              },
+                              rendererSettingFunction: (renderer) {
+                                (renderer as PieChartRenderer)
+                                  ..setHoleColor(ColorUtils.WHITE)
+                                  ..setHoleColor(ColorUtils.WHITE)
+                                  ..setTransparentCircleColor(ColorUtils.WHITE)
+                                  ..setTransparentCircleAlpha(110);
+                              },
+                              description: Description()..enabled = false,
+                              centerTextTypeface: TypeFace()..fontWeight = FontWeight.bold,
+                              transparentCircleRadiusPercent: 50,
+                              extraBottomOffset: 1,
+                              extraTopOffset: 1,
+                              holeRadiusPercent: 50,
+                              rotateEnabled: true,
+                              centerText: "Total\n${total}",
                             );
-                            controller.data = PieData(dataSet);
+                            controller.data = PieData(dataSet)..setValueTextColor(Colors.black);
                             return Container(
                                 margin: EdgeInsets.only(left: 10, top: 10, right: 10),
                                 width: 300,
@@ -273,7 +294,7 @@ class _CashFlowState extends State<CashFlowView> {
                                         ),
                                       ),
                                       Container(
-                                        height: 250,
+                                        height: 270,
                                         child: PieChart(controller),
                                       )
                                     ],
@@ -287,7 +308,6 @@ class _CashFlowState extends State<CashFlowView> {
                               .of<HomeBloc>(context)
                               .cashFlowData,
                           builder: (context, AsyncSnapshot<List<CashFlowOfDay>> snapshot) {
-                            print(snapshot);
                             if(snapshot.connectionState == ConnectionState.waiting) {
                               return Container(
                                   margin: EdgeInsets.only(left: 10, top: 10, right: 10),

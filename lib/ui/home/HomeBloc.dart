@@ -19,7 +19,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   @override
   Stream<HomeState> mapEventToState(HomeEvent event) async* {
-    print("-------> $event");
     if(event is GetWalletsEvent) {
       yield* _getWalletsWithBalance();
     } else if(event is GetThisMonthBalanceEvent) {
@@ -33,7 +32,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     yield* _repository.getWalletsWithBalance().map((event) {
       wallets.sink.add(event.map((e) {
         double percent = e.income > 0.0 ? (e.balance.abs() / e.income.abs()) : 0;
-        print("PERCENT $percent");
         return (e..balancePercent = percent);
       }).toList());
       return HomeState();
@@ -68,7 +66,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       balance += result.income.abs() - result.expense.abs();
       cashFlow.add(result..balance = balance);
       startDateTime = startDateTime.add(Duration(days: 1));
-      print(startDateTime.millisecondsSinceEpoch);
     }
     this.cashFlowData.sink.add(cashFlow);
     yield* Stream.value(CashFlowState(income, expense));
