@@ -40,8 +40,19 @@ class AccountBookRepositoryImpl extends AccountBookRepository {
 
 
   @override
+  Future<int> editAnAccountBook(account_book book) {
+    return _accountBookDao.editAnAccountBook(book);
+  }
+
+  @override
   Future<int> saveCurrentAccountBook(account_book book) {
     return setBook(book);
+  }
+
+
+  @override
+  Future<void> deleteAnAccountBook(account_book book) {
+    return _accountBookDao.deleteAnAccountBook(book);
   }
 
   Stream<int> _initializeDataForAccountBook(int accountBookId) {

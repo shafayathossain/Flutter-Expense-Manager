@@ -5,7 +5,7 @@ import 'package:expense_manager/data/models/WalletWithBalance.dart';
 
 abstract class HomeRepository {
 
-  Stream<List<WalletWithBalance>> getWalletsWithBalance();
+  Future<List<WalletWithBalance>> getWalletsWithBalance();
   Future<List<CashFlowOfDay>> getCashFlow(int startTime, int endTime);
   Future<List<ExpenseOfCategory>> getTotalExpenseForAllCategories(int startTime, int endTime);
 }

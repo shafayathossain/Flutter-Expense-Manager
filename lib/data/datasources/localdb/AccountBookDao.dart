@@ -25,4 +25,23 @@ class AccountBookDao extends DatabaseAccessor<LocalDatabase> {
       print(error);
     });
   }
+
+  Future<int> editAnAccountBook(account_book book) {
+    return (update(_database.accountBook)
+      ..where((tbl) => tbl.id.equals(book.id))
+    ).write(AccountBookCompanion(
+      color: Value(book.color),
+      name: Value(book.name)
+    ));
+  }
+
+  Future<void> deleteAnAccountBook(account_book book) {
+    return batch((batch) {
+      batch.deleteWhere(_database.accountBook, (row) => row.id.equals(book.id));
+      batch.deleteWhere(_database.wallet, (row) => row.bookId.equals(book.id));
+      batch.deleteWhere(_database.entry, (row) => row.bookId.equals(book.id));
+      batch.deleteWhere(_database.category, (row) => row.bookId.equals(book.id));
+      batch.deleteWhere(_database.tag, (row) => row.bookId.equals(book.id));
+    });
+  }
 }

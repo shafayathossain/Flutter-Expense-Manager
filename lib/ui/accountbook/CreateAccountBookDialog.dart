@@ -1,5 +1,6 @@
 
 
+import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 import 'package:expense_manager/ui/accountbook/AccountBookEvents.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,13 +10,14 @@ import 'package:provider/provider.dart';
 import '../ColorPickerWidget.dart';
 import 'AccountBookBloc.dart';
 
-typedef void CreateAccountBookDialogCallback(String name, int color);
+typedef void CreateAccountBookDialogCallback(String name, int color, int bookId);
 
 class CreateAccountBookDialog extends StatelessWidget {
 
   final CreateAccountBookDialogCallback callback;
+  final account_book book;
 
-  CreateAccountBookDialog({this.callback});
+  CreateAccountBookDialog({this.book, this.callback});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +30,7 @@ class CreateAccountBookDialog extends StatelessWidget {
         backgroundColor: Colors.transparent,
         child: Provider(
           create: (_) => callback,
-          child: AccountBookForm(),
+          child: AccountBookForm(book: book,),
         ),
       ),
       onWillPop: () {}
@@ -42,6 +44,9 @@ class CreateAccountBookDialog extends StatelessWidget {
 
 class AccountBookForm extends StatefulWidget {
 
+  final account_book book;
+
+  AccountBookForm({this.book});
 
   @override
   State createState() {
@@ -59,6 +64,12 @@ class AccountBookFormState extends State<AccountBookForm> {
   @override
   Widget build(BuildContext context) {
     print(state);
+    if(widget.book != null) {
+      accountNameTextController.text = widget.book.name;
+      if(color == -1) {
+        color = widget.book.color;
+      }
+    }
     return Stack(
       children: [
         state == 0 ? _showFirstState() : _showSecondState()
@@ -67,6 +78,7 @@ class AccountBookFormState extends State<AccountBookForm> {
   }
 
   Widget _showFirstState() {
+    print(color);
     return Container(
       decoration: BoxDecoration(
           color: Colors.white,
@@ -84,7 +96,7 @@ class AccountBookFormState extends State<AccountBookForm> {
                 ),
                 width: double.maxFinite,
                 child: Text(
-                  "CREATE ACCOUNT BOOK",
+                  widget.book == null ? "CREATE ACCOUNT BOOK" : "EDIT ACCOUNT BOOK",
                   textAlign: TextAlign.start,
                   style: TextStyle(
                       color: Colors.black,
@@ -230,7 +242,10 @@ class AccountBookFormState extends State<AccountBookForm> {
                     ),
                     onPressed: () {
                       if(_formKey.currentState.validate() && color != -1) {
-                        context.read<CreateAccountBookDialogCallback>().call(accountNameTextController.text.toString(), color);
+                        context.read<CreateAccountBookDialogCallback>().call(
+                            accountNameTextController.text.toString(),
+                            color,
+                            widget.book == null ? null : widget.book.id);
                         Navigator.pop(context);
                       } else {
                         if(color == -1) {

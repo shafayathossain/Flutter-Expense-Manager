@@ -24,6 +24,10 @@ class AccountBookBloc extends Bloc<AccountBookEvents, AccountBookStates> {
       yield* _getAllBooks();
     } else if(event is ViewAccountBookEvent) {
       yield* _saveCurrentAccountBook(event.book);
+    } else if(event is DeleteAccountBookEvent) {
+      yield* _deleteABook(event.book);
+    } else if(event is EditAccountBookEvent) {
+      yield* _updateABook(event.name, event.color, event.id);
     }
   }
 
@@ -53,9 +57,25 @@ class AccountBookBloc extends Bloc<AccountBookEvents, AccountBookStates> {
     }
   }
 
+
+  Stream<AccountBookStates> _updateABook(String name, int color, int id) async* {
+    account_book book = account_book(
+        id: id,
+        name: name,
+        color: color,
+    );
+    final result = await repository.editAnAccountBook(book);
+    yield* _getAllBooks();
+  }
+
   Stream<AccountBookStates> _saveCurrentAccountBook(account_book book) async* {
     int result = await repository.saveCurrentAccountBook(book);
     yield* Stream.value(ViewBookState());
+  }
+
+  Stream<AccountBookStates> _deleteABook(account_book book) async* {
+    final result = await repository.deleteAnAccountBook(book);
+    yield* _getAllBooks();
   }
 
 }

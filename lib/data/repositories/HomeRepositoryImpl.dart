@@ -1,3 +1,4 @@
+import 'package:expense_manager/data/datasources/app_preference.dart';
 import 'package:expense_manager/data/datasources/localdb/EntryDao.dart';
 import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 import 'package:expense_manager/data/datasources/localdb/WalletDao.dart';
@@ -25,8 +26,10 @@ class HomeRepositoryImpl extends HomeRepository {
   }
 
   @override
-  Stream<List<WalletWithBalance>> getWalletsWithBalance() {
-    return _walletDao.getWalletsWithBalance();
+  Future<List<WalletWithBalance>> getWalletsWithBalance() async {
+    return getBook().then((value) {
+      return _walletDao.getWalletsWithBalance(value.id);
+    });
   }
 
   @override
