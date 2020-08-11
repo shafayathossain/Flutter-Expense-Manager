@@ -3,6 +3,7 @@ import 'package:expense_manager/data/datasources/localdb/EntryDao.dart';
 import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 import 'package:expense_manager/data/datasources/localdb/WalletDao.dart';
 import 'package:expense_manager/data/models/CashFlowOfDay.dart';
+import 'package:expense_manager/data/models/EntryWithCategoryAndWallet.dart';
 import 'package:expense_manager/data/models/ExpenseOfCategory.dart';
 import 'package:expense_manager/data/models/WalletWithBalance.dart';
 import 'package:expense_manager/data/repositories/HomeRepository.dart';
@@ -41,5 +42,13 @@ class HomeRepositoryImpl extends HomeRepository {
   Future<List<ExpenseOfCategory>> getTotalExpenseForAllCategories(
       int startTime, int endTime) {
     return getBook().then((value) => _entryDao.getTotalExpenseForAllCategories(startTime, endTime, value.id));
+  }
+
+  @override
+  Future<List<EntryWithCategoryAndWallet>> getTopFiveEntries(
+      int startTime, int endTime) {
+    return getBook().then((value) {
+      return _entryDao.getTopFiveEntry(startTime, endTime, value.id);
+    });
   }
 }

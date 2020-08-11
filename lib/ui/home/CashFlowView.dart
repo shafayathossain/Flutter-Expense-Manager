@@ -1,6 +1,5 @@
 import 'package:expense_manager/data/models/CashFlowOfDay.dart';
 import 'package:expense_manager/data/models/ExpenseOfCategory.dart';
-import 'package:expense_manager/data/repositories/HomeRepositoryImpl.dart';
 import 'package:expense_manager/ui/home/DayRangeChip.dart';
 import 'package:date_range_picker/date_range_picker.dart' as DateRagePicker;
 import 'package:charts_flutter/flutter.dart' as charts;
@@ -8,6 +7,7 @@ import 'package:expense_manager/ui/home/HomeBloc.dart';
 import 'package:expense_manager/ui/home/HomeEvent.dart';
 import 'package:expense_manager/ui/home/HomeState.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:mp_chart/mp/chart/bar_chart.dart';
@@ -59,348 +59,486 @@ class _CashFlowState extends State<CashFlowView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder(
-        bloc: BlocProvider.of<HomeBloc>(context),
-        builder: (context, state) {
-          return Container(
-            child: Column(
+    return Column(
+      children: [
+        Container(
+            margin: EdgeInsets.only(left: 10, top: 10, right: 10),
+            height: 50,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              controller: _scrollController,
+              key: _dateRangeListViewKey,
               children: [
-                Container(
-                    margin: EdgeInsets.only(left: 10, top: 10, right: 10),
-                    height: 50,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      controller: _scrollController,
-                      key: _dateRangeListViewKey,
-                      children: [
-                        DayRangeChipGroup(
-                          [
-                            "This month",
-                            "Last month",
-                            "This year",
-                            "Last year",
-                            _customChipName
-                          ],
-                          selectedIndex: _selectedPosition,
-                          onChipSelectedCallback: (index) {
-                            _selectedPosition = index;
-                            BlocProvider.of<HomeBloc>(context).add(
-                                GetThisMonthBalanceEvent(
-                                  DateTime(DateTime
-                                      .now()
-                                      .year, DateTime
-                                      .now()
-                                      .month, 1).millisecondsSinceEpoch,
-                                  DateTime(DateTime
-                                      .now()
-                                      .year, DateTime
-                                      .now()
-                                      .month + 1, 1)
-                                      .subtract(Duration(days: index))
-                                      .millisecondsSinceEpoch,
-                                ));
-                            BlocProvider.of<HomeBloc>(context).add(
-                                GetExpensesOfCategory(
-                                  DateTime(DateTime
-                                      .now()
-                                      .year, DateTime
-                                      .now()
-                                      .month, 1).millisecondsSinceEpoch,
-                                  DateTime(DateTime
-                                      .now()
-                                      .year, DateTime
-                                      .now()
-                                      .month + 1, 1)
-                                      .subtract(Duration(days: index))
-                                      .millisecondsSinceEpoch,
-                                ));
-                            if (index == 4) {
-                              _showDatePickerDialog();
-                            } else {
-                              if (_customChipName != "Custom") {
-                                setState(() {
-                                  _customChipName = "Custom";
-                                });
-                              }
-                            }
-                          },
-                        ),
-                      ],
-                    )
+                DayRangeChipGroup(
+                  [
+                    "This month",
+                    "Last month",
+                    "This year",
+                    "Last year",
+                    _customChipName
+                  ],
+                  selectedIndex: _selectedPosition,
+                  onChipSelectedCallback: (index) {
+                    _selectedPosition = index;
+                    BlocProvider.of<HomeBloc>(context).add(
+                        GetThisMonthBalanceEvent(
+                          DateTime(DateTime
+                              .now()
+                              .year, DateTime
+                              .now()
+                              .month, 1).millisecondsSinceEpoch,
+                          DateTime(DateTime
+                              .now()
+                              .year, DateTime
+                              .now()
+                              .month + 1, 1)
+                              .subtract(Duration(days: index))
+                              .millisecondsSinceEpoch,
+                        ));
+                    BlocProvider.of<HomeBloc>(context).add(
+                        GetExpensesOfCategory(
+                          DateTime(DateTime
+                              .now()
+                              .year, DateTime
+                              .now()
+                              .month, 1).millisecondsSinceEpoch,
+                          DateTime(DateTime
+                              .now()
+                              .year, DateTime
+                              .now()
+                              .month + 1, 1)
+                              .subtract(Duration(days: index))
+                              .millisecondsSinceEpoch,
+                        ));
+                    BlocProvider.of<HomeBloc>(context).add(
+                        GetTopFiveEntriesEvent(
+                          DateTime(DateTime
+                              .now()
+                              .year, DateTime
+                              .now()
+                              .month, 1).millisecondsSinceEpoch,
+                          DateTime(DateTime
+                              .now()
+                              .year, DateTime
+                              .now()
+                              .month + 1, 1)
+                              .subtract(Duration(days: index))
+                              .millisecondsSinceEpoch,
+                        ));
+                    if (index == 4) {
+                      _showDatePickerDialog();
+                    } else {
+                      if (_customChipName != "Custom") {
+                        setState(() {
+                          _customChipName = "Custom";
+                        });
+                      }
+                    }
+                  },
                 ),
-                Container(
-                  height: 330,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Wrap(
-                      children: <Widget>[
-                        StreamBuilder(
-                          stream: BlocProvider
-                              .of<HomeBloc>(context)
-                              .incomeAndExpenses,
+              ],
+            )
+        ),
+        Container(
+          height: 330,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Wrap(
+              children: <Widget>[
+                StreamBuilder(
+                  stream: BlocProvider
+                      .of<HomeBloc>(context)
+                      .incomeAndExpenses,
 
-                          builder: (context, AsyncSnapshot<List<double>> snapshot) {
+                  builder: (context, AsyncSnapshot<List<double>> snapshot) {
 
-                            List<BarEntry> entries = List();
-                            if(snapshot.data != null) {
-                              snapshot.data.forEach((element) {
-                                entries.add(
-                                    BarEntry(x: snapshot.data.indexOf(element)
-                                        .toDouble(), y: element)
-                                );
-                              });
-                            }
-                            IBarDataSet dataSet = BarDataSet( entries, "")..setColors1([Colors.green, Colors.red]);
-                            BarData data = BarData([dataSet]);
-                            data.setValueTextSize(10.0);
-                            BarChartController controller = BarChartController(
-                              axisLeftSettingFunction: (axisLeft, controller) {
-                                axisLeft.drawGridLines = false;
-                                axisLeft.setAxisMinimum(0.0);
-                                axisLeft.position = YAxisLabelPosition.OUTSIDE_CHART;
-                                axisLeft.spacePercentTop = 15;
-                              },
-                              axisRightSettingFunction: (axisRight, controller) {
-                                axisRight.drawGridLines = false;
-                                axisRight.enabled = false;
-                              },
-                              legendSettingFunction: (legend, controller) {
-                                legend.enabled = false;
-                              },
-                              xAxisSettingFunction: (xAxis, controller) {
-                                xAxis
-                                  ..position = XAxisPosition.BOTTOM
-                                  ..drawGridLines = false
-                                  ..setGranularity(1.0);
-                                xAxis.setValueFormatter(MyValueFormatter());
-                              },
-                              drawGridBackground: false,
-                              drawValueAboveBar: true,
-                              description: (Description()..enabled = false),
-                              fitBars: true,
-                            );
-                            controller.data = data;
-                            return Container(
+                    List<BarEntry> entries = List();
+                    if(snapshot.data != null) {
+                      snapshot.data.forEach((element) {
+                        entries.add(
+                            BarEntry(x: snapshot.data.indexOf(element)
+                                .toDouble(), y: element)
+                        );
+                      });
+                    }
+                    IBarDataSet dataSet = BarDataSet( entries, "")..setColors1([Colors.green, Colors.red]);
+                    BarData data = BarData([dataSet]);
+                    data.setValueTextSize(10.0);
+                    BarChartController controller = BarChartController(
+                      axisLeftSettingFunction: (axisLeft, controller) {
+                        axisLeft.drawGridLines = false;
+                        axisLeft.setAxisMinimum(0.0);
+                        axisLeft.position = YAxisLabelPosition.OUTSIDE_CHART;
+                        axisLeft.spacePercentTop = 15;
+                      },
+                      axisRightSettingFunction: (axisRight, controller) {
+                        axisRight.drawGridLines = false;
+                        axisRight.enabled = false;
+                      },
+                      legendSettingFunction: (legend, controller) {
+                        legend.enabled = false;
+                      },
+                      xAxisSettingFunction: (xAxis, controller) {
+                        xAxis
+                          ..position = XAxisPosition.BOTTOM
+                          ..drawGridLines = false
+                          ..setGranularity(1.0);
+                        xAxis.setValueFormatter(MyValueFormatter());
+                      },
+                      drawGridBackground: false,
+                      drawValueAboveBar: true,
+                      description: (Description()..enabled = false),
+                      fitBars: true,
+                    );
+                    controller.data = data;
+                    return Container(
+                        margin: EdgeInsets.only(left: 10, top: 10, right: 10),
+                        width: 300,
+                        height: 320,
+                        child: Card(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Container(
                                 margin: EdgeInsets.only(left: 10, top: 10, right: 10),
-                                width: 300,
-                                height: 320,
-                                child: Card(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.max,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Container(
-                                        margin: EdgeInsets.only(left: 10, top: 10, right: 10),
-                                        child: Text(
-                                          "Balance",
-                                          style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        height: 240,
-                                        child: BarChart(controller),
-                                      ),
-                                      Container(
-                                        margin: EdgeInsets.only(left: 10, top: 0, right: 10),
-                                        child: Text(
-                                          "Total balance:   ${snapshot.data != null ? snapshot.data[0] - snapshot.data[1] : 0.0}",
-                                          style: TextStyle(
-                                              fontSize: 16
-                                          ),
-                                        ),
-                                      )
-                                    ],
+                                child: Text(
+                                  "Balance",
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold
                                   ),
-                                )
-                            );
-                          },
-                        ),
-                        StreamBuilder(
-                          stream: BlocProvider
-                              .of<HomeBloc>(context)
-                              .expenses,
-                          builder: (context, AsyncSnapshot<List<ExpenseOfCategory>> snapshot) {
-
-                            List<PieEntry> entries = [];
-                            List<Color> colors = [];
-                            double total = 0.0;
-                            if(snapshot.data != null) {
-                              snapshot.data.forEach((element) {
-                                total += element.total.abs();
-                                entries.add(
-                                    PieEntry(
-                                      value: element.total.abs(),
-                                      label: element.name,
-                                    )
-                                );
-                                colors.add(Color(element.color));
-                              });
-                            }
-                            final dataSet = PieDataSet(entries, "");
-                            dataSet.setColors1(colors);
-                            dataSet.setValueTextColor(Colors.white);
-                            dataSet.setXValuePosition(ValuePosition.INSIDE_SLICE);
-                            dataSet.setYValuePosition(ValuePosition.OUTSIDE_SLICE);
-                            dataSet.setSelectionShift(0);
-                            dataSet.setValueLineColor(Colors.black);
-                            dataSet.setValueTextSize(10.0);
-                            dataSet.setValueLinePart1Length(.5);
-                            dataSet.setValueLinePart2Length(.2);
-                            dataSet.setValueLinePart1OffsetPercentage(80.0);
-                            final controller = PieChartController(
-                              legendSettingFunction: (legend, controller) {
-                                legend
-                                  ..verticalAlignment = (LegendVerticalAlignment.TOP)
-                                  ..horizontalAlignment = (LegendHorizontalAlignment.RIGHT)
-                                  ..orientation = (LegendOrientation.VERTICAL)
-                                  ..drawInside = (false)
-                                  ..enabled = (false);
-                              },
-                              rendererSettingFunction: (renderer) {
-                                (renderer as PieChartRenderer)
-                                  ..setHoleColor(ColorUtils.WHITE)
-                                  ..setHoleColor(ColorUtils.WHITE)
-                                  ..setTransparentCircleColor(ColorUtils.WHITE)
-                                  ..setTransparentCircleAlpha(110);
-                              },
-                              description: Description()..enabled = false,
-                              centerTextTypeface: TypeFace()..fontWeight = FontWeight.bold,
-                              transparentCircleRadiusPercent: 50,
-                              extraBottomOffset: 1,
-                              extraTopOffset: 1,
-                              holeRadiusPercent: 50,
-                              rotateEnabled: true,
-                              centerText: "Total\n${total}",
-                            );
-                            controller.data = PieData(dataSet)..setValueTextColor(Colors.black);
-                            return Container(
-                                margin: EdgeInsets.only(left: 10, top: 10, right: 10),
-                                width: 300,
-                                height: 320,
-                                child: Card(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.max,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Container(
-                                        margin: EdgeInsets.only(left: 10, top: 10, right: 10),
-                                        child: Text(
-                                          "Expenses",
-                                          style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        height: 270,
-                                        child: PieChart(controller),
-                                      )
-                                    ],
+                                ),
+                              ),
+                              Container(
+                                height: 240,
+                                child: BarChart(controller),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(left: 10, top: 0, right: 10),
+                                child: Text(
+                                  "Total balance:   ${snapshot.data != null ? snapshot.data[0] - snapshot.data[1] : 0.0}",
+                                  style: TextStyle(
+                                      fontSize: 16
                                   ),
-                                )
-                            );
-                          },
-                        ),
-                        StreamBuilder(
-                          stream: BlocProvider
-                              .of<HomeBloc>(context)
-                              .cashFlowData,
-                          builder: (context, AsyncSnapshot<List<CashFlowOfDay>> snapshot) {
-                            if(snapshot.connectionState == ConnectionState.waiting) {
-                              return Container(
-                                  margin: EdgeInsets.only(left: 10, top: 10, right: 10),
-                                  width: 300,
-                                  height: 320,
-                                  child: Card()
-                              );
-                            }
-                            List<Entry> entries = [];
-                            if(snapshot.data != null) {
-                              snapshot.data.forEach((element) {
-                                entries.add(
-                                    Entry(
-                                        x: snapshot.data.indexOf(element)
-                                            .toDouble(),
-                                        y: element.balance
-                                    )
-                                );
-                              });
-                            }
-                            LineDataSet dataSet = LineDataSet(entries, "")
-                              ..setDrawCircles(false)
-                              ..setMode(Mode.HORIZONTAL_BEZIER)
-                              ..setDrawFilled(true)
-                              ..setDrawValues(false)
-                              ..setGradientFilled(true)
-                              ..setGradientColor(Color(0x007AC1), Color(0xFF0000));
-
-                            final controller = LineChartController(
-                                xAxisSettingFunction: (xAxis, controller) {
-                                  xAxis.drawGridLinesBehindData = true;
-                                  xAxis.drawLabels = false;
-                                  xAxis.enabled = false;
-                                },
-                                axisLeftSettingFunction: (axisLeft, controller) {
-                                  axisLeft.drawLabels = true;
-                                  axisLeft.drawGridLines = true;
-                                  axisLeft.enabled = true;
-                                },
-                                axisRightSettingFunction: (axisRight, controller) {
-                                  axisRight.drawLabels = false;
-                                  axisRight.drawGridLines = false;
-                                  axisRight.enabled = false;
-                                },
-                                legendSettingFunction: (legend, controller) {
-                                  legend.enabled = false;
-                                },
-
-                                description: Description()..enabled = false
-                            );
-                            controller.data = LineData()..addDataSet(dataSet);
-                            return Container(
-                                margin: EdgeInsets.only(left: 10, top: 10, right: 10),
-                                width: 300,
-                                height: 320,
-                                child: Card(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.max,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Container(
-                                        margin: EdgeInsets.only(left: 10, top: 10, right: 10),
-                                        child: Text(
-                                          "Income and expenditure flow",
-                                          style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        height: 260,
-                                        child: LineChart(controller),
-                                      )
-                                    ],
-                                  ),
-                                )
-                            );
-                          },
+                                ),
+                              )
+                            ],
+                          ),
                         )
-                      ],
-                    ),
-                  ),
+                    );
+                  },
+                ),
+                StreamBuilder(
+                  stream: BlocProvider
+                      .of<HomeBloc>(context)
+                      .expenses,
+                  builder: (context, AsyncSnapshot<List<ExpenseOfCategory>> snapshot) {
+
+                    List<PieEntry> entries = [];
+                    List<Color> colors = [];
+                    double total = 0.0;
+                    if(snapshot.data != null) {
+                      snapshot.data.forEach((element) {
+                        total += element.total.abs();
+                        entries.add(
+                            PieEntry(
+                              value: element.total.abs(),
+                              label: element.name,
+                            )
+                        );
+                        colors.add(Color(element.color));
+                      });
+                    }
+                    final dataSet = PieDataSet(entries, "");
+                    dataSet.setColors1(colors);
+                    dataSet.setValueTextColor(Colors.white);
+                    dataSet.setXValuePosition(ValuePosition.INSIDE_SLICE);
+                    dataSet.setYValuePosition(ValuePosition.OUTSIDE_SLICE);
+                    dataSet.setSelectionShift(0);
+                    dataSet.setValueLineColor(Colors.black);
+                    dataSet.setValueTextSize(10.0);
+                    dataSet.setValueLinePart1Length(.5);
+                    dataSet.setValueLinePart2Length(.2);
+                    dataSet.setValueLinePart1OffsetPercentage(80.0);
+                    final controller = PieChartController(
+                      legendSettingFunction: (legend, controller) {
+                        legend
+                          ..verticalAlignment = (LegendVerticalAlignment.TOP)
+                          ..horizontalAlignment = (LegendHorizontalAlignment.RIGHT)
+                          ..orientation = (LegendOrientation.VERTICAL)
+                          ..drawInside = (false)
+                          ..enabled = (false);
+                      },
+                      rendererSettingFunction: (renderer) {
+                        (renderer as PieChartRenderer)
+                          ..setHoleColor(ColorUtils.WHITE)
+                          ..setHoleColor(ColorUtils.WHITE)
+                          ..setTransparentCircleColor(ColorUtils.WHITE)
+                          ..setTransparentCircleAlpha(110);
+                      },
+                      description: Description()..enabled = false,
+                      centerTextTypeface: TypeFace()..fontWeight = FontWeight.bold,
+                      transparentCircleRadiusPercent: 50,
+                      extraBottomOffset: 1,
+                      extraTopOffset: 1,
+                      holeRadiusPercent: 50,
+                      rotateEnabled: true,
+                      centerText: "Total\n${total}",
+                    );
+                    controller.data = PieData(dataSet)..setValueTextColor(Colors.black);
+                    return Container(
+                        margin: EdgeInsets.only(left: 10, top: 10, right: 10),
+                        width: 300,
+                        height: 320,
+                        child: Card(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Container(
+                                margin: EdgeInsets.only(left: 10, top: 10, right: 10),
+                                child: Text(
+                                  "Expenses",
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                height: 270,
+                                child: PieChart(controller),
+                              )
+                            ],
+                          ),
+                        )
+                    );
+                  },
+                ),
+                StreamBuilder(
+                  stream: BlocProvider
+                      .of<HomeBloc>(context)
+                      .cashFlowData,
+                  builder: (context, AsyncSnapshot<List<CashFlowOfDay>> snapshot) {
+                    if(snapshot.connectionState == ConnectionState.waiting) {
+                      return Container(
+                          margin: EdgeInsets.only(left: 10, top: 10, right: 10),
+                          width: 300,
+                          height: 320,
+                          child: Card()
+                      );
+                    }
+                    List<Entry> entries = [];
+                    if(snapshot.data != null) {
+                      snapshot.data.forEach((element) {
+                        entries.add(
+                            Entry(
+                                x: snapshot.data.indexOf(element)
+                                    .toDouble(),
+                                y: element.balance
+                            )
+                        );
+                      });
+                    }
+                    LineDataSet dataSet = LineDataSet(entries, "")
+                      ..setDrawCircles(false)
+                      ..setMode(Mode.HORIZONTAL_BEZIER)
+                      ..setDrawFilled(true)
+                      ..setDrawValues(false)
+                      ..setGradientFilled(true)
+                      ..setGradientColor(Color(0x007AC1), Color(0xFF0000));
+
+                    final controller = LineChartController(
+                        xAxisSettingFunction: (xAxis, controller) {
+                          xAxis.drawGridLinesBehindData = true;
+                          xAxis.drawLabels = false;
+                          xAxis.enabled = false;
+                        },
+                        axisLeftSettingFunction: (axisLeft, controller) {
+                          axisLeft.drawLabels = true;
+                          axisLeft.drawGridLines = true;
+                          axisLeft.enabled = true;
+                        },
+                        axisRightSettingFunction: (axisRight, controller) {
+                          axisRight.drawLabels = false;
+                          axisRight.drawGridLines = false;
+                          axisRight.enabled = false;
+                        },
+                        legendSettingFunction: (legend, controller) {
+                          legend.enabled = false;
+                        },
+
+                        description: Description()..enabled = false
+                    );
+                    controller.data = LineData()..addDataSet(dataSet);
+                    return Container(
+                        margin: EdgeInsets.only(left: 10, top: 10, right: 10),
+                        width: 300,
+                        height: 320,
+                        child: Card(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Container(
+                                margin: EdgeInsets.only(left: 10, top: 10, right: 10),
+                                child: Text(
+                                  "Income and expenditure flow",
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                height: 260,
+                                child: LineChart(controller),
+                              )
+                            ],
+                          ),
+                        )
+                    );
+                  },
                 )
               ],
             ),
-          );
-        });
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.all(10),
+          child: Card(
+            child: Column(
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(left: 15, top: 5),
+                      child: Text(
+                        "Entries",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(right: 10, top: 5),
+                      child: RaisedButton(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18.0),
+                        ),
+                        color: Colors.blueAccent,
+                        highlightColor: Colors.blueAccent,
+                        splashColor: Colors.white60,
+                        onPressed: (){},
+                        child: Text(
+                          "See all",
+                          style: TextStyle(
+                              color: Colors.white
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    BlocBuilder(
+                      bloc: BlocProvider.of<HomeBloc>(context),
+                      builder: (context, state) {
+                        if(state is TopFiveEntriesState) {
+                          final formatter = DateFormat("dd-MM-yyyy");
+                          return Column(
+                            children: List.generate(state.entries.length, (index) {
+                              return Column(
+                                mainAxisSize: MainAxisSize.max,
+                                children: <Widget>[
+                                  Container(
+                                    padding: EdgeInsets.all(10),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: <Widget>[
+                                        Column(
+                                          children: <Widget>[
+                                            Row(
+                                              children: <Widget>[
+                                                Column(
+                                                  children: <Widget>[
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                                      children: <Widget>[
+                                                        CircleAvatar(
+                                                          radius: 20,
+                                                          backgroundColor: Colors.red,
+                                                        ),
+                                                        Padding(
+                                                          padding: EdgeInsets.only(left: 20),
+                                                          child: Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: <Widget>[
+                                                              Text(
+                                                                state.entries[index].mCategory.name,
+                                                                style: TextStyle(
+                                                                    fontWeight: FontWeight.bold,
+                                                                    fontSize: 18
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                formatter.format(
+                                                                    DateTime.fromMillisecondsSinceEpoch(
+                                                                        state.entries[index].mEntry.date
+                                                                    )
+                                                                ),
+                                                                style: TextStyle(
+                                                                    fontSize: 14
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        )
+                                                      ],
+                                                    )
+                                                  ],
+                                                ),
+                                                Text(
+                                                  state.entries[index].mEntry.amount.toString(),
+                                                  style: TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 18
+                                                  ),
+                                                )
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              );
+                            }),
+                          );
+                        } else {
+                          return Container();
+                        }
+                      },
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+        )
+      ],
+    );
   }
 
   void _showDatePickerDialog() async {

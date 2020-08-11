@@ -1,14 +1,11 @@
-import 'package:expense_manager/data/models/Category.dart';
-import 'package:expense_manager/data/models/Entry.dart';
-import 'package:expense_manager/data/models/Tag.dart';
-import 'package:expense_manager/data/models/Wallet.dart';
+import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 
 class EntryWithCategoryAndWallet {
 
-  EntryWithCategoryAndWallet(this.entry, this.category, this.tag, this.wallet);
+  EntryWithCategoryAndWallet(this.mEntry, this.mCategory, this.mTag, this.mWallet);
 
-  Entry entry;
-  Category category;
-  Tag tag;
-  Wallet wallet;
+  entry mEntry;
+  category mCategory;
+  tag mTag;
+  wallet mWallet;
 }

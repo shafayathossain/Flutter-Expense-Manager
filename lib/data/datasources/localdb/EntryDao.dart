@@ -20,7 +20,7 @@ class EntryDao extends DatabaseAccessor<LocalDatabase> with _$EntryDaoMixin {
     this._database = database;
   }
 
-  Stream<List<EntryWithCategoryAndWallet>> getTopFiveEntry(int startTimeInMillis, int endTimeInMillis, int bookId) {
+  Future<List<EntryWithCategoryAndWallet>> getTopFiveEntry(int startTimeInMillis, int endTimeInMillis, int bookId) {
     final query = select(_database.entry)
         .join(
         [
@@ -33,16 +33,14 @@ class EntryDao extends DatabaseAccessor<LocalDatabase> with _$EntryDaoMixin {
       ..orderBy([OrderingTerm.desc(_database.entry.amount)])
       ..limit(5);
 
-    return query.get().asStream().map((rows) {
-      return rows.map((e) {
-        return EntryWithCategoryAndWallet(
-          e.readTable(this.entry as TableInfo<$EntryTable, entry>),
-          e.readTable(this.category as TableInfo<$CategoryTable, category>),
-          e.readTable(this.tag as TableInfo<$TagTable, tag>),
-          e.readTable(this.wallet as TableInfo<$WalletTable, wallet>)
-        );
-      }).toList();
-    });
+    return query.map((row) {
+      return EntryWithCategoryAndWallet(
+        row.readTable(_database.entry),
+        row.readTable(_database.category),
+        row.readTable(_database.tag),
+        row.readTable(_database.wallet)
+      );
+    }).get();
   }
 
   Stream<List<EntryWithCategoryAndWallet>> getEntriesBetweenADateRange(int startTimeInMillis, int endTimeInMillis, int bookId) {

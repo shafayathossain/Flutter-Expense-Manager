@@ -28,4 +28,11 @@ class GetExpensesOfCategory extends HomeEvent {
   GetExpensesOfCategory(this.startTime, this.endTime);
 }
 
+class GetTopFiveEntriesEvent extends HomeEvent {
+  int startTime;
+  int endTime;
+
+  GetTopFiveEntriesEvent(this.startTime, this.endTime);
+}
+
 class ResetEvent extends HomeEvent {}

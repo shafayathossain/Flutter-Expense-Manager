@@ -1,4 +1,5 @@
 import 'package:expense_manager/data/models/CashFlowOfDay.dart';
+import 'package:expense_manager/data/models/EntryWithCategoryAndWallet.dart';
 import 'package:expense_manager/data/models/ExpenseOfCategory.dart';
 import 'package:expense_manager/data/models/WalletWithBalance.dart';
 import 'package:expense_manager/data/repositories/HomeRepository.dart';
@@ -14,6 +15,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   PublishSubject<List<double>> incomeAndExpenses = new PublishSubject();
   PublishSubject<List<CashFlowOfDay>> cashFlowData = PublishSubject();
   PublishSubject<List<ExpenseOfCategory>> expenses = PublishSubject();
+  PublishSubject<List<EntryWithCategoryAndWallet>> topFiveEntries = PublishSubject();
 
   HomeBloc(this._repository) : super(null);
 
@@ -25,6 +27,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       yield* _getCashFlow(event.startTime, event.endTime);
     } else if(event is GetExpensesOfCategory) {
       yield* _getExpensesOfAllCategories(event.startTime, event.endTime);
+    } else if(event is GetTopFiveEntriesEvent) {
+      yield* _getTopFiveEntries(event.startTime, event.endTime);
     }
   }
 
@@ -81,5 +85,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
     expenses.add(result);
     yield* Stream.value(ExpenseOfCategoryState(result));
+  }
+
+  Stream<HomeState> _getTopFiveEntries(int startTime, int endTime) async* {
+    final result = await _repository.getTopFiveEntries(startTime, endTime);
+    yield* Stream.value(TopFiveEntriesState(entries: result));
   }
 }
