@@ -54,7 +54,6 @@ class CategoryFormState extends State<CategoryForm> {
 
   @override
   Widget build(BuildContext context) {
-    print(state);
     return Stack(
       children: [
         state == 0 ? _showFirstState() : _showSecondState()
@@ -180,7 +179,6 @@ class CategoryFormState extends State<CategoryForm> {
                       ),
                     ),
                     onPressed: () {
-                      print(state);
                       state = 1;
                       setState(() {
 

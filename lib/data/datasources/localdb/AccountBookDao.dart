@@ -20,10 +20,7 @@ class AccountBookDao extends DatabaseAccessor<LocalDatabase> {
   }
 
   Stream<int> insert(Insertable<account_book> book) {
-    return into(_database.accountBook).insert(book).asStream()
-    .doOnError((error) {
-      print(error);
-    });
+    return into(_database.accountBook).insert(book).asStream();
   }
 
   Future<int> editAnAccountBook(account_book book) {

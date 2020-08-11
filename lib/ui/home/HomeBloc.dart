@@ -72,6 +72,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   Stream<HomeState> _getExpensesOfAllCategories(int startTime, int endTime) async* {
     List<ExpenseOfCategory> result = await _repository.getTotalExpenseForAllCategories(startTime, endTime);
+    if(result != null) {
+      result.forEach((element) {
+        if (element.total == null) element.total = 0.0;
+        if (element.name == null) element.name = "";
+        if (element.color == null) element.color = 0xFFFFFF;
+      });
+    }
     expenses.add(result);
     yield* Stream.value(ExpenseOfCategoryState(result));
   }

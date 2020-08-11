@@ -32,7 +32,6 @@ class AddEntryFormWidget extends StatelessWidget {
       create: (_) => AddEntryBloc(EntryRepositoryImpl(context)),
       child: Builder(
         builder: (contextB) {
-          print("Calling block add event");
           BlocProvider.of<AddEntryBloc>(contextB)..add(GetCategoriesEvent(isIncome));
           BlocProvider.of<AddEntryBloc>(contextB)..add(GetWalletsEvent());
           return AddEntryStatefulFormWidget(categorySelectionCallback, isIncome);
@@ -88,13 +87,11 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
 
   @override
   Widget build(BuildContext context) {
-    print("BUILD");
     if(!BlocProvider.of<AddEntryBloc>(context).errorSubject.hasListener) {
       BlocProvider
           .of<AddEntryBloc>(context)
           .errorSubject
           .listen((event) {
-        print(event);
         final snackBar = SnackBar(
           content: Text(
             event.toString(),
@@ -112,7 +109,6 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
           bloc: BlocProvider.of<AddEntryBloc>(context),
           buildWhen: (context, state) => state == EntrySavedState,
           builder: (context, state) {
-            print("STATE REFRESHED $state");
             return StreamBuilder(
                 stream: BlocProvider.of<CreateEntryBloc>(context).saveButtonListener,
                 builder: (context, AsyncSnapshot<int> snapshot) {
@@ -131,7 +127,6 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                       children: [
                         NotificationListener(
                           onNotification: (_) {
-                            print(_controller.status);
                             if(_controller.status == AnimationStatus.completed) {
                               _controller.reverse();
                             }
@@ -622,7 +617,6 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
         barrierDismissible: false,
         builder:(contextC) => CreateCategoryDialog(
           (name, color) {
-            print(name);
             BlocProvider.of<AddEntryBloc>(context)..add(CreateCategoryEvent(
                 name, color, widget.isIncome
             ));
@@ -637,7 +631,6 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
         barrierDismissible: false,
         builder:(contextC) => CreateTagDialog(
               (name, color) {
-            print(name);
             BlocProvider.of<AddEntryBloc>(context)..add(CreateTagEvent(
                 name, color, _selectedCategory.id
             ));

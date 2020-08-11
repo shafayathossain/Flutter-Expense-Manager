@@ -63,7 +63,6 @@ class AccountBookFormState extends State<AccountBookForm> {
 
   @override
   Widget build(BuildContext context) {
-    print(state);
     if(widget.book != null) {
       accountNameTextController.text = widget.book.name;
       if(color == -1) {
@@ -78,7 +77,6 @@ class AccountBookFormState extends State<AccountBookForm> {
   }
 
   Widget _showFirstState() {
-    print(color);
     return Container(
       decoration: BoxDecoration(
           color: Colors.white,
@@ -196,7 +194,6 @@ class AccountBookFormState extends State<AccountBookForm> {
                       ),
                     ),
                     onPressed: () {
-                      print(state);
                       state = 1;
                       setState(() {
 

@@ -7,7 +7,7 @@ abstract class EntryRepository {
   Stream<List<tag>> getAllTags(int categoryId);
   Stream<int> createTag(String name, int color, int categoryId);
   Stream<List<wallet>> getAllWallets();
-  Stream<int> addEntry(num amount, int time, category category, wallet wallet,
+  Future<int> addEntry(num amount, int time, category category, wallet wallet,
       String description, tag tag);
 
 }

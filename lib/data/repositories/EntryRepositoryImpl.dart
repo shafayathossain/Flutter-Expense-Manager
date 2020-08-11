@@ -1,3 +1,4 @@
+import 'package:expense_manager/data/datasources/app_preference.dart';
 import 'package:expense_manager/data/datasources/localdb/CategoryDao.dart';
 import 'package:expense_manager/data/datasources/localdb/EntryDao.dart';
 import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
@@ -70,17 +71,19 @@ class EntryRepositoryImpl extends EntryRepository {
   }
 
   @override
-  Stream<int> addEntry(num amount, int time, category category, wallet wallet,
+  Future<int> addEntry(num amount, int time, category category, wallet wallet,
       String description, tag tag) {
-    entry mEntry = entry(
-      amount: amount,
-      date: time,
-      bookId: 1,
-      categoryId: category.id,
-      walletId: wallet.id,
-      description: description,
-      tagId: tag == null ? null : tag.id
-    );
-    return _entryDao.insertEntry(mEntry);
+    return getBook().then((value) {
+      entry mEntry = entry(
+          amount: amount,
+          date: time,
+          bookId: value.id,
+          categoryId: category.id,
+          walletId: wallet.id,
+          description: description,
+          tagId: tag == null ? null : tag.id
+      );
+      return _entryDao.insertEntry(mEntry);
+    });
   }
 }

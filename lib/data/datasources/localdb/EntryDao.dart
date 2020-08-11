@@ -93,8 +93,8 @@ class EntryDao extends DatabaseAccessor<LocalDatabase> with _$EntryDaoMixin {
     });
   }
 
-  Stream<int> insertEntry(entry entry) {
-    return into(_database.entry).insert(entry).asStream();
+  Future<int> insertEntry(entry entry) {
+    return into(_database.entry).insert(entry);
   }
 
   Stream<bool> updateEntry(entry entry) {

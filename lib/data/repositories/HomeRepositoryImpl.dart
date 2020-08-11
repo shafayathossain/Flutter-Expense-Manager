@@ -28,7 +28,6 @@ class HomeRepositoryImpl extends HomeRepository {
   @override
   Future<List<WalletWithBalance>> getWalletsWithBalance() async {
     return getBook().then((value) {
-      print(value.id);
       return _walletDao.getWalletsWithBalance(value.id);
     });
   }

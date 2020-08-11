@@ -17,7 +17,7 @@ class AccountBookBloc extends Bloc<AccountBookEvents, AccountBookStates> {
 
   @override
   Stream<AccountBookStates> mapEventToState(AccountBookEvents event) async* {
-    print(event);
+
     if(event is CreateAccountBookEvent) {
      yield* _createABook(event.name, event.color);
     } else if(event is LoadAccountBookEvent) {
@@ -33,7 +33,7 @@ class AccountBookBloc extends Bloc<AccountBookEvents, AccountBookStates> {
 
   @override
   Future<void> close() {
-    print("CLose");
+
     return super.close();
   }
 
@@ -50,9 +50,8 @@ class AccountBookBloc extends Bloc<AccountBookEvents, AccountBookStates> {
       color: color,
       creationDate: DateTime.now().millisecondsSinceEpoch
     );
-    print(book);
+
     await for(int event in repository.createAnAccountBook(book)) {
-      print(event);
       yield* _getAllBooks();
     }
   }

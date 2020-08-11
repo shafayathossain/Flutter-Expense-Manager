@@ -34,7 +34,6 @@ class AccountBookScreen extends StatelessWidget {
                         barrierDismissible: false,
                         builder:(contextC) => CreateAccountBookDialog(
                           callback: (name, color, id) {
-                            print(name);
                             BlocProvider.of<AccountBookBloc>(contextB)..add(CreateAccountBookEvent(
                                 name: name,
                                 color: color
@@ -95,7 +94,6 @@ class AccountBookViewStates extends State<AccountBookView> {
             padding: EdgeInsets.symmetric(vertical: 10.0),
             itemCount: (state).accountBooks.length,
             itemBuilder: (BuildContext context, int index) {
-              print(state.accountBooks);
               return Container(
                 child: Provider(
                   create: (_) => widget.books[index],
@@ -105,7 +103,6 @@ class AccountBookViewStates extends State<AccountBookView> {
                     book: widget.books[index],
                     callback: (position) {
                       this._selectedPosition = position;
-                      print("CALL $_selectedPosition $position");
                       setState(() {
 
                       });
@@ -137,7 +134,6 @@ class AccountBookItemView extends StatelessWidget {
   AccountBookItemView({this.selectedPosition, this.currentPosition, this.book, this.callback});
 
   Widget build(BuildContext context) {
-    print("$currentPosition -> ${book}");
     if(currentPosition == selectedPosition) {
       return Container(
         height: 150,
@@ -237,7 +233,6 @@ class AccountBookItemView extends StatelessWidget {
                                     builder:(contextC) => CreateAccountBookDialog(
                                       book: book,
                                       callback: (name, color, id) {
-                                        print(name);
                                         if(id == null) {
                                           BlocProvider.of<AccountBookBloc>(context)
                                             ..add(CreateAccountBookEvent(

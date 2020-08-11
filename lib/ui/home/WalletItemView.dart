@@ -16,7 +16,6 @@ class WalletItemView extends StatelessWidget {
   WalletItemView({this.selectedPosition, this.currentPosition, this.callback});
 
   Widget build(BuildContext context) {
-    print("$currentPosition -> ${currentPosition == selectedPosition}");
     final walletInformationView = getWalletInformationView(context);
     if(currentPosition == selectedPosition) {
       return Container(

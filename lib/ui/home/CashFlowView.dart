@@ -37,6 +37,7 @@ import 'package:mp_chart/mp/core/enums/legend_vertical_alignment.dart';
 import 'package:mp_chart/mp/core/enums/mode.dart';
 import 'package:mp_chart/mp/core/enums/value_position.dart';
 import 'package:mp_chart/mp/core/enums/x_axis_position.dart';
+import 'package:mp_chart/mp/core/enums/y_axis_label_position.dart';
 import 'package:mp_chart/mp/core/render/pie_chart_renderer.dart';
 import 'package:mp_chart/mp/core/utils/color_utils.dart';
 import 'package:mp_chart/mp/core/value_formatter/value_formatter.dart';
@@ -156,6 +157,8 @@ class _CashFlowState extends State<CashFlowView> {
                               axisLeftSettingFunction: (axisLeft, controller) {
                                 axisLeft.drawGridLines = false;
                                 axisLeft.setAxisMinimum(0.0);
+                                axisLeft.position = YAxisLabelPosition.OUTSIDE_CHART;
+                                axisLeft.spacePercentTop = 15;
                               },
                               axisRightSettingFunction: (axisRight, controller) {
                                 axisRight.drawGridLines = false;
@@ -172,6 +175,7 @@ class _CashFlowState extends State<CashFlowView> {
                                 xAxis.setValueFormatter(MyValueFormatter());
                               },
                               drawGridBackground: false,
+                              drawValueAboveBar: true,
                               description: (Description()..enabled = false),
                               fitBars: true,
                             );
@@ -410,7 +414,6 @@ class _CashFlowState extends State<CashFlowView> {
       lastDate: new DateTime(2030),
     );
     if (pickedDates != null) {
-      print(pickedDates);
       if (pickedDates.length == 2) {
         final formatter = DateFormat("dd-MM-yyyy");
         final dateString =

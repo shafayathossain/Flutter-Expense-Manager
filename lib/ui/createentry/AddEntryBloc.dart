@@ -33,10 +33,8 @@ class AddEntryBloc extends Bloc<AddEntryEvent, AddEntryState> {
     Expression exp = parser.parse(formulaString);
     try {
       double value = exp.evaluate(EvaluationType.REAL, ContextModel());
-      print(value);
       return sink.add(value.toString());
     } catch(e) {
-      print(e.toString());
       sink.addError(e.toString());
     }
   });
@@ -75,7 +73,6 @@ class AddEntryBloc extends Bloc<AddEntryEvent, AddEntryState> {
           return getCategories(isIncome);
         })
         .map((event) {
-          print("ADD ENTRY 54 -> ${event}");
           categorySubject.sink.add(event);
           return CategoriesFetchedState(event);
         });
@@ -121,7 +118,6 @@ class AddEntryBloc extends Bloc<AddEntryEvent, AddEntryState> {
          time = formatter
             .parse(date)
             .millisecondsSinceEpoch;
-        print(time);
       } catch (e) {
         hasError = true;
         yield* Stream.value(EntryErrorState("Select a date"));
@@ -135,10 +131,10 @@ class AddEntryBloc extends Bloc<AddEntryEvent, AddEntryState> {
       yield* Stream.value(EntryErrorState("Select a wallet"));
     } else {
       value = isIncome ? value.abs() : -1 * value.abs();
-      yield* _repository
+      final result = await _repository
           .addEntry(value, time, selectedCategory, selectedWallet, description,
-          selectedTag)
-          .map((event) => EntrySavedState());
+          selectedTag);
+      yield* Stream.value(EntrySavedState());
     }
 
   }
