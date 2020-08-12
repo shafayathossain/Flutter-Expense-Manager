@@ -19,10 +19,16 @@ class DayRangeChipGroup extends StatefulWidget {
 
 class DayRangeChipGroupState extends State<DayRangeChipGroup> {
 
-//  int selectedIndex = -1;
-//  final List<String> chipTexts;
-//  List<int> chipColors = [];
-
+  @override
+  void initState() {
+    super.initState();
+    print("INIT STATE");
+    if(widget.selectedIndex == 0) {
+      if(widget.onChipSelectedCallback != null) {
+        widget.onChipSelectedCallback.call(0);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

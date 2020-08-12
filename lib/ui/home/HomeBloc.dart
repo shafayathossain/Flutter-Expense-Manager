@@ -29,24 +29,18 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     if(event is GetWalletsEvent) {
       yield* _getWalletsWithBalance();
     } else if(event is GetBalanceEvent) {
+      print(event.startTime);
+      print(event.endTime);
       this._balanceEvent = event;
       yield* _getCashFlow(event.startTime, event.endTime);
-    } else if(event is GetExpensesOfCategory) {
-      this._expensesOfCategoryEvent = event;
       yield* _getExpensesOfAllCategories(event.startTime, event.endTime);
-    } else if(event is GetTopFiveEntriesEvent) {
-      this._getTopFiveEntriesEvent = event;
       yield* _getTopFiveEntries(event.startTime, event.endTime);
     } else if(event is ResumeEvent) {
       yield* _getWalletsWithBalance();
       if(_balanceEvent != null) {
         yield* _getCashFlow(_balanceEvent.startTime, _balanceEvent.endTime);
-      }
-      if(_expensesOfCategoryEvent != null) {
-        yield* _getExpensesOfAllCategories(_expensesOfCategoryEvent.startTime, _expensesOfCategoryEvent.endTime);
-      }
-      if(_getTopFiveEntriesEvent != null) {
-        yield* _getTopFiveEntries(_getTopFiveEntriesEvent.startTime, _getTopFiveEntriesEvent.endTime);
+        yield* _getExpensesOfAllCategories(_balanceEvent.startTime, _balanceEvent.endTime);
+        yield* _getTopFiveEntries(_balanceEvent.startTime, _balanceEvent.endTime);
       }
     }
   }

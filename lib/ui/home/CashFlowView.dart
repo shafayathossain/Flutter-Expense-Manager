@@ -80,51 +80,71 @@ class _CashFlowState extends State<CashFlowView> {
                   selectedIndex: _selectedPosition,
                   onChipSelectedCallback: (index) {
                     _selectedPosition = index;
-                    BlocProvider.of<HomeBloc>(context).add(
-                        GetBalanceEvent(
-                          DateTime(DateTime
-                              .now()
-                              .year, DateTime
-                              .now()
-                              .month, 1).millisecondsSinceEpoch,
-                          DateTime(DateTime
-                              .now()
-                              .year, DateTime
-                              .now()
-                              .month + 1, 1)
-                              .subtract(Duration(days: index))
-                              .millisecondsSinceEpoch,
-                        ));
-                    BlocProvider.of<HomeBloc>(context).add(
-                        GetExpensesOfCategory(
-                          DateTime(DateTime
-                              .now()
-                              .year, DateTime
-                              .now()
-                              .month, 1).millisecondsSinceEpoch,
-                          DateTime(DateTime
-                              .now()
-                              .year, DateTime
-                              .now()
-                              .month + 1, 1)
-                              .subtract(Duration(days: index))
-                              .millisecondsSinceEpoch,
-                        ));
-                    BlocProvider.of<HomeBloc>(context).add(
-                        GetTopFiveEntriesEvent(
-                          DateTime(DateTime
-                              .now()
-                              .year, DateTime
-                              .now()
-                              .month, 1).millisecondsSinceEpoch,
-                          DateTime(DateTime
-                              .now()
-                              .year, DateTime
-                              .now()
-                              .month + 1, 1)
-                              .subtract(Duration(days: index))
-                              .millisecondsSinceEpoch,
-                        ));
+                    if(index == 0) {
+                      BlocProvider.of<HomeBloc>(context).add(
+                          GetBalanceEvent(
+                            DateTime(
+                                DateTime.now().year,
+                                DateTime.now().month,
+                                1
+                            ).millisecondsSinceEpoch,
+                            DateTime(
+                                DateTime.now().year,
+                                DateTime.now().month + 1,
+                                1
+                            )
+                                .subtract(Duration(days: 1))
+                                .millisecondsSinceEpoch,
+                          ));
+                    } else if(index == 1) {
+                      BlocProvider.of<HomeBloc>(context).add(
+                          GetBalanceEvent(
+                            DateTime(
+                                DateTime.now().year,
+                                DateTime.now().month - 1,
+                                1
+                            ).millisecondsSinceEpoch,
+                            DateTime(
+                                DateTime.now().year,
+                                DateTime.now().month,
+                                1
+                            )
+                                .subtract(Duration(days: 1))
+                                .millisecondsSinceEpoch,
+                          ));
+                    } else if(index == 2) {
+                      BlocProvider.of<HomeBloc>(context).add(
+                          GetBalanceEvent(
+                            DateTime(
+                                DateTime.now().year,
+                                1,
+                                1
+                            ).millisecondsSinceEpoch,
+                            DateTime(
+                                DateTime.now().year + 1,
+                                1,
+                                1
+                            )
+                                .subtract(Duration(days: 1))
+                                .millisecondsSinceEpoch,
+                          ));
+                    } else if(index == 3) {
+                      BlocProvider.of<HomeBloc>(context).add(
+                          GetBalanceEvent(
+                            DateTime(
+                                DateTime.now().year - 1,
+                                1,
+                                1
+                            ).millisecondsSinceEpoch,
+                            DateTime(
+                                DateTime.now().year,
+                                1,
+                                1
+                            )
+                                .subtract(Duration(days: 1))
+                                .millisecondsSinceEpoch,
+                          ));
+                    }
                     if (index == 4) {
                       _showDatePickerDialog();
                     } else {
@@ -564,9 +584,15 @@ class _CashFlowState extends State<CashFlowView> {
         final formatter = DateFormat("dd-MM-yyyy");
         final dateString =
             "${formatter.format(pickedDates[0])} to ${formatter.format(pickedDates[1])}";
+
         setState(() {
           _customChipName = dateString;
           _scrollToPosition(5);
+          BlocProvider.of<HomeBloc>(context).add(
+              GetBalanceEvent(
+                pickedDates[0].millisecondsSinceEpoch,
+                pickedDates[1].millisecondsSinceEpoch,
+              ));
         });
       }
     }
