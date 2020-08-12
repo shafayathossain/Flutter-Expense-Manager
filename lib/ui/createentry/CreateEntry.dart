@@ -52,7 +52,12 @@ class CreateEntryPageState extends State<CreateEntryPage> {
                   backgroundColor: widget.appBarColor,
                   actions: [
                     MaterialButton(
-                      child: Text("Save"),
+                      child: Text(
+                        "Save",
+                        style: TextStyle(
+                          color: Colors.white
+                        ),
+                      ),
                       onPressed: () {
                         BlocProvider.of<CreateEntryBloc>(contextB).add(SaveEvent());
                       },

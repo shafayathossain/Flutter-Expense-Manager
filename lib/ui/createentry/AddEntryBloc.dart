@@ -58,6 +58,7 @@ class AddEntryBloc extends Bloc<AddEntryEvent, AddEntryState> {
             if(event is EntryErrorState) {
               errorSubject.add(event.error);
             }
+
             return event;
       });
     }

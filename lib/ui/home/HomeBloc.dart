@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:expense_manager/data/models/CashFlowOfDay.dart';
 import 'package:expense_manager/data/models/EntryWithCategoryAndWallet.dart';
 import 'package:expense_manager/data/models/ExpenseOfCategory.dart';
@@ -35,7 +37,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   Stream<HomeState> _getWalletsWithBalance() async* {
     final result = await _repository.getWalletsWithBalance();
     wallets.sink.add(result.map((e) {
-      double percent = e.income > 0.0 ? (e.balance.abs() / e.income.abs()) : 0;
+      print(e.balance);
+      double percent = e.income > 0.0 ? (max(e.balance, 0) / e.income.abs()) : 0;
       return (e..balancePercent = percent);
     }).toList());
     yield* Stream.value(HomeState());

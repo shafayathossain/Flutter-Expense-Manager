@@ -14,6 +14,9 @@ class CreateEntryBloc extends Bloc<AddEntryEvent, AddEntryState> {
     if(event is SaveEvent) {
       subject.sink.add(1);
       yield* Stream.value(AddEntryState());
+    } else if(event is EntryAddedEvent) {
+      subject.sink.add(0);
+      yield* Stream.value(AddEntryState());
     }
   }
 }

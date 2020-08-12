@@ -16,6 +16,8 @@ class SaveEvent extends AddEntryEvent {
     this.selectedTag, this.description, this.isIncome});
 }
 
+class EntryAddedEvent extends AddEntryEvent {}
+
 class CheckFormulaEvent extends AddEntryEvent {
   String formula;
   CheckFormulaEvent({this.formula});
