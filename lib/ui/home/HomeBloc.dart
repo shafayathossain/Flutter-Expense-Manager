@@ -18,6 +18,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   PublishSubject<List<CashFlowOfDay>> cashFlowData = PublishSubject();
   PublishSubject<List<ExpenseOfCategory>> expenses = PublishSubject();
   PublishSubject<List<EntryWithCategoryAndWallet>> topFiveEntries = PublishSubject();
+  GetBalanceEvent _balanceEvent;
+  GetExpensesOfCategory _expensesOfCategoryEvent;
+  GetTopFiveEntriesEvent _getTopFiveEntriesEvent;
 
   HomeBloc(this._repository) : super(null);
 
@@ -25,12 +28,26 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   Stream<HomeState> mapEventToState(HomeEvent event) async* {
     if(event is GetWalletsEvent) {
       yield* _getWalletsWithBalance();
-    } else if(event is GetThisMonthBalanceEvent) {
+    } else if(event is GetBalanceEvent) {
+      this._balanceEvent = event;
       yield* _getCashFlow(event.startTime, event.endTime);
     } else if(event is GetExpensesOfCategory) {
+      this._expensesOfCategoryEvent = event;
       yield* _getExpensesOfAllCategories(event.startTime, event.endTime);
     } else if(event is GetTopFiveEntriesEvent) {
+      this._getTopFiveEntriesEvent = event;
       yield* _getTopFiveEntries(event.startTime, event.endTime);
+    } else if(event is ResumeEvent) {
+      yield* _getWalletsWithBalance();
+      if(_balanceEvent != null) {
+        yield* _getCashFlow(_balanceEvent.startTime, _balanceEvent.endTime);
+      }
+      if(_expensesOfCategoryEvent != null) {
+        yield* _getExpensesOfAllCategories(_expensesOfCategoryEvent.startTime, _expensesOfCategoryEvent.endTime);
+      }
+      if(_getTopFiveEntriesEvent != null) {
+        yield* _getTopFiveEntries(_getTopFiveEntriesEvent.startTime, _getTopFiveEntriesEvent.endTime);
+      }
     }
   }
 

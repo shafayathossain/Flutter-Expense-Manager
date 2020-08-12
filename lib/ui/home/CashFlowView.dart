@@ -81,7 +81,7 @@ class _CashFlowState extends State<CashFlowView> {
                   onChipSelectedCallback: (index) {
                     _selectedPosition = index;
                     BlocProvider.of<HomeBloc>(context).add(
-                        GetThisMonthBalanceEvent(
+                        GetBalanceEvent(
                           DateTime(DateTime
                               .now()
                               .year, DateTime

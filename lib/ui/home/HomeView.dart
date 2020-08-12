@@ -39,7 +39,7 @@ class HomeView extends StatelessWidget {
         ),
         onPressed: () {
           Navigator.pushNamed(context, CreateEntryRout)
-              .then((value) => _bloc.add(GetWalletsEvent()));
+              .then((value) => _bloc.add(ResumeEvent()));
         },
       ),
       body: BlocProvider(
@@ -80,7 +80,9 @@ class HomeBodyState extends State<HomeBodyView> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     print(state);
-    BlocProvider.of<HomeBloc>(context).add(GetWalletsEvent());
+    if(state == AppLifecycleState.resumed) {
+      BlocProvider.of<HomeBloc>(context).add(ResumeEvent());
+    }
   }
 
   @override
