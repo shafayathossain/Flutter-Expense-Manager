@@ -447,90 +447,98 @@ class _CashFlowState extends State<CashFlowView> {
                   ],
                 ),
                 Row(
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    BlocBuilder(
-                      bloc: BlocProvider.of<HomeBloc>(context),
-                      builder: (context, state) {
-                        if(state is TopFiveEntriesState) {
-                          final formatter = DateFormat("dd-MM-yyyy");
-                          return Column(
-                            children: List.generate(state.entries.length, (index) {
+                    Expanded(
+                      child: Container(
+                        child: BlocBuilder(
+                          bloc: BlocProvider.of<HomeBloc>(context),
+                          builder: (context, state) {
+                            if(state is TopFiveEntriesState) {
+                              final formatter = DateFormat("dd-MM-yyyy");
                               return Column(
-                                mainAxisSize: MainAxisSize.max,
-                                children: <Widget>[
-                                  Container(
-                                    padding: EdgeInsets.all(10),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: <Widget>[
-                                        Column(
+                                children: List.generate(state.entries.length, (index) {
+                                  return Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: <Widget>[
+                                      Container(
+                                        padding: EdgeInsets.all(10),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          mainAxisSize: MainAxisSize.max,
                                           children: <Widget>[
-                                            Row(
-                                              children: <Widget>[
-                                                Column(
-                                                  children: <Widget>[
-                                                    Row(
-                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                            Expanded(
+                                              child: Column(
+                                                children: <Widget>[
+                                                  Container(
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      mainAxisSize: MainAxisSize.max,
                                                       children: <Widget>[
-                                                        CircleAvatar(
-                                                          radius: 20,
-                                                          backgroundColor: Colors.red,
+                                                        Column(
+                                                          children: <Widget>[
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.start,
+                                                              children: <Widget>[
+                                                                CircleAvatar(
+                                                                  radius: 20,
+                                                                  backgroundColor: Colors.red,
+                                                                ),
+                                                                Padding(
+                                                                  padding: EdgeInsets.only(left: 20),
+                                                                  child: Column(
+                                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                                    children: <Widget>[
+                                                                      Text(
+                                                                        state.entries[index].mCategory.name,
+                                                                        style: TextStyle(
+                                                                            fontWeight: FontWeight.bold,
+                                                                            fontSize: 18
+                                                                        ),
+                                                                      ),
+                                                                      Text(
+                                                                        formatter.format(
+                                                                            DateTime.fromMillisecondsSinceEpoch(
+                                                                                state.entries[index].mEntry.date
+                                                                            )
+                                                                        ),
+                                                                        style: TextStyle(
+                                                                            fontSize: 14
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                )
+                                                              ],
+                                                            )
+                                                          ],
                                                         ),
-                                                        Padding(
-                                                          padding: EdgeInsets.only(left: 20),
-                                                          child: Column(
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                            children: <Widget>[
-                                                              Text(
-                                                                state.entries[index].mCategory.name,
-                                                                style: TextStyle(
-                                                                    fontWeight: FontWeight.bold,
-                                                                    fontSize: 18
-                                                                ),
-                                                              ),
-                                                              Text(
-                                                                formatter.format(
-                                                                    DateTime.fromMillisecondsSinceEpoch(
-                                                                        state.entries[index].mEntry.date
-                                                                    )
-                                                                ),
-                                                                style: TextStyle(
-                                                                    fontSize: 14
-                                                                ),
-                                                              ),
-                                                            ],
+                                                        Text(
+                                                          state.entries[index].mEntry.amount.toString(),
+                                                          style: TextStyle(
+                                                              fontWeight: FontWeight.bold,
+                                                              fontSize: 18
                                                           ),
                                                         )
                                                       ],
-                                                    )
-                                                  ],
-                                                ),
-                                                Text(
-                                                  state.entries[index].mEntry.amount.toString(),
-                                                  style: TextStyle(
-                                                      fontWeight: FontWeight.bold,
-                                                      fontSize: 18
-                                                  ),
-                                                )
-                                              ],
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
                                             )
                                           ],
                                         ),
-                                      ],
-                                    ),
-                                  )
-                                ],
+                                      )
+                                    ],
+                                  );
+                                }),
                               );
-                            }),
-                          );
-                        } else {
-                          return Container();
-                        }
-                      },
-                    ),
+                            } else {
+                              return Container();
+                            }
+                          },
+                        ),
+                      ),
+                    )
                   ],
                 )
               ],
