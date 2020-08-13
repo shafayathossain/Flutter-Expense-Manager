@@ -7,5 +7,6 @@ abstract class AccountBookRepository {
   Future<int> editAnAccountBook(account_book book);
   Future<int> saveCurrentAccountBook(account_book book);
   Future<void> deleteAnAccountBook(account_book book);
+  Future<account_book> getCurrentBook();
 
 }

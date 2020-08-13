@@ -20,6 +20,7 @@ class EntryRepositoryImpl extends EntryRepository {
   EntryDao _entryDao;
   CategoryDao _categoryDao;
   WalletDao _walletDao;
+  AppPreference _appPreference = AppPreference();
 
   @override
   Stream<List<category>> getAllCategories(bool isIncome) {
@@ -73,7 +74,7 @@ class EntryRepositoryImpl extends EntryRepository {
   @override
   Future<int> addEntry(num amount, int time, category category, wallet wallet,
       String description, tag tag) {
-    return getBook().then((value) {
+    return _appPreference.getBook().then((value) {
       entry mEntry = entry(
           amount: amount,
           date: time,

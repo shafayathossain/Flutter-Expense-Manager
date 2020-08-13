@@ -15,6 +15,7 @@ class HomeRepositoryImpl extends HomeRepository {
 
   WalletDao _walletDao;
   EntryDao _entryDao;
+  AppPreference _preference = AppPreference();
 
   HomeRepositoryImpl(BuildContext context) {
     try {
@@ -28,26 +29,26 @@ class HomeRepositoryImpl extends HomeRepository {
 
   @override
   Future<List<WalletWithBalance>> getWalletsWithBalance() async {
-    return getBook().then((value) {
+    return _preference.getBook().then((value) {
       return _walletDao.getWalletsWithBalance(value.id);
     });
   }
 
   @override
   Future<List<CashFlowOfDay>> getCashFlow(int startTime, int endTime) {
-    return getBook().then((value) => _entryDao.getCashFlow(startTime, endTime, value.id));
+    return _preference.getBook().then((value) => _entryDao.getCashFlow(startTime, endTime, value.id));
   }
 
   @override
   Future<List<ExpenseOfCategory>> getTotalExpenseForAllCategories(
       int startTime, int endTime) {
-    return getBook().then((value) => _entryDao.getTotalExpenseForAllCategories(startTime, endTime, value.id));
+    return _preference.getBook().then((value) => _entryDao.getTotalExpenseForAllCategories(startTime, endTime, value.id));
   }
 
   @override
   Future<List<EntryWithCategoryAndWallet>> getTopFiveEntries(
       int startTime, int endTime) {
-    return getBook().then((value) {
+    return _preference.getBook().then((value) {
       return _entryDao.getTopFiveEntry(startTime, endTime, value.id);
     });
   }

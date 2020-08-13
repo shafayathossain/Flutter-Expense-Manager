@@ -2,15 +2,19 @@
 import 'package:expense_manager/ui/accountbook/AccountBookView.dart';
 import 'package:expense_manager/ui/createentry/CreateEntry.dart';
 import 'package:expense_manager/ui/home/HomeView.dart';
+import 'package:expense_manager/ui/splash/splash_view.dart';
 import 'package:flutter/material.dart';
 
-const String AccountBookRoute = "/";
+const String SplashRoute = "/";
+const String AccountBookRoute = "account_book";
 const String HomeRoute = "home";
 const String CreateEntryRout = "create_entry";
 
 class Router {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case SplashRoute:
+        return MaterialPageRoute(builder: (_) => SplashView());
       case AccountBookRoute:
         return MaterialPageRoute(builder: (_) => AccountBookScreen());
       case HomeRoute:

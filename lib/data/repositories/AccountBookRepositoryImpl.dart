@@ -24,6 +24,7 @@ class AccountBookRepositoryImpl extends AccountBookRepository {
   AccountBookDao _accountBookDao;
   CategoryDao _categoryDao;
   WalletDao _walletDao;
+  AppPreference _preference = AppPreference();
 
   @override
   Stream<List<account_book>> getAllAccountBooks() {
@@ -46,13 +47,19 @@ class AccountBookRepositoryImpl extends AccountBookRepository {
 
   @override
   Future<int> saveCurrentAccountBook(account_book book) {
-    return setBook(book);
+    return _preference.setBook(book);
   }
 
 
   @override
   Future<void> deleteAnAccountBook(account_book book) {
     return _accountBookDao.deleteAnAccountBook(book);
+  }
+
+
+  @override
+  Future<account_book> getCurrentBook() {
+    return _preference.getBook();
   }
 
   Stream<int> _initializeDataForAccountBook(int accountBookId) {
