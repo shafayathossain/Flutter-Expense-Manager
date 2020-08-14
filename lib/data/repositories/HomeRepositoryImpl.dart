@@ -52,4 +52,14 @@ class HomeRepositoryImpl extends HomeRepository {
       return _entryDao.getTopFiveEntry(startTime, endTime, value.id);
     });
   }
+
+  @override
+  Future<account_book> getCurrentAccountBook() {
+    return _preference.getBook();
+  }
+
+  @override
+  Future<int> clearCurrentAccountBook() {
+    return _preference.setBook(null);
+  }
 }

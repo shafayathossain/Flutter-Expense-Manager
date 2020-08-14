@@ -5,6 +5,7 @@ import 'package:expense_manager/ui/home/CashFlowView.dart';
 import 'package:expense_manager/ui/home/DayRangeChip.dart';
 import 'package:expense_manager/ui/home/HomeBloc.dart';
 import 'package:expense_manager/ui/home/HomeEvent.dart';
+import 'package:expense_manager/ui/home/HomeState.dart';
 import 'package:expense_manager/ui/home/WalletItemView.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -21,30 +22,56 @@ class HomeView extends StatelessWidget {
 
     _bloc = HomeBloc(HomeRepositoryImpl(context));
 
-    return Scaffold(
-      backgroundColor: Color(0xFFE5EAEC),
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        title: Text(
-          "Home",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: Image.asset(
-          "assets/images/ic_plus.png",
-          width: 24,
-          height: 24,
-          alignment: Alignment.centerLeft,
-        ),
-        onPressed: () {
-          Navigator.pushNamed(context, CreateEntryRout)
-              .then((value) => _bloc.add(ResumeEvent()));
+    return BlocProvider(
+      create: (context) => _bloc,
+      child: Builder(
+        builder: (contextB) {
+          _bloc.add(GetAccountBookEvent());
+          return BlocConsumer<HomeBloc, HomeState>(
+            listener: (context, state) {
+              print(state);
+              if(state is ClearAccountBookState) {
+                Navigator.pushReplacementNamed(context, AccountBookRoute);
+              }
+            },
+            listenWhen: (context, state) => state is HomeState,
+            buildWhen: (context, state) => state is GetAccountBookState,
+            builder: (context, state) {
+              return Scaffold(
+                backgroundColor: Color(0xFFE5EAEC),
+                appBar: AppBar(
+                  backgroundColor: Colors.blue,
+                  title: Text(
+                    state == null ? "Home" : (state as GetAccountBookState).book.name,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  actions: <Widget>[
+                    MaterialButton(
+                      child: Text("change".toUpperCase()),
+                      textColor: Colors.white,
+                      onPressed: () {
+                        _bloc.add(ClearAccountBookEvent());
+                      },
+                    )
+                  ],
+                ),
+                floatingActionButton: FloatingActionButton(
+                  child: Image.asset(
+                    "assets/images/ic_plus.png",
+                    width: 24,
+                    height: 24,
+                    alignment: Alignment.centerLeft,
+                  ),
+                  onPressed: () {
+                    Navigator.pushNamed(context, CreateEntryRout)
+                        .then((value) => _bloc.add(ResumeEvent()));
+                  },
+                ),
+                body: HomeBodyView(),
+              );
+            },
+          );
         },
-      ),
-      body: BlocProvider(
-        create: (context) => _bloc,
-        child: HomeBodyView(),
       ),
     );
   }

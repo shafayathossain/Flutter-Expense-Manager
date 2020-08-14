@@ -10,4 +10,6 @@ abstract class HomeRepository {
   Future<List<CashFlowOfDay>> getCashFlow(int startTime, int endTime);
   Future<List<ExpenseOfCategory>> getTotalExpenseForAllCategories(int startTime, int endTime);
   Future<List<EntryWithCategoryAndWallet>> getTopFiveEntries(int startTime, int endTime);
+  Future<account_book> getCurrentAccountBook();
+  Future<int> clearCurrentAccountBook();
 }

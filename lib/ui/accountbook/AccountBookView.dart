@@ -1,6 +1,7 @@
 
 import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 import 'package:expense_manager/data/models/AccountBook.dart';
+import 'package:expense_manager/data/models/account_book_with_balance.dart';
 import 'package:expense_manager/data/repositories/AccountBookRepositoryImpl.dart';
 import 'package:expense_manager/ui/Router.dart';
 import 'package:expense_manager/ui/accountbook/AccountBookBloc.dart';
@@ -59,7 +60,7 @@ class AccountBookScreen extends StatelessWidget {
 
 class AccountBookView extends StatefulWidget {
 
-  List<account_book> books = [];
+  List<AccountBookWithBalance> books = [];
 
   @override
   State createState() {
@@ -88,7 +89,7 @@ class AccountBookViewStates extends State<AccountBookView> {
         return !(currentState is ViewBookState);
       },
       builder: (context, state) {
-        if(state is AccountBookLoadedState && state.accountBooks.length > 0) {
+        if(state is AccountBookLoadedState && state.accountBooks.length > 0 && state.accountBooks[0].book != null) {
           widget.books = state.accountBooks;
           return ListView.builder(
             padding: EdgeInsets.symmetric(vertical: 10.0),
@@ -100,7 +101,7 @@ class AccountBookViewStates extends State<AccountBookView> {
                   child: AccountBookItemView(
                     selectedPosition: _selectedPosition,
                     currentPosition: index,
-                    book: widget.books[index],
+                    accountBookWithBalance: widget.books[index],
                     callback: (position) {
                       this._selectedPosition = position;
                       setState(() {
@@ -128,10 +129,11 @@ class AccountBookItemView extends StatelessWidget {
 
   int selectedPosition = -1;
   int currentPosition = -1;
-  account_book book;
+  AccountBookWithBalance accountBookWithBalance;
   AccountBookItemCallback callback;
 
-  AccountBookItemView({this.selectedPosition, this.currentPosition, this.book, this.callback});
+  AccountBookItemView({this.selectedPosition, this.currentPosition,
+    this.accountBookWithBalance, this.callback});
 
   Widget build(BuildContext context) {
     if(currentPosition == selectedPosition) {
@@ -144,33 +146,102 @@ class AccountBookItemView extends StatelessWidget {
           child: Card(
             child: Stack(
               children: [
-                Positioned(
-                  child: Container(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                                color: Colors.black26,
-                                child: Center(
-                                  child: Text(
-                                    book.name,
-                                    style: TextStyle(color: Colors.black),
-                                  ),
-                                ))
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
+                Container(
+                    height: 150,
+                    child: GestureDetector(
+                        child: Card(
+                          color: Color(accountBookWithBalance.book.color),
+                          child: Container(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: <Widget>[
+                                Column(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: <Widget>[
+                                    Text(
+                                      accountBookWithBalance.book.name,
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold
+                                      ),
+                                    ),
+                                    Text(
+                                      (accountBookWithBalance.income - accountBookWithBalance.expense).toString(),
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                Column(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: <Widget>[
+                                    Row(
+                                      children: <Widget>[
+                                        Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            Text(
+                                              "Income",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            Text(
+                                              (accountBookWithBalance.income).toString(),
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 22,
+                                              ),
+                                            )
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                    Row(
+                                      children: <Widget>[
+                                        Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            Text(
+                                              "Expense",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            Text(
+                                              (accountBookWithBalance.expense.abs()).toString(),
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 22,
+                                              ),
+                                            )
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        onTap: () {
+                          callback.call(currentPosition);
+                        }
+                    )
+
                 ),
                 Positioned(
                   child: Container(
-                    color: Colors.white..withOpacity(0.1),
+                    color: Colors.white60,
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -180,7 +251,7 @@ class AccountBookItemView extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             RawMaterialButton(
-                              fillColor: Color(book.color),
+                              fillColor: Color(accountBookWithBalance.book.color),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.all(Radius.circular(3.0))
                               ),
@@ -191,11 +262,11 @@ class AccountBookItemView extends StatelessWidget {
                                 ),
                               ),
                               onPressed: () {
-                                BlocProvider.of<AccountBookBloc>(context)..add(ViewAccountBookEvent(context.read<account_book>()));
+                                BlocProvider.of<AccountBookBloc>(context)..add(ViewAccountBookEvent(context.read<AccountBookWithBalance>().book));
                               },
                             ),
                             RawMaterialButton(
-                              fillColor: Color(book.color),
+                              fillColor: Color(accountBookWithBalance.book.color),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.all(Radius.circular(3.0))
                               ),
@@ -216,7 +287,7 @@ class AccountBookItemView extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             RawMaterialButton(
-                              fillColor: Color(book.color),
+                              fillColor: Color(accountBookWithBalance.book.color),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.all(Radius.circular(3.0))
                               ),
@@ -231,7 +302,7 @@ class AccountBookItemView extends StatelessWidget {
                                     context: context,
                                     barrierDismissible: false,
                                     builder:(contextC) => CreateAccountBookDialog(
-                                      book: book,
+                                      book: accountBookWithBalance.book,
                                       callback: (name, color, id) {
                                         if(id == null) {
                                           BlocProvider.of<AccountBookBloc>(context)
@@ -253,7 +324,7 @@ class AccountBookItemView extends StatelessWidget {
                               },
                             ),
                             RawMaterialButton(
-                              fillColor: Color(book.color),
+                              fillColor: Color(accountBookWithBalance.book.color),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.all(Radius.circular(3.0))
                               ),
@@ -283,8 +354,87 @@ class AccountBookItemView extends StatelessWidget {
           height: 150,
           child: GestureDetector(
               child: Card(
-                child: Center(
-                  child: Text(book.name),
+                color: Color(accountBookWithBalance.book.color),
+                child: Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Column(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          Text(
+                            accountBookWithBalance.book.name,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold
+                            ),
+                          ),
+                          Text(
+                            (accountBookWithBalance.income - accountBookWithBalance.expense).toString(),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold
+                            ),
+                          )
+                        ],
+                      ),
+                      Column(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          Row(
+                            children: <Widget>[
+                              Column(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Text(
+                                    "Income",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Text(
+                                    (accountBookWithBalance.income).toString(),
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 22,
+                                    ),
+                                  )
+                                ],
+                              )
+                            ],
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Column(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Text(
+                                    "Expense",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Text(
+                                    (accountBookWithBalance.expense.abs()).toString(),
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 22,
+                                    ),
+                                  )
+                                ],
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
               onTap: () {

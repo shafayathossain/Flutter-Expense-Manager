@@ -1,3 +1,4 @@
+import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 import 'package:expense_manager/data/models/EntryWithCategoryAndWallet.dart';
 import 'package:expense_manager/data/models/ExpenseOfCategory.dart';
 
@@ -28,5 +29,13 @@ class TopFiveEntriesState extends HomeState {
 
   TopFiveEntriesState({this.entries});
 }
+
+class GetAccountBookState extends HomeState {
+  account_book book;
+
+  GetAccountBookState(this.book);
+}
+
+class ClearAccountBookState extends HomeState {}
 
 class ResetState extends HomeState {}

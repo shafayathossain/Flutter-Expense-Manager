@@ -26,6 +26,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   @override
   Stream<HomeState> mapEventToState(HomeEvent event) async* {
+    print(event);
     if(event is GetWalletsEvent) {
       yield* _getWalletsWithBalance();
     } else if(event is GetBalanceEvent) {
@@ -42,13 +43,18 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         yield* _getExpensesOfAllCategories(_balanceEvent.startTime, _balanceEvent.endTime);
         yield* _getTopFiveEntries(_balanceEvent.startTime, _balanceEvent.endTime);
       }
+    } else if(event is GetAccountBookEvent) {
+      yield* _getCurrentAccountBook();
+    } else if(event is ClearAccountBookEvent) {
+      yield* _clearCurrentAccountBook();
     }
   }
 
   Stream<HomeState> _getWalletsWithBalance() async* {
     final result = await _repository.getWalletsWithBalance();
     wallets.sink.add(result.map((e) {
-      print(e.balance);
+      if(e.balance == null) e.balance = 0.0;
+      if(e.income == null) e.income = 0.0;
       double percent = e.income > 0.0 ? (max(e.balance, 0) / e.income.abs()) : 0;
       return (e..balancePercent = percent);
     }).toList());
@@ -104,5 +110,15 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   Stream<HomeState> _getTopFiveEntries(int startTime, int endTime) async* {
     final result = await _repository.getTopFiveEntries(startTime, endTime);
     yield* Stream.value(TopFiveEntriesState(entries: result));
+  }
+
+  Stream<HomeState> _getCurrentAccountBook() async* {
+    final book = await _repository.getCurrentAccountBook();
+    yield* Stream.value(GetAccountBookState(book));
+  }
+
+  Stream<HomeState> _clearCurrentAccountBook() async* {
+    final result = await _repository.clearCurrentAccountBook();
+    yield* Stream.value(ClearAccountBookState());
   }
 }

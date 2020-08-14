@@ -36,6 +36,10 @@ class GetTopFiveEntriesEvent extends HomeEvent {
   GetTopFiveEntriesEvent(this.startTime, this.endTime);
 }
 
+class GetAccountBookEvent extends HomeEvent { }
+
+class ClearAccountBookEvent extends HomeEvent { }
+
 class ResetEvent extends HomeEvent {}
 
 class ResumeEvent extends HomeEvent {}

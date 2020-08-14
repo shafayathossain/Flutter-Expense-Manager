@@ -38,9 +38,9 @@ class AccountBookBloc extends Bloc<AccountBookEvents, AccountBookStates> {
   }
 
   Stream<AccountBookStates> _getAllBooks() async* {
-    await for(List<account_book> event in repository.getAllAccountBooks()) {
-      yield AccountBookLoadedState()..accountBooks = event;
-    }
+    final result = await repository.getAllAccountBooks();
+    yield AccountBookLoadedState()..accountBooks = result;
+
   }
 
   Stream<AccountBookStates> _createABook(String name, int color) async* {

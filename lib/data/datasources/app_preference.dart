@@ -35,10 +35,15 @@ class AppPreference {
   Future<int> setBook(account_book book) async {
     try {
       final preference = await SharedPreferences.getInstance();
-      final bookString = book.toJsonString();
-      preference.setString(BOOK, bookString);
+      if(book == null) {
+        preference.remove(BOOK);
+      } else {
+        final bookString = book.toJsonString();
+        preference.setString(BOOK, bookString);
+      }
       return 1;
     } catch(e) {
+      print(e);
       return 0;
     }
   }

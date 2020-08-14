@@ -5,6 +5,7 @@ import 'package:expense_manager/data/datasources/localdb/EntryDao.dart';
 import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 import 'package:expense_manager/data/datasources/localdb/WalletDao.dart';
 import 'package:expense_manager/data/models/AccountBook.dart';
+import 'package:expense_manager/data/models/account_book_with_balance.dart';
 import 'package:expense_manager/data/repositories/AccountBookRepository.dart';
 import 'package:expense_manager/utils.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +28,7 @@ class AccountBookRepositoryImpl extends AccountBookRepository {
   AppPreference _preference = AppPreference();
 
   @override
-  Stream<List<account_book>> getAllAccountBooks() {
+  Future<List<AccountBookWithBalance>> getAllAccountBooks() {
     return _accountBookDao.getAllAccountBooks();
   }
 
