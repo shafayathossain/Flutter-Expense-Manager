@@ -29,7 +29,6 @@ class HomeView extends StatelessWidget {
           _bloc.add(GetAccountBookEvent());
           return BlocConsumer<HomeBloc, HomeState>(
             listener: (context, state) {
-              print(state);
               if(state is ClearAccountBookState) {
                 Navigator.pushReplacementNamed(context, AccountBookRoute);
               }
@@ -130,20 +129,19 @@ class HomeBodyState extends State<HomeBodyView> with WidgetsBindingObserver {
           Container(
             height: 150,
             margin: EdgeInsets.only(left: 10, top: 10),
-            child: StreamBuilder(
-              stream: BlocProvider.of<HomeBloc>(context).wallets,
-              builder:
-                  (context, AsyncSnapshot<List<WalletWithBalance>> snapshot) {
+            child: BlocConsumer<HomeBloc, HomeState>(
+              listener: (context, state) {},
+              buildWhen: (context, state) => state is WalletsState,
+              builder: (context, state) {
                 int walletCount = 0;
-                if (snapshot.hasData) {
-                  walletCount = snapshot.data.length;
-                }
+                walletCount = !(state is WalletsState) ? 0 :(state as WalletsState).wallets.length;
+                print(walletCount);
                 return ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: walletCount,
                   itemBuilder: (context, int index) {
                     return Provider(
-                      create: (_) => snapshot.data[index],
+                      create: (_) => (state as WalletsState).wallets[index],
                       child: WalletItemView(
                         selectedPosition: _selectedPosition,
                         currentPosition: index,

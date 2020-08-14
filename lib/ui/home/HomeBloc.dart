@@ -52,13 +52,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   Stream<HomeState> _getWalletsWithBalance() async* {
     final result = await _repository.getWalletsWithBalance();
+    print(result[0].balance);
     wallets.sink.add(result.map((e) {
       if(e.balance == null) e.balance = 0.0;
       if(e.income == null) e.income = 0.0;
       double percent = e.income > 0.0 ? (max(e.balance, 0) / e.income.abs()) : 0;
       return (e..balancePercent = percent);
     }).toList());
-    yield* Stream.value(HomeState());
+    yield* Stream.value(WalletsState(result));
   }
 
   Stream<HomeState> _getCashFlow(int startTime, int endTime) async* {

@@ -1,12 +1,20 @@
 import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 import 'package:expense_manager/data/models/EntryWithCategoryAndWallet.dart';
 import 'package:expense_manager/data/models/ExpenseOfCategory.dart';
+import 'package:expense_manager/data/models/WalletWithBalance.dart';
 
 class HomeState {}
 
 class InitState extends HomeState {}
 
 class LoadingState extends HomeState {}
+
+class WalletsState extends HomeState {
+  List<WalletWithBalance> wallets;
+
+  WalletsState(this.wallets);
+
+}
 
 class CashFlowState extends HomeState {
   double income;
