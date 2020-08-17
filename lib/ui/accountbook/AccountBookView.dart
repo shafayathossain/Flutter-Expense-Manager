@@ -1,4 +1,7 @@
 
+import 'dart:io';
+
+import 'package:csv/csv.dart';
 import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 import 'package:expense_manager/data/models/AccountBook.dart';
 import 'package:expense_manager/data/models/account_book_with_balance.dart';
@@ -11,6 +14,8 @@ import 'package:expense_manager/ui/home/HomeBloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import 'CreateAccountBookDialog.dart';
@@ -78,15 +83,18 @@ class AccountBookViewStates extends State<AccountBookView> {
 
     return BlocConsumer<AccountBookBloc, AccountBookStates>(
       listenWhen: (previousState, currentState) {
-        return (currentState is ViewBookState);
+        return (currentState is ViewBookState) || (currentState is ExportEntriesState);
       },
       listener: (context, state) {
         if(state is ViewBookState) {
           Navigator.pushReplacementNamed(context, HomeRoute);
+        } else if(state is ExportEntriesState) {
+          String csv = ListToCsvConverter().convert(state.row);
+          _writeCsv(state.bookName, csv);
         }
       },
       buildWhen: (previousState, currentState) {
-        return !(currentState is ViewBookState);
+        return !((currentState is ViewBookState) || (currentState is ExportEntriesState));
       },
       builder: (context, state) {
         if(state is AccountBookLoadedState && state.accountBooks.length > 0 && state.accountBooks[0].book != null) {
@@ -120,6 +128,25 @@ class AccountBookViewStates extends State<AccountBookView> {
         }
       },
     );
+  }
+
+  void _writeCsv(String bookName, String csv) async {
+    if (await Permission.storage.request().isGranted) {
+      Directory appDocDir = await getExternalStorageDirectory();
+      String appDocPath = appDocDir.path;
+      String filePath = appDocPath + "${bookName}.csv";
+      File file = File(filePath);
+      file.writeAsString(csv);
+      final snackBar = SnackBar(
+        content: Text(
+          "File saved in $filePath",
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.green,
+
+      );
+      Scaffold.of(context).showSnackBar(snackBar);
+    }
   }
 }
 
@@ -277,6 +304,14 @@ class AccountBookItemView extends StatelessWidget {
                                 ),
                               ),
                               onPressed: () {
+                                BlocProvider.of<AccountBookBloc>(context)
+                                  ..add(
+                                      ExportAccountBookEvent(
+                                          context
+                                              .read<AccountBookWithBalance>()
+                                              .book
+                                      )
+                                  );
 
                               },
                             ),

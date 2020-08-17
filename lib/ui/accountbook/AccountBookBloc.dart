@@ -6,6 +6,7 @@ import 'package:expense_manager/data/models/AccountBook.dart';
 import 'package:expense_manager/data/repositories/AccountBookRepository.dart';
 import 'package:expense_manager/ui/accountbook/AccountBookEvents.dart';
 import 'package:expense_manager/ui/accountbook/AccountBookStates.dart';
+import 'package:expense_manager/utils.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 
@@ -28,6 +29,8 @@ class AccountBookBloc extends Bloc<AccountBookEvents, AccountBookStates> {
       yield* _deleteABook(event.book);
     } else if(event is EditAccountBookEvent) {
       yield* _updateABook(event.name, event.color, event.id);
+    } else if(event is ExportAccountBookEvent) {
+      yield* _exportEntries(event.book);
     }
   }
 
@@ -75,6 +78,31 @@ class AccountBookBloc extends Bloc<AccountBookEvents, AccountBookStates> {
   Stream<AccountBookStates> _deleteABook(account_book book) async* {
     final result = await repository.deleteAnAccountBook(book);
     yield* _getAllBooks();
+  }
+
+  Stream<AccountBookStates> _exportEntries(account_book book) async* {
+    final result = await repository.getAllEntries(book.id);
+    final rowHeads = ["Date", "Name", "Tag", "Amount", "Wallet", "Description"];
+    List<List<dynamic>> rows = [[rowHeads]];
+    String previousDate = "";
+    result.forEach((element) {
+      String tempDate = Convert(element.mEntry.date).toDateString();
+      if(tempDate != previousDate) {
+        previousDate = tempDate;
+      } else {
+        tempDate = "";
+      }
+      final row = [
+        tempDate,
+        element.mCategory.name,
+        element.mTag == null ? "" : element.mTag.name,
+        element.mEntry.amount,
+        element.mWallet.name,
+        element.mEntry.description == null ? "" : element.mEntry.description
+      ];
+      rows.add(row);
+    });
+    yield* Stream.value(ExportEntriesState(rows, book.name));
   }
 
 }

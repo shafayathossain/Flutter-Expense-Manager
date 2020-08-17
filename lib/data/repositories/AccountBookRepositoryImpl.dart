@@ -5,6 +5,7 @@ import 'package:expense_manager/data/datasources/localdb/EntryDao.dart';
 import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 import 'package:expense_manager/data/datasources/localdb/WalletDao.dart';
 import 'package:expense_manager/data/models/AccountBook.dart';
+import 'package:expense_manager/data/models/EntryWithCategoryAndWallet.dart';
 import 'package:expense_manager/data/models/account_book_with_balance.dart';
 import 'package:expense_manager/data/repositories/AccountBookRepository.dart';
 import 'package:expense_manager/utils.dart';
@@ -19,12 +20,14 @@ class AccountBookRepositoryImpl extends AccountBookRepository {
     _accountBookDao = AccountBookDao(context.read<LocalDatabase>());
     _categoryDao = CategoryDao(context.read<LocalDatabase>());
     _walletDao = WalletDao(context.read<LocalDatabase>());
+    _entryDao = EntryDao(context.read<LocalDatabase>());
   }
 
   final BuildContext context;
   AccountBookDao _accountBookDao;
   CategoryDao _categoryDao;
   WalletDao _walletDao;
+  EntryDao _entryDao;
   AppPreference _preference = AppPreference();
 
   @override
@@ -61,6 +64,12 @@ class AccountBookRepositoryImpl extends AccountBookRepository {
   @override
   Future<account_book> getCurrentBook() {
     return _preference.getBook();
+  }
+
+
+  @override
+  Future<List<EntryWithCategoryAndWallet>> getAllEntries(int bookId) {
+    return _entryDao.getAllEntries(bookId);
   }
 
   Stream<int> _initializeDataForAccountBook(int accountBookId) {

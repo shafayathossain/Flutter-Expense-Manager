@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 int hexToInt(String hex) {
   int val = 0;
   int len = hex.length;
@@ -16,4 +18,14 @@ int hexToInt(String hex) {
     }
   }
   return val;
+}
+
+extension Convert on int {
+
+  String toDateString() {
+    final formatter = DateFormat("dd-MM-yyyy");
+    final dateTimeObject = DateTime.fromMillisecondsSinceEpoch(this);
+    return formatter.format(dateTimeObject);
+  }
+
 }

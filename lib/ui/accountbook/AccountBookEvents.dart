@@ -30,3 +30,9 @@ class DeleteAccountBookEvent extends AccountBookEvents {
 
   DeleteAccountBookEvent(this.book);
 }
+
+class ExportAccountBookEvent extends AccountBookEvents {
+  account_book book;
+
+  ExportAccountBookEvent(this.book);
+}

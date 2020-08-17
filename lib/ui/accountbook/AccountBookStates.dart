@@ -12,3 +12,11 @@ class AccountBookLoadedState extends AccountBookStates {
 }
 
 class ViewBookState extends AccountBookStates {}
+
+class ExportEntriesState extends AccountBookStates {
+
+  List<List<dynamic>> row;
+  String bookName;
+
+  ExportEntriesState(this.row, this.bookName);
+}

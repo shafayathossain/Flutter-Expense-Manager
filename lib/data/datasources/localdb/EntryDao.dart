@@ -67,7 +67,7 @@ class EntryDao extends DatabaseAccessor<LocalDatabase> with _$EntryDaoMixin {
     });
   }
 
-  Stream<List<EntryWithCategoryAndWallet>> getAllEntries(int bookId) {
+  Future<List<EntryWithCategoryAndWallet>> getAllEntries(int bookId) {
     final query = select(_database.entry)
         .join(
         [
@@ -79,16 +79,14 @@ class EntryDao extends DatabaseAccessor<LocalDatabase> with _$EntryDaoMixin {
         ])..where(_database.entry.bookId.equals(bookId))
       ..orderBy([OrderingTerm.desc(_database.entry.amount)]);
 
-    return query.get().asStream().map((rows) {
-      return rows.map((e) {
+    return query.map((row) {
         return EntryWithCategoryAndWallet(
-            e.readTable(this.entry as TableInfo<$EntryTable, entry>),
-            e.readTable(this.category as TableInfo<$CategoryTable, category>),
-            e.readTable(this.tag as TableInfo<$TagTable, tag>),
-            e.readTable(this.wallet as TableInfo<$WalletTable, wallet>)
+            row.readTable(this.entry as TableInfo<$EntryTable, entry>),
+            row.readTable(this.category as TableInfo<$CategoryTable, category>),
+            row.readTable(this.tag as TableInfo<$TagTable, tag>),
+            row.readTable(this.wallet as TableInfo<$WalletTable, wallet>)
         );
-      }).toList();
-    });
+    }).get();
   }
 
   Future<int> insertEntry(entry entry) {
