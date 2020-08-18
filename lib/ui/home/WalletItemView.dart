@@ -21,6 +21,52 @@ class WalletItemView extends StatelessWidget {
 
   Widget build(BuildContext context) {
     final walletInformationView = getWalletInformationView(context);
+    List<Widget> widgets = [
+      RawMaterialButton(
+        fillColor: Color(context.watch<WalletWithBalance>().mWallet.color),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(3.0))
+        ),
+        child: Text(
+          "adjust".toUpperCase(),
+          style: TextStyle(
+              color: Colors.white
+          ),
+        ),
+        onPressed: () {
+          callback.call(-1);
+          showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder:(contextC) => AdjustWalletBalanceDialog(
+                callback: (amount) {
+                  BlocProvider.of<HomeBloc>(context).add(AdjustWalletBalanceEvent(amount, context.read<WalletWithBalance>()));
+                },
+              )
+          );
+        },
+      ),
+    ];
+    print(context.watch<WalletWithBalance>().mWallet.canDelete);
+    if(context.watch<WalletWithBalance>().mWallet.canDelete) {
+      widgets.add(
+        RawMaterialButton(
+          fillColor: Color(context.watch<WalletWithBalance>().mWallet.color),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(3.0))
+          ),
+          child: Text(
+            "delete".toUpperCase(),
+            style: TextStyle(
+                color: Colors.white
+            ),
+          ),
+          onPressed: () {
+
+          },
+        ),
+      );
+    }
     if(currentPosition == selectedPosition) {
       return Container(
         height: 150,
@@ -37,6 +83,8 @@ class WalletItemView extends StatelessWidget {
               Positioned(
                 child: Container(
                   color: Colors.white60,
+                  height: 150,
+                  width: 300,
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -44,47 +92,7 @@ class WalletItemView extends StatelessWidget {
                       Row(
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          RawMaterialButton(
-                            fillColor: Color(context.watch<WalletWithBalance>().mWallet.color),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(3.0))
-                            ),
-                            child: Text(
-                              "adjust".toUpperCase(),
-                              style: TextStyle(
-                                  color: Colors.white
-                              ),
-                            ),
-                            onPressed: () {
-                              callback.call(-1);
-                              showDialog(
-                                  context: context,
-                                  barrierDismissible: false,
-                                  builder:(contextC) => AdjustWalletBalanceDialog(
-                                    callback: (amount) {
-                                      BlocProvider.of<HomeBloc>(context).add(AdjustWalletBalanceEvent(amount, context.read<WalletWithBalance>()));
-                                    },
-                                  )
-                              );
-                            },
-                          ),
-                          RawMaterialButton(
-                            fillColor: Color(context.watch<WalletWithBalance>().mWallet.color),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(3.0))
-                            ),
-                            child: Text(
-                              "delete".toUpperCase(),
-                              style: TextStyle(
-                                  color: Colors.white
-                              ),
-                            ),
-                            onPressed: () {
-
-                            },
-                          ),
-                        ],
+                        children: widgets,
                       ),
                     ],
                   ),

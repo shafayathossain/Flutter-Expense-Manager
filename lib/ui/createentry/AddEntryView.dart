@@ -182,7 +182,11 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                                   builder: (context, snapshot) {
                                     if(snapshot.hasData) {
                                       _amountTextController.text = snapshot.data as String;
-                                      _amountTextController.selection = TextSelection.collapsed(offset: _amountTextController.text.length);
+                                      _amountTextController.selection =
+                                          TextSelection
+                                              .collapsed(
+                                              offset: _amountTextController.text.length
+                                          );
                                     }
                                     return TextFormField(
                                       maxLines: 1,
@@ -482,7 +486,7 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                                             snapshot.data.map((e) => e.name).toList(),
                                             chipColors: snapshot.data.map((e) => e.color).toList(),
                                             onChipSelectedCallback: (int index) {
-
+                                              _selectedTag = snapshot.data[index];
                                             },
                                           )
                                       ),
@@ -566,8 +570,6 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                                 child: GestureDetector(
                                   child: TextFormField(
                                     maxLines: 100,
-                                    showCursor: true,
-                                    readOnly: true,
                                     validator: (text) {
                                       if (text == null || text.isEmpty) {
                                         return 'Text is empty';
@@ -711,7 +713,7 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                   Expanded(
                     child: TableCalendar(
                       calendarController: _calendarController,
-                      rowHeight: 40,
+                      rowHeight: 35,
                       headerStyle: HeaderStyle(
                           centerHeaderTitle: true,
                           formatButtonVisible: false
