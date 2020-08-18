@@ -131,10 +131,9 @@ class AccountBookViewStates extends State<AccountBookView> {
   }
 
   void _writeCsv(String bookName, String csv) async {
-    if (await Permission.storage.request().isGranted) {
       Directory appDocDir = await getExternalStorageDirectory();
       String appDocPath = appDocDir.path;
-      String filePath = appDocPath + "${bookName}.csv";
+      String filePath = appDocPath + "/${bookName}.csv";
       File file = File(filePath);
       file.writeAsString(csv);
       final snackBar = SnackBar(
@@ -146,7 +145,7 @@ class AccountBookViewStates extends State<AccountBookView> {
 
       );
       Scaffold.of(context).showSnackBar(snackBar);
-    }
+
   }
 }
 

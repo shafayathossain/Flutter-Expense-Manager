@@ -83,7 +83,8 @@ class AccountBookBloc extends Bloc<AccountBookEvents, AccountBookStates> {
   Stream<AccountBookStates> _exportEntries(account_book book) async* {
     final result = await repository.getAllEntries(book.id);
     final rowHeads = ["Date", "Name", "Tag", "Amount", "Wallet", "Description"];
-    List<List<dynamic>> rows = [[rowHeads]];
+    List<List<dynamic>> rows = [rowHeads];
+
     String previousDate = "";
     result.forEach((element) {
       String tempDate = Convert(element.mEntry.date).toDateString();
