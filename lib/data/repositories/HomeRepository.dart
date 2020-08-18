@@ -12,4 +12,5 @@ abstract class HomeRepository {
   Future<List<EntryWithCategoryAndWallet>> getTopFiveEntries(int startTime, int endTime);
   Future<account_book> getCurrentAccountBook();
   Future<int> clearCurrentAccountBook();
+  Future<int> adjustWalletBalance(double amount, int date, int walletId);
 }

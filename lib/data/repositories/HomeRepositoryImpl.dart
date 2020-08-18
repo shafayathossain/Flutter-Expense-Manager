@@ -1,4 +1,5 @@
 import 'package:expense_manager/data/datasources/app_preference.dart';
+import 'package:expense_manager/data/datasources/localdb/CategoryDao.dart';
 import 'package:expense_manager/data/datasources/localdb/EntryDao.dart';
 import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 import 'package:expense_manager/data/datasources/localdb/WalletDao.dart';
@@ -15,15 +16,18 @@ class HomeRepositoryImpl extends HomeRepository {
 
   WalletDao _walletDao;
   EntryDao _entryDao;
+  CategoryDao _categoryDao;
   AppPreference _preference = AppPreference();
 
   HomeRepositoryImpl(BuildContext context) {
     try {
       _walletDao = WalletDao(context.watch<LocalDatabase>());
       _entryDao = EntryDao(context.watch<LocalDatabase>());
+      _categoryDao = CategoryDao(context.watch<LocalDatabase>());
     } catch(e) {
       _walletDao = WalletDao(context.read<LocalDatabase>());
       _entryDao = EntryDao(context.read<LocalDatabase>());
+      _categoryDao = CategoryDao(context.read<LocalDatabase>());
     }
   }
 
@@ -61,5 +65,25 @@ class HomeRepositoryImpl extends HomeRepository {
   @override
   Future<int> clearCurrentAccountBook() {
     return _preference.setBook(null);
+  }
+
+  @override
+  Future<int> adjustWalletBalance(double amount, int date, int walletId) {
+
+    return _preference.getBook().then((book) {
+      return _categoryDao.findCategory("Adjustment", amount < 0 ? false : true, book.id)
+          .then((category) {
+        entry mEntry = entry(
+          amount: amount,
+          date: date,
+          categoryId: category.id,
+          tagId: null,
+          walletId: walletId,
+          description: null,
+          bookId: book.id
+        );
+        return _entryDao.insertEntry(mEntry);
+      });
+    });
   }
 }

@@ -69,12 +69,12 @@ class CategoryDao extends DatabaseAccessor<LocalDatabase> with _$CategoryDaoMixi
     return delete(_database.tag).delete(tag).asStream();
   }
 
-  Stream<category> findCategory(String name, bool isIncome, int bookId) {
+  Future<category> findCategory(String name, bool isIncome, int bookId) {
     return (select(_database.category)..limit(1)
       ..where((tbl) => tbl.name.equals(name) &
       tbl.isIncome.equals(isIncome) &
       tbl.bookId.equals(bookId)))
-        .getSingle().asStream();
+        .getSingle();
   }
 
   Stream<category> getCategory(int categoryId) {

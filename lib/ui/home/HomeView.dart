@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:expense_manager/data/models/WalletWithBalance.dart';
 import 'package:expense_manager/data/repositories/HomeRepositoryImpl.dart';
 import 'package:expense_manager/ui/Router.dart';
@@ -78,7 +80,14 @@ class HomeView extends StatelessWidget {
 
 class HomeBodyView extends StatefulWidget {
 
-  const HomeBodyView({ Key key }) : super(key: key);
+  Key walletListKey = new Key(
+      Random(
+          DateTime.now().millisecondsSinceEpoch
+      )
+          .nextInt(1000)
+          .toString());
+
+  HomeBodyView({ Key key }) : super(key: key);
 
   @override
   State createState() {
@@ -115,49 +124,52 @@ class HomeBodyState extends State<HomeBodyView> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     BlocProvider.of<HomeBloc>(context).add(GetWalletsEvent());
     return Container(
-      child: ListView(
+      child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
-        shrinkWrap: true,
-        children: [
-          Container(
-            margin: EdgeInsets.only(left: 10, top: 10),
-            child: Text(
-              "Wallets",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              margin: EdgeInsets.only(left: 10, top: 10),
+              child: Text(
+                "Wallets",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+              ),
             ),
-          ),
-          Container(
-            height: 150,
-            margin: EdgeInsets.only(left: 10, top: 10),
-            child: BlocConsumer<HomeBloc, HomeState>(
-              listener: (context, state) {},
-              buildWhen: (context, state) => state is WalletsState,
-              builder: (context, state) {
-                int walletCount = 0;
-                walletCount = !(state is WalletsState) ? 0 :(state as WalletsState).wallets.length;
-                print(walletCount);
-                return ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: walletCount,
-                  itemBuilder: (context, int index) {
-                    return Provider(
-                      create: (_) => (state as WalletsState).wallets[index],
-                      child: WalletItemView(
-                        selectedPosition: _selectedPosition,
-                        currentPosition: index,
-                        callback: (position) {
-                          _selectedPosition = position;
-                              setState(() { });
-                        },
-                      ),
-                    );
-                  },
-                );
-              },
+            Container(
+              height: 150,
+              margin: EdgeInsets.only(left: 10, top: 10),
+              child: BlocConsumer<HomeBloc, HomeState>(
+                listener: (context, state) {},
+                buildWhen: (context, state) => state is WalletsState,
+                builder: (context, state) {
+                  int walletCount = 0;
+                  walletCount = !(state is WalletsState) ? 0 :(state as WalletsState).wallets.length;
+                  print(walletCount);
+                  return ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: walletCount,
+                    itemBuilder: (context, int index) {
+                      return Provider(
+                        create: (_) => (state as WalletsState).wallets[index],
+                        key: ValueKey((state as WalletsState).wallets[index].balance),
+                        child: WalletItemView(
+                          selectedPosition: _selectedPosition,
+                          currentPosition: index,
+                          callback: (position) {
+                            _selectedPosition = position;
+                            setState(() { });
+                          },
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
             ),
-          ),
-          CashFlowView(),
-        ],
+            CashFlowView(),
+          ],
+        ),
       ),
     );
   }

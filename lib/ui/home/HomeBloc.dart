@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 import 'package:expense_manager/data/models/CashFlowOfDay.dart';
 import 'package:expense_manager/data/models/EntryWithCategoryAndWallet.dart';
 import 'package:expense_manager/data/models/ExpenseOfCategory.dart';
@@ -47,6 +48,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       yield* _getCurrentAccountBook();
     } else if(event is ClearAccountBookEvent) {
       yield* _clearCurrentAccountBook();
+    } else if(event is AdjustWalletBalanceEvent) {
+      yield* _adjustWalletBalance(event.amount, event.mWallet);
     }
   }
 
@@ -121,5 +124,22 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   Stream<HomeState> _clearCurrentAccountBook() async* {
     final result = await _repository.clearCurrentAccountBook();
     yield* Stream.value(ClearAccountBookState());
+  }
+
+  Stream<HomeState> _adjustWalletBalance(double amount, WalletWithBalance wallet) async* {
+    double adjustedBalance = amount - wallet.balance;
+    int date = DateTime(
+      DateTime.now().year,
+      DateTime.now().month,
+      DateTime.now().day,
+      0,
+      0,
+      0,
+      0,
+      0
+    ).millisecondsSinceEpoch;
+    final result = await _repository
+        .adjustWalletBalance(adjustedBalance, date, wallet.mWallet.id);
+    yield* _getWalletsWithBalance();
   }
 }

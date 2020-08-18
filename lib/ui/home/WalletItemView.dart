@@ -1,5 +1,9 @@
 
 import 'package:expense_manager/data/models/WalletWithBalance.dart';
+import 'package:expense_manager/ui/home/HomeBloc.dart';
+import 'package:expense_manager/ui/home/HomeEvent.dart';
+import 'package:expense_manager/ui/home/adjust_wallet_dialog.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +17,7 @@ class WalletItemView extends StatelessWidget {
   int currentPosition = -1;
   WalletItemCallback callback;
 
-  WalletItemView({this.selectedPosition, this.currentPosition, this.callback});
+  WalletItemView({this.selectedPosition, this.currentPosition, this.callback, Key key}): super(key: key);
 
   Widget build(BuildContext context) {
     final walletInformationView = getWalletInformationView(context);
@@ -53,7 +57,16 @@ class WalletItemView extends StatelessWidget {
                               ),
                             ),
                             onPressed: () {
-
+                              callback.call(-1);
+                              showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder:(contextC) => AdjustWalletBalanceDialog(
+                                    callback: (amount) {
+                                      BlocProvider.of<HomeBloc>(context).add(AdjustWalletBalanceEvent(amount, context.read<WalletWithBalance>()));
+                                    },
+                                  )
+                              );
                             },
                           ),
                           RawMaterialButton(

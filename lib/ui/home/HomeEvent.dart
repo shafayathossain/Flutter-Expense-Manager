@@ -1,3 +1,6 @@
+import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
+import 'package:expense_manager/data/models/WalletWithBalance.dart';
+
 class HomeEvent{}
 
 class InitialEvent extends HomeEvent {}
@@ -43,3 +46,11 @@ class ClearAccountBookEvent extends HomeEvent { }
 class ResetEvent extends HomeEvent {}
 
 class ResumeEvent extends HomeEvent {}
+
+class AdjustWalletBalanceEvent extends HomeEvent {
+
+  double amount;
+  WalletWithBalance mWallet;
+
+  AdjustWalletBalanceEvent(this.amount, this.mWallet);
+}
