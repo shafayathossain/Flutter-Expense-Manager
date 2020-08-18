@@ -113,6 +113,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   Stream<HomeState> _getTopFiveEntries(int startTime, int endTime) async* {
     final result = await _repository.getTopFiveEntries(startTime, endTime);
+    print("five entry - $result");
     yield* Stream.value(TopFiveEntriesState(entries: result));
   }
 

@@ -470,15 +470,19 @@ class _CashFlowState extends State<CashFlowView> {
                   children: <Widget>[
                     Expanded(
                       child: Container(
-                        child: BlocBuilder(
+                        child: BlocConsumer(
+                          listener: (context, state) {},
                           bloc: BlocProvider.of<HomeBloc>(context),
+                          buildWhen: (contet, state) => state is TopFiveEntriesState,
                           builder: (context, state) {
+                            print("476 - $state");
                             if(state is TopFiveEntriesState) {
                               final formatter = DateFormat("dd-MM-yyyy");
                               return Column(
                                 children: List.generate(state.entries.length, (index) {
                                   return Column(
                                     mainAxisSize: MainAxisSize.max,
+                                    key: UniqueKey(),
                                     children: <Widget>[
                                       Container(
                                         padding: EdgeInsets.all(10),

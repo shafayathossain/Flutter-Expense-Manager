@@ -23,7 +23,6 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
 
     _bloc = HomeBloc(HomeRepositoryImpl(context));
-
     return BlocProvider(
       create: (context) => _bloc,
       child: Builder(

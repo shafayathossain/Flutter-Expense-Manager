@@ -369,7 +369,7 @@ class AccountBookItemView extends StatelessWidget {
                                 ),
                               ),
                               onPressed: () {
-                                _showDeleteConfirmationDialog(context);
+                                _showDeleteConfirmationDialog(context, accountBookWithBalance.book);
                               },
                             )
                           ],
@@ -480,7 +480,7 @@ class AccountBookItemView extends StatelessWidget {
     }
   }
 
-  void _showDeleteConfirmationDialog(BuildContext context) {
+  void _showDeleteConfirmationDialog(BuildContext context, account_book book) {
     showDialog(
       context: context,
       builder: (contextB) {
@@ -509,7 +509,7 @@ class AccountBookItemView extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                BlocProvider.of<AccountBookBloc>(context)..add(DeleteAccountBookEvent(context.read<account_book>()));
+                BlocProvider.of<AccountBookBloc>(context)..add(DeleteAccountBookEvent(book));
                 Navigator.pop(context);
               },
             ),
