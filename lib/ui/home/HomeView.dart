@@ -1,10 +1,9 @@
 import 'dart:math';
 
-import 'package:expense_manager/data/models/WalletWithBalance.dart';
 import 'package:expense_manager/data/repositories/HomeRepositoryImpl.dart';
 import 'package:expense_manager/ui/Router.dart';
 import 'package:expense_manager/ui/home/CashFlowView.dart';
-import 'package:expense_manager/ui/home/DayRangeChip.dart';
+import 'package:expense_manager/ui/home/CreateWalletDialog.dart';
 import 'package:expense_manager/ui/home/HomeBloc.dart';
 import 'package:expense_manager/ui/home/HomeEvent.dart';
 import 'package:expense_manager/ui/home/HomeState.dart';
@@ -16,12 +15,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
 class HomeView extends StatelessWidget {
-
   HomeBloc _bloc;
 
   @override
   Widget build(BuildContext context) {
-
     _bloc = HomeBloc(HomeRepositoryImpl(context));
     return BlocProvider(
       create: (context) => _bloc,
@@ -30,7 +27,7 @@ class HomeView extends StatelessWidget {
           _bloc.add(GetAccountBookEvent());
           return BlocConsumer<HomeBloc, HomeState>(
             listener: (context, state) {
-              if(state is ClearAccountBookState) {
+              if (state is ClearAccountBookState) {
                 Navigator.pushReplacementNamed(context, AccountBookRoute);
               }
             },
@@ -42,7 +39,9 @@ class HomeView extends StatelessWidget {
                 appBar: AppBar(
                   backgroundColor: Colors.blue,
                   title: Text(
-                    state == null ? "Home" : (state as GetAccountBookState).book.name,
+                    state == null
+                        ? "Home"
+                        : (state as GetAccountBookState).book.name,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   actions: <Widget>[
@@ -78,15 +77,10 @@ class HomeView extends StatelessWidget {
 }
 
 class HomeBodyView extends StatefulWidget {
-
   Key walletListKey = new Key(
-      Random(
-          DateTime.now().millisecondsSinceEpoch
-      )
-          .nextInt(1000)
-          .toString());
+      Random(DateTime.now().millisecondsSinceEpoch).nextInt(1000).toString());
 
-  HomeBodyView({ Key key }) : super(key: key);
+  HomeBodyView({Key key}) : super(key: key);
 
   @override
   State createState() {
@@ -97,13 +91,11 @@ class HomeBodyView extends StatefulWidget {
 class HomeBodyState extends State<HomeBodyView> with WidgetsBindingObserver {
   int _selectedPosition;
 
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
   }
-
 
   @override
   void dispose() {
@@ -114,7 +106,7 @@ class HomeBodyState extends State<HomeBodyView> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     print(state);
-    if(state == AppLifecycleState.resumed) {
+    if (state == AppLifecycleState.resumed) {
       BlocProvider.of<HomeBloc>(context).add(ResumeEvent());
     }
   }
@@ -128,12 +120,28 @@ class HomeBodyState extends State<HomeBodyView> with WidgetsBindingObserver {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              margin: EdgeInsets.only(left: 10, top: 10),
-              child: Text(
-                "Wallets",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Container(
+                  margin: EdgeInsets.only(left: 10, top: 10),
+                  child: Text(
+                    "Wallets",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                  ),
+                ),
+                Container(
+                  child: MaterialButton(
+                      child: Text(
+                        "Create",
+                        style: TextStyle(color: Colors.blueAccent),
+                      ),
+                      padding: EdgeInsets.all(0),
+                      onPressed: () {
+                        _showAddWalletDialog();
+                      }),
+                )
+              ],
             ),
             Container(
               height: 150,
@@ -142,8 +150,11 @@ class HomeBodyState extends State<HomeBodyView> with WidgetsBindingObserver {
                 listener: (context, state) {},
                 buildWhen: (context, state) => state is WalletsState,
                 builder: (context, state) {
+                  print(state);
                   int walletCount = 0;
-                  walletCount = !(state is WalletsState) ? 0 :(state as WalletsState).wallets.length;
+                  walletCount = !(state is WalletsState)
+                      ? 0
+                      : (state as WalletsState).wallets.length;
                   print(walletCount);
                   return ListView.builder(
                     scrollDirection: Axis.horizontal,
@@ -151,13 +162,14 @@ class HomeBodyState extends State<HomeBodyView> with WidgetsBindingObserver {
                     itemBuilder: (context, int index) {
                       return Provider(
                         create: (_) => (state as WalletsState).wallets[index],
-                        key: ValueKey((state as WalletsState).wallets[index].balance),
+                        key: ObjectKey(
+                            (state as WalletsState).wallets[index].balance),
                         child: WalletItemView(
                           selectedPosition: _selectedPosition,
                           currentPosition: index,
                           callback: (position) {
                             _selectedPosition = position;
-                            setState(() { });
+                            setState(() {});
                           },
                         ),
                       );
@@ -171,5 +183,18 @@ class HomeBodyState extends State<HomeBodyView> with WidgetsBindingObserver {
         ),
       ),
     );
+  }
+
+  void _showAddWalletDialog() {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (contextC) => CreateWalletDialog(
+              callback: (name, color, id) {
+                print("$name");
+                BlocProvider.of<HomeBloc>(context)
+                  ..add(CreateWalletEvent(name, color));
+              },
+            ));
   }
 }

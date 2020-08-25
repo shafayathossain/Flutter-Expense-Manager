@@ -10,10 +10,8 @@ import 'package:expense_manager/data/models/WalletWithBalance.dart';
 import 'package:expense_manager/data/repositories/HomeRepository.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
 
 class HomeRepositoryImpl extends HomeRepository {
-
   WalletDao _walletDao;
   EntryDao _entryDao;
   CategoryDao _categoryDao;
@@ -24,7 +22,7 @@ class HomeRepositoryImpl extends HomeRepository {
       _walletDao = WalletDao(context.watch<LocalDatabase>());
       _entryDao = EntryDao(context.watch<LocalDatabase>());
       _categoryDao = CategoryDao(context.watch<LocalDatabase>());
-    } catch(e) {
+    } catch (e) {
       _walletDao = WalletDao(context.read<LocalDatabase>());
       _entryDao = EntryDao(context.read<LocalDatabase>());
       _categoryDao = CategoryDao(context.read<LocalDatabase>());
@@ -40,13 +38,16 @@ class HomeRepositoryImpl extends HomeRepository {
 
   @override
   Future<List<CashFlowOfDay>> getCashFlow(int startTime, int endTime) {
-    return _preference.getBook().then((value) => _entryDao.getCashFlow(startTime, endTime, value.id));
+    return _preference
+        .getBook()
+        .then((value) => _entryDao.getCashFlow(startTime, endTime, value.id));
   }
 
   @override
   Future<List<ExpenseOfCategory>> getTotalExpenseForAllCategories(
       int startTime, int endTime) {
-    return _preference.getBook().then((value) => _entryDao.getTotalExpenseForAllCategories(startTime, endTime, value.id));
+    return _preference.getBook().then((value) => _entryDao
+        .getTotalExpenseForAllCategories(startTime, endTime, value.id));
   }
 
   @override
@@ -69,21 +70,29 @@ class HomeRepositoryImpl extends HomeRepository {
 
   @override
   Future<int> adjustWalletBalance(double amount, int date, int walletId) {
-
     return _preference.getBook().then((book) {
-      return _categoryDao.findCategory("Adjustment", amount < 0 ? false : true, book.id)
+      return _categoryDao
+          .findCategory("Adjustment", amount < 0 ? false : true, book.id)
           .then((category) {
         entry mEntry = entry(
-          amount: amount,
-          date: date,
-          categoryId: category.id,
-          tagId: null,
-          walletId: walletId,
-          description: null,
-          bookId: book.id
-        );
+            amount: amount,
+            date: date,
+            categoryId: category.id,
+            tagId: null,
+            walletId: walletId,
+            description: null,
+            bookId: book.id);
         return _entryDao.insertEntry(mEntry);
       });
+    });
+  }
+
+  @override
+  Future<int> createWallet(String name, int color) {
+    return _preference.getBook().then((value) {
+      wallet mWallet =
+          wallet(name: name, color: color, bookId: value.id, canDelete: true);
+      return _walletDao.insertWallet(mWallet);
     });
   }
 }

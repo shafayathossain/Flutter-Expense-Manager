@@ -7,39 +7,37 @@ part 'WalletDao.g.dart';
 
 @UseDao(tables: [Wallet])
 class WalletDao extends DatabaseAccessor<LocalDatabase> with _$WalletDaoMixin {
-
   LocalDatabase _database;
 
-  WalletDao(LocalDatabase attachedDatabase): super(attachedDatabase) {
+  WalletDao(LocalDatabase attachedDatabase) : super(attachedDatabase) {
     this._database = attachedDatabase;
   }
 
-  Stream<int> insertWallet(wallet mWallet) {
-    return into(_database.wallet).insert(mWallet).asStream();
+  Future<int> insertWallet(wallet mWallet) {
+    return into(_database.wallet).insert(mWallet);
   }
 
   Stream<List<wallet>> getWallets(int bookId) {
-    return (select(_database.wallet))
-        .get().asStream();
+    return (select(_database.wallet)).get().asStream();
   }
 
   Future<List<WalletWithBalance>> getWalletsWithBalance(int bookId) {
     final balance = CustomExpression<double>("SUM(entry.amount)");
-    final income = CustomExpression<double>("SUM(CASE WHEN entry.amount>=0 THEN entry.amount ELSE 0 END)");
-    final query = (select(_database.wallet)
-        .join([leftOuterJoin(_database.entry, _database.entry.walletId.equalsExp(_database.wallet.id))])
-        ..addColumns([balance, income])
-        ..where(_database.wallet.bookId.equals(bookId))
-        ..groupBy([_database.entry.walletId])
-      );
+    final income = CustomExpression<double>(
+        "SUM(CASE WHEN entry.amount>=0 THEN entry.amount ELSE 0 END)");
+    final query = (select(_database.wallet).join([
+      leftOuterJoin(_database.entry,
+          _database.entry.walletId.equalsExp(_database.wallet.id),
+          useColumns: false)
+    ])
+      ..addColumns([balance, income])
+      ..where(_database.wallet.bookId.equals(bookId))
+      ..groupBy([_database.entry.walletId]));
     return query.map((event) {
       return WalletWithBalance(
-        balance: event.read(balance),
-        income: event.read(income),
-        mWallet: event.readTable(_database.wallet)
-      );
+          balance: event.read(balance),
+          income: event.read(income),
+          mWallet: event.readTable(_database.wallet));
     }).get();
-
   }
-
 }
