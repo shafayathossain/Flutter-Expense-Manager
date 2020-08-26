@@ -1,8 +1,7 @@
+import 'package:date_range_picker/date_range_picker.dart' as DateRagePicker;
 import 'package:expense_manager/data/models/CashFlowOfDay.dart';
 import 'package:expense_manager/data/models/ExpenseOfCategory.dart';
 import 'package:expense_manager/ui/home/DayRangeChip.dart';
-import 'package:date_range_picker/date_range_picker.dart' as DateRagePicker;
-import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:expense_manager/ui/home/HomeBloc.dart';
 import 'package:expense_manager/ui/home/HomeEvent.dart';
 import 'package:expense_manager/ui/home/HomeState.dart';
@@ -17,20 +16,17 @@ import 'package:mp_chart/mp/controller/bar_chart_controller.dart';
 import 'package:mp_chart/mp/controller/line_chart_controller.dart';
 import 'package:mp_chart/mp/controller/pie_chart_controller.dart';
 import 'package:mp_chart/mp/core/adapter_android_mp.dart';
-import 'package:mp_chart/mp/core/axis/y_axis.dart';
 import 'package:mp_chart/mp/core/data/bar_data.dart';
 import 'package:mp_chart/mp/core/data/line_data.dart';
 import 'package:mp_chart/mp/core/data/pie_data.dart';
 import 'package:mp_chart/mp/core/data_interfaces/i_bar_data_set.dart';
 import 'package:mp_chart/mp/core/data_set/bar_data_set.dart';
-import 'package:mp_chart/mp/core/data_set/data_set.dart';
 import 'package:mp_chart/mp/core/data_set/line_data_set.dart';
 import 'package:mp_chart/mp/core/data_set/pie_data_set.dart';
 import 'package:mp_chart/mp/core/description.dart';
 import 'package:mp_chart/mp/core/entry/bar_entry.dart';
 import 'package:mp_chart/mp/core/entry/entry.dart';
 import 'package:mp_chart/mp/core/entry/pie_entry.dart';
-import 'package:mp_chart/mp/core/enums/axis_dependency.dart';
 import 'package:mp_chart/mp/core/enums/legend_horizontal_alignment.dart';
 import 'package:mp_chart/mp/core/enums/legend_orientation.dart';
 import 'package:mp_chart/mp/core/enums/legend_vertical_alignment.dart';
@@ -41,10 +37,8 @@ import 'package:mp_chart/mp/core/enums/y_axis_label_position.dart';
 import 'package:mp_chart/mp/core/render/pie_chart_renderer.dart';
 import 'package:mp_chart/mp/core/utils/color_utils.dart';
 import 'package:mp_chart/mp/core/value_formatter/value_formatter.dart';
-import 'package:provider/provider.dart';
 
 class CashFlowView extends StatefulWidget {
-
   @override
   State createState() {
     return _CashFlowState();
@@ -80,70 +74,40 @@ class _CashFlowState extends State<CashFlowView> {
                   selectedIndex: _selectedPosition,
                   onChipSelectedCallback: (index) {
                     _selectedPosition = index;
-                    if(index == 0) {
-                      BlocProvider.of<HomeBloc>(context).add(
-                          GetBalanceEvent(
-                            DateTime(
-                                DateTime.now().year,
-                                DateTime.now().month,
-                                1
-                            ).millisecondsSinceEpoch,
-                            DateTime(
-                                DateTime.now().year,
-                                DateTime.now().month + 1,
-                                1
-                            )
-                                .subtract(Duration(days: 1))
-                                .millisecondsSinceEpoch,
-                          ));
-                    } else if(index == 1) {
-                      BlocProvider.of<HomeBloc>(context).add(
-                          GetBalanceEvent(
-                            DateTime(
-                                DateTime.now().year,
-                                DateTime.now().month - 1,
-                                1
-                            ).millisecondsSinceEpoch,
-                            DateTime(
-                                DateTime.now().year,
-                                DateTime.now().month,
-                                1
-                            )
-                                .subtract(Duration(days: 1))
-                                .millisecondsSinceEpoch,
-                          ));
-                    } else if(index == 2) {
-                      BlocProvider.of<HomeBloc>(context).add(
-                          GetBalanceEvent(
-                            DateTime(
-                                DateTime.now().year,
-                                1,
-                                1
-                            ).millisecondsSinceEpoch,
-                            DateTime(
-                                DateTime.now().year + 1,
-                                1,
-                                1
-                            )
-                                .subtract(Duration(days: 1))
-                                .millisecondsSinceEpoch,
-                          ));
-                    } else if(index == 3) {
-                      BlocProvider.of<HomeBloc>(context).add(
-                          GetBalanceEvent(
-                            DateTime(
-                                DateTime.now().year - 1,
-                                1,
-                                1
-                            ).millisecondsSinceEpoch,
-                            DateTime(
-                                DateTime.now().year,
-                                1,
-                                1
-                            )
-                                .subtract(Duration(days: 1))
-                                .millisecondsSinceEpoch,
-                          ));
+                    if (index == 0) {
+                      BlocProvider.of<HomeBloc>(context).add(GetBalanceEvent(
+                        DateTime(DateTime.now().year, DateTime.now().month, 1)
+                            .millisecondsSinceEpoch,
+                        DateTime(DateTime.now().year, DateTime.now().month + 1,
+                                1)
+                            .subtract(Duration(days: 1))
+                            .millisecondsSinceEpoch,
+                      ));
+                    } else if (index == 1) {
+                      BlocProvider.of<HomeBloc>(context).add(GetBalanceEvent(
+                        DateTime(DateTime.now().year, DateTime.now().month - 1,
+                                1)
+                            .millisecondsSinceEpoch,
+                        DateTime(DateTime.now().year, DateTime.now().month, 1)
+                            .subtract(Duration(days: 1))
+                            .millisecondsSinceEpoch,
+                      ));
+                    } else if (index == 2) {
+                      BlocProvider.of<HomeBloc>(context).add(GetBalanceEvent(
+                        DateTime(DateTime.now().year, 1, 1)
+                            .millisecondsSinceEpoch,
+                        DateTime(DateTime.now().year + 1, 1, 1)
+                            .subtract(Duration(days: 1))
+                            .millisecondsSinceEpoch,
+                      ));
+                    } else if (index == 3) {
+                      BlocProvider.of<HomeBloc>(context).add(GetBalanceEvent(
+                        DateTime(DateTime.now().year - 1, 1, 1)
+                            .millisecondsSinceEpoch,
+                        DateTime(DateTime.now().year, 1, 1)
+                            .subtract(Duration(days: 1))
+                            .millisecondsSinceEpoch,
+                      ));
                     }
                     if (index == 4) {
                       _showDatePickerDialog();
@@ -157,31 +121,26 @@ class _CashFlowState extends State<CashFlowView> {
                   },
                 ),
               ],
-            )
-        ),
+            )),
         Container(
-          height: 330,
+          height: 340,
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Wrap(
               children: <Widget>[
                 StreamBuilder(
-                  stream: BlocProvider
-                      .of<HomeBloc>(context)
-                      .incomeAndExpenses,
-
+                  stream: BlocProvider.of<HomeBloc>(context).incomeAndExpenses,
                   builder: (context, AsyncSnapshot<List<double>> snapshot) {
-
                     List<BarEntry> entries = List();
-                    if(snapshot.data != null) {
+                    if (snapshot.data != null) {
                       snapshot.data.forEach((element) {
-                        entries.add(
-                            BarEntry(x: snapshot.data.indexOf(element)
-                                .toDouble(), y: element)
-                        );
+                        entries.add(BarEntry(
+                            x: snapshot.data.indexOf(element).toDouble(),
+                            y: element));
                       });
                     }
-                    IBarDataSet dataSet = BarDataSet( entries, "")..setColors1([Colors.green, Colors.red]);
+                    IBarDataSet dataSet = BarDataSet(entries, "")
+                      ..setColors1([Colors.green, Colors.red]);
                     BarData data = BarData([dataSet]);
                     data.setValueTextSize(10.0);
                     BarChartController controller = BarChartController(
@@ -214,7 +173,7 @@ class _CashFlowState extends State<CashFlowView> {
                     return Container(
                         margin: EdgeInsets.only(left: 10, top: 10, right: 10),
                         width: 300,
-                        height: 320,
+                        height: 330,
                         child: Card(
                           child: Column(
                             mainAxisSize: MainAxisSize.max,
@@ -222,13 +181,13 @@ class _CashFlowState extends State<CashFlowView> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
                               Container(
-                                margin: EdgeInsets.only(left: 10, top: 10, right: 10),
+                                margin: EdgeInsets.only(
+                                    left: 10, top: 10, right: 10),
                                 child: Text(
                                   "Balance",
                                   style: TextStyle(
                                       fontSize: 20,
-                                      fontWeight: FontWeight.bold
-                                  ),
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                               Container(
@@ -236,38 +195,32 @@ class _CashFlowState extends State<CashFlowView> {
                                 child: BarChart(controller),
                               ),
                               Container(
-                                margin: EdgeInsets.only(left: 10, top: 0, right: 10),
+                                margin: EdgeInsets.only(
+                                    left: 10, top: 0, right: 10),
                                 child: Text(
                                   "Total balance:   ${snapshot.data != null ? snapshot.data[0] - snapshot.data[1] : 0.0}",
-                                  style: TextStyle(
-                                      fontSize: 16
-                                  ),
+                                  style: TextStyle(fontSize: 16),
                                 ),
                               )
                             ],
                           ),
-                        )
-                    );
+                        ));
                   },
                 ),
                 StreamBuilder(
-                  stream: BlocProvider
-                      .of<HomeBloc>(context)
-                      .expenses,
-                  builder: (context, AsyncSnapshot<List<ExpenseOfCategory>> snapshot) {
-
+                  stream: BlocProvider.of<HomeBloc>(context).expenses,
+                  builder: (context,
+                      AsyncSnapshot<List<ExpenseOfCategory>> snapshot) {
                     List<PieEntry> entries = [];
                     List<Color> colors = [];
                     double total = 0.0;
-                    if(snapshot.data != null) {
+                    if (snapshot.data != null) {
                       snapshot.data.forEach((element) {
                         total += element.total.abs();
-                        entries.add(
-                            PieEntry(
-                              value: element.total.abs(),
-                              label: element.name,
-                            )
-                        );
+                        entries.add(PieEntry(
+                          value: element.total.abs(),
+                          label: element.name,
+                        ));
                         colors.add(Color(element.color));
                       });
                     }
@@ -286,7 +239,8 @@ class _CashFlowState extends State<CashFlowView> {
                       legendSettingFunction: (legend, controller) {
                         legend
                           ..verticalAlignment = (LegendVerticalAlignment.TOP)
-                          ..horizontalAlignment = (LegendHorizontalAlignment.RIGHT)
+                          ..horizontalAlignment =
+                              (LegendHorizontalAlignment.RIGHT)
                           ..orientation = (LegendOrientation.VERTICAL)
                           ..drawInside = (false)
                           ..enabled = (false);
@@ -299,7 +253,8 @@ class _CashFlowState extends State<CashFlowView> {
                           ..setTransparentCircleAlpha(110);
                       },
                       description: Description()..enabled = false,
-                      centerTextTypeface: TypeFace()..fontWeight = FontWeight.bold,
+                      centerTextTypeface: TypeFace()
+                        ..fontWeight = FontWeight.bold,
                       transparentCircleRadiusPercent: 50,
                       extraBottomOffset: 1,
                       extraTopOffset: 1,
@@ -307,11 +262,12 @@ class _CashFlowState extends State<CashFlowView> {
                       rotateEnabled: true,
                       centerText: "Total\n${total}",
                     );
-                    controller.data = PieData(dataSet)..setValueTextColor(Colors.black);
+                    controller.data = PieData(dataSet)
+                      ..setValueTextColor(Colors.black);
                     return Container(
                         margin: EdgeInsets.only(left: 10, top: 10, right: 10),
                         width: 300,
-                        height: 320,
+                        height: 330,
                         child: Card(
                           child: Column(
                             mainAxisSize: MainAxisSize.max,
@@ -319,13 +275,13 @@ class _CashFlowState extends State<CashFlowView> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
                               Container(
-                                margin: EdgeInsets.only(left: 10, top: 10, right: 10),
+                                margin: EdgeInsets.only(
+                                    left: 10, top: 10, right: 10),
                                 child: Text(
                                   "Expenses",
                                   style: TextStyle(
                                       fontSize: 20,
-                                      fontWeight: FontWeight.bold
-                                  ),
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                               Container(
@@ -334,33 +290,26 @@ class _CashFlowState extends State<CashFlowView> {
                               )
                             ],
                           ),
-                        )
-                    );
+                        ));
                   },
                 ),
                 StreamBuilder(
-                  stream: BlocProvider
-                      .of<HomeBloc>(context)
-                      .cashFlowData,
-                  builder: (context, AsyncSnapshot<List<CashFlowOfDay>> snapshot) {
-                    if(snapshot.connectionState == ConnectionState.waiting) {
+                  stream: BlocProvider.of<HomeBloc>(context).cashFlowData,
+                  builder:
+                      (context, AsyncSnapshot<List<CashFlowOfDay>> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
                       return Container(
                           margin: EdgeInsets.only(left: 10, top: 10, right: 10),
                           width: 300,
-                          height: 320,
-                          child: Card()
-                      );
+                          height: 330,
+                          child: Card());
                     }
                     List<Entry> entries = [];
-                    if(snapshot.data != null) {
+                    if (snapshot.data != null) {
                       snapshot.data.forEach((element) {
-                        entries.add(
-                            Entry(
-                                x: snapshot.data.indexOf(element)
-                                    .toDouble(),
-                                y: element.balance
-                            )
-                        );
+                        entries.add(Entry(
+                            x: snapshot.data.indexOf(element).toDouble(),
+                            y: element.balance));
                       });
                     }
                     LineDataSet dataSet = LineDataSet(entries, "")
@@ -390,14 +339,12 @@ class _CashFlowState extends State<CashFlowView> {
                         legendSettingFunction: (legend, controller) {
                           legend.enabled = false;
                         },
-
-                        description: Description()..enabled = false
-                    );
+                        description: Description()..enabled = false);
                     controller.data = LineData()..addDataSet(dataSet);
                     return Container(
                         margin: EdgeInsets.only(left: 10, top: 10, right: 10),
                         width: 300,
-                        height: 320,
+                        height: 330,
                         child: Card(
                           child: Column(
                             mainAxisSize: MainAxisSize.max,
@@ -405,13 +352,13 @@ class _CashFlowState extends State<CashFlowView> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
                               Container(
-                                margin: EdgeInsets.only(left: 10, top: 10, right: 10),
+                                margin: EdgeInsets.only(
+                                    left: 10, top: 10, right: 10),
                                 child: Text(
                                   "Income and expenditure flow",
                                   style: TextStyle(
                                       fontSize: 20,
-                                      fontWeight: FontWeight.bold
-                                  ),
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                               Container(
@@ -420,8 +367,7 @@ class _CashFlowState extends State<CashFlowView> {
                               )
                             ],
                           ),
-                        )
-                    );
+                        ));
                   },
                 )
               ],
@@ -441,9 +387,7 @@ class _CashFlowState extends State<CashFlowView> {
                       child: Text(
                         "Entries",
                         style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20
-                        ),
+                            fontWeight: FontWeight.bold, fontSize: 20),
                       ),
                     ),
                     Padding(
@@ -455,12 +399,10 @@ class _CashFlowState extends State<CashFlowView> {
                         color: Colors.blueAccent,
                         highlightColor: Colors.blueAccent,
                         splashColor: Colors.white60,
-                        onPressed: (){},
+                        onPressed: () {},
                         child: Text(
                           "See all",
-                          style: TextStyle(
-                              color: Colors.white
-                          ),
+                          style: TextStyle(color: Colors.white),
                         ),
                       ),
                     )
@@ -473,13 +415,15 @@ class _CashFlowState extends State<CashFlowView> {
                         child: BlocConsumer(
                           listener: (context, state) {},
                           bloc: BlocProvider.of<HomeBloc>(context),
-                          buildWhen: (contet, state) => state is TopFiveEntriesState,
+                          buildWhen: (contet, state) =>
+                              state is TopFiveEntriesState,
                           builder: (context, state) {
                             print("476 - $state");
-                            if(state is TopFiveEntriesState) {
+                            if (state is TopFiveEntriesState) {
                               final formatter = DateFormat("dd-MM-yyyy");
                               return Column(
-                                children: List.generate(state.entries.length, (index) {
+                                children: List.generate(state.entries.length,
+                                    (index) {
                                   return Column(
                                     mainAxisSize: MainAxisSize.max,
                                     key: UniqueKey(),
@@ -487,7 +431,8 @@ class _CashFlowState extends State<CashFlowView> {
                                       Container(
                                         padding: EdgeInsets.all(10),
                                         child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           mainAxisSize: MainAxisSize.max,
                                           children: <Widget>[
                                             Expanded(
@@ -495,39 +440,55 @@ class _CashFlowState extends State<CashFlowView> {
                                                 children: <Widget>[
                                                   Container(
                                                     child: Row(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                      mainAxisSize: MainAxisSize.max,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      mainAxisSize:
+                                                          MainAxisSize.max,
                                                       children: <Widget>[
                                                         Column(
                                                           children: <Widget>[
                                                             Row(
-                                                              mainAxisAlignment: MainAxisAlignment.start,
-                                                              children: <Widget>[
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .start,
+                                                              children: <
+                                                                  Widget>[
                                                                 CircleAvatar(
                                                                   radius: 20,
-                                                                  backgroundColor: Colors.red,
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .red,
                                                                 ),
                                                                 Padding(
-                                                                  padding: EdgeInsets.only(left: 20),
+                                                                  padding: EdgeInsets
+                                                                      .only(
+                                                                          left:
+                                                                              20),
                                                                   child: Column(
-                                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                                    children: <Widget>[
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    children: <
+                                                                        Widget>[
                                                                       Text(
-                                                                        state.entries[index].mCategory.name,
+                                                                        state
+                                                                            .entries[index]
+                                                                            .mCategory
+                                                                            .name,
                                                                         style: TextStyle(
-                                                                            fontWeight: FontWeight.bold,
-                                                                            fontSize: 18
-                                                                        ),
+                                                                            fontWeight:
+                                                                                FontWeight.bold,
+                                                                            fontSize: 18),
                                                                       ),
                                                                       Text(
-                                                                        formatter.format(
-                                                                            DateTime.fromMillisecondsSinceEpoch(
-                                                                                state.entries[index].mEntry.date
-                                                                            )
-                                                                        ),
+                                                                        formatter.format(DateTime.fromMillisecondsSinceEpoch(state
+                                                                            .entries[index]
+                                                                            .mEntry
+                                                                            .date)),
                                                                         style: TextStyle(
-                                                                            fontSize: 14
-                                                                        ),
+                                                                            fontSize:
+                                                                                14),
                                                                       ),
                                                                     ],
                                                                   ),
@@ -537,11 +498,14 @@ class _CashFlowState extends State<CashFlowView> {
                                                           ],
                                                         ),
                                                         Text(
-                                                          state.entries[index].mEntry.amount.toString(),
+                                                          state.entries[index]
+                                                              .mEntry.amount
+                                                              .toString(),
                                                           style: TextStyle(
-                                                              fontWeight: FontWeight.bold,
-                                                              fontSize: 18
-                                                          ),
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 18),
                                                         )
                                                       ],
                                                     ),
@@ -592,11 +556,10 @@ class _CashFlowState extends State<CashFlowView> {
         setState(() {
           _customChipName = dateString;
           _scrollToPosition(5);
-          BlocProvider.of<HomeBloc>(context).add(
-              GetBalanceEvent(
-                pickedDates[0].millisecondsSinceEpoch,
-                pickedDates[1].millisecondsSinceEpoch,
-              ));
+          BlocProvider.of<HomeBloc>(context).add(GetBalanceEvent(
+            pickedDates[0].millisecondsSinceEpoch,
+            pickedDates[1].millisecondsSinceEpoch,
+          ));
         });
       }
     }
@@ -611,13 +574,11 @@ class _CashFlowState extends State<CashFlowView> {
 }
 
 class MyValueFormatter extends ValueFormatter {
-
-
   @override
   String getFormattedValue1(double value) {
-    if(value == 0) {
+    if (value == 0) {
       return "Income";
-    } else if(value == 1) {
+    } else if (value == 1) {
       return "Expense";
     } else {
       return "Others";
