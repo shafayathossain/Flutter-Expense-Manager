@@ -7,6 +7,7 @@ import 'package:expense_manager/ui/createentry/AddEntryBloc.dart';
 import 'package:expense_manager/ui/createentry/AddEntryStates.dart';
 import 'package:expense_manager/ui/createentry/CalculatorKeyBoardView.dart';
 import 'package:expense_manager/ui/createentry/CreateEntryBloc.dart';
+import 'package:expense_manager/ui/home/BottomSheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -674,12 +675,10 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
   }
 
   void _showDatePicker() {
-    showModalBottomSheet(
+    showModalBottomSheetCustom(
         context: context,
-        isDismissible: true,
-        useRootNavigator: true,
         builder: (ctx) {
-          return Container(
+          return SingleChildScrollView(
               child: Column(
             children: [
               Row(
@@ -721,7 +720,7 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
                   Expanded(
                     child: TableCalendar(
                       calendarController: _calendarController,
-                      rowHeight: 35,
+                      rowHeight: 55,
                       headerStyle: HeaderStyle(
                           centerHeaderTitle: true, formatButtonVisible: false),
                       calendarStyle: CalendarStyle(
