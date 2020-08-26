@@ -419,7 +419,8 @@ class _CashFlowState extends State<CashFlowView> {
                               state is TopFiveEntriesState,
                           builder: (context, state) {
                             print("476 - $state");
-                            if (state is TopFiveEntriesState) {
+                            if (state is TopFiveEntriesState &&
+                                state.entries.length > 0) {
                               final formatter = DateFormat("dd-MM-yyyy");
                               return Column(
                                 children: List.generate(state.entries.length,
@@ -519,6 +520,12 @@ class _CashFlowState extends State<CashFlowView> {
                                     ],
                                   );
                                 }),
+                              );
+                            } else if (state is TopFiveEntriesState) {
+                              return Container(
+                                height: 50,
+                                alignment: Alignment.center,
+                                child: Text("No entries created"),
                               );
                             } else {
                               return Container();
