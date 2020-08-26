@@ -1,3 +1,4 @@
+import 'package:expense_manager/data/models/EntryWithCategoryAndWallet.dart';
 import 'package:expense_manager/data/models/entry_list_item.dart';
 import 'package:expense_manager/data/repositories/HomeRepositoryImpl.dart';
 import 'package:expense_manager/ui/entries/entries_bloc.dart';
@@ -15,6 +16,7 @@ class EntriesView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<int> argument = ModalRoute.of(context).settings.arguments;
+    List<EntryWithCategoryAndWallet> entries = [];
     startTime = argument[0];
     endTime = argument[1];
 
@@ -46,7 +48,10 @@ class EntriesView extends StatelessWidget {
                       Flexible(
                         child: TextFormField(
                           maxLines: 1,
-                          onChanged: (text) {},
+                          onChanged: (text) {
+                            BlocProvider.of<EntriesBloc>(contextB)
+                                .add(SearchEntryEvent(text, entries));
+                          },
                           decoration: InputDecoration(
                               hintText: "Search here",
                               fillColor: Color(0xFFD3DADD),
@@ -92,8 +97,12 @@ class EntriesView extends StatelessWidget {
                       listener: (context, state) {},
                       buildWhen: (context, state) => state is GetEntriesState,
                       builder: (context, state) {
-                        return EntryListView(
-                            (state as GetEntriesState).entries);
+                        if (state is GetEntriesState && state.entries != null) {
+                          entries = state.rawEntries;
+                          return EntryListView(state.entries);
+                        } else {
+                          return Container();
+                        }
                       },
                     ),
                   ),

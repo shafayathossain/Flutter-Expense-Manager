@@ -14,3 +14,10 @@ class DeleteEntryEvent extends EntriesEvent {
 
   DeleteEntryEvent(this.entry);
 }
+
+class SearchEntryEvent extends EntriesEvent {
+  String keyword;
+  List<EntryWithCategoryAndWallet> entries;
+
+  SearchEntryEvent(this.keyword, this.entries);
+}

@@ -60,10 +60,10 @@ class EntryDao extends DatabaseAccessor<LocalDatabase> with _$EntryDaoMixin {
 
     return query.map((row) {
       return EntryWithCategoryAndWallet(
-          row.readTable(this.entry as TableInfo<$EntryTable, entry>),
-          row.readTable(this.category as TableInfo<$CategoryTable, category>),
-          row.readTable(this.tag as TableInfo<$TagTable, tag>),
-          row.readTable(this.wallet as TableInfo<$WalletTable, wallet>));
+          row.readTable(this.entry),
+          row.readTable(this.category),
+          row.readTable(this.tag),
+          row.readTable(this.wallet));
     }).get();
   }
 

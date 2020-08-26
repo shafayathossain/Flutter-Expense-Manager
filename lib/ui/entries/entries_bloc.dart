@@ -19,15 +19,17 @@ class EntriesBloc extends Bloc<EntriesEvent, EntriesState> {
       yield* _getEntries(event.startTime, event.endTime);
     } else if (event is DeleteEntryEvent) {
       yield* _deleteEntry(event.entry);
+    } else if (event is SearchEntryEvent) {
+      yield* _search(event.keyword, event.entries);
     }
   }
 
   Stream<EntriesState> _getEntries(int startTime, int endTime) async* {
     this._lastStartTime = startTime;
     this._lastEndTime = endTime;
-    final result =
-        await _repository.getEntriesBetweenADateRange(startTime, endTime);
-    print(result[1].mWallet.name);
+    final result = await _repository
+        .getEntriesBetweenADateRange(startTime, endTime)
+        .timeout(Duration(seconds: 5));
     List<EntryListItem> itemsToShow = [];
     final dateTimeFormatter = DateFormat("dd-MM-yyyy");
     String lastDate = "";
@@ -40,11 +42,33 @@ class EntriesBloc extends Bloc<EntriesEvent, EntriesState> {
       }
       itemsToShow.add(EntryListItem(2, item: element));
     });
-    yield* Stream.value(GetEntriesState(itemsToShow));
+    yield* Stream.value(GetEntriesState(itemsToShow, result));
   }
 
   Stream<EntriesState> _deleteEntry(EntryWithCategoryAndWallet entry) async* {
     final result = _repository.deleteEntry(entry.mEntry);
     yield* _getEntries(this._lastStartTime, this._lastEndTime);
+  }
+
+  Stream<EntriesState> _search(
+      String keyword, List<EntryWithCategoryAndWallet> entries) async* {
+    List<EntryListItem> itemsToShow = [];
+    final dateTimeFormatter = DateFormat("dd-MM-yyyy");
+    String lastDate = "";
+    entries.forEach((element) {
+      if (element.mEntry.description
+          .toLowerCase()
+          .contains(keyword.toLowerCase())) {
+        DateTime time =
+            DateTime.fromMillisecondsSinceEpoch(element.mEntry.date);
+        String timeString = dateTimeFormatter.format(time);
+        if (lastDate != timeString) {
+          lastDate = timeString;
+          itemsToShow.add(EntryListItem(1, date: timeString));
+        }
+        itemsToShow.add(EntryListItem(2, item: element));
+      }
+    });
+    yield* Stream.value(GetEntriesState(itemsToShow, entries));
   }
 }
