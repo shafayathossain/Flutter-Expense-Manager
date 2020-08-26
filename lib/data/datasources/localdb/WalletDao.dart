@@ -17,8 +17,9 @@ class WalletDao extends DatabaseAccessor<LocalDatabase> with _$WalletDaoMixin {
     return into(_database.wallet).insert(mWallet);
   }
 
-  Stream<List<wallet>> getWallets(int bookId) {
-    return (select(_database.wallet)).get().asStream();
+  Future<List<wallet>> getWallets(int bookId) {
+    return (select(_database.wallet)..where((tbl) => tbl.bookId.equals(bookId)))
+        .get();
   }
 
   Future<List<WalletWithBalance>> getWalletsWithBalance(int bookId) {

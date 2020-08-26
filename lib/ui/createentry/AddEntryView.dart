@@ -20,7 +20,6 @@ import 'dialogs/CreateTagDialog.dart';
 typedef void CategorySelectionCallback(int color);
 
 class AddEntryFormWidget extends StatelessWidget {
-
   CategorySelectionCallback categorySelectionCallback;
   bool isIncome = false;
 
@@ -30,19 +29,17 @@ class AddEntryFormWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => AddEntryBloc(EntryRepositoryImpl(context)),
-      child: Builder(
-        builder: (contextB) {
-          BlocProvider.of<AddEntryBloc>(contextB)..add(GetCategoriesEvent(isIncome));
-          BlocProvider.of<AddEntryBloc>(contextB)..add(GetWalletsEvent());
-          return AddEntryStatefulFormWidget(categorySelectionCallback, isIncome);
-        }
-      ),
+      child: Builder(builder: (contextB) {
+        BlocProvider.of<AddEntryBloc>(contextB)
+          ..add(GetCategoriesEvent(isIncome));
+        BlocProvider.of<AddEntryBloc>(contextB)..add(GetWalletsEvent());
+        return AddEntryStatefulFormWidget(categorySelectionCallback, isIncome);
+      }),
     );
   }
 }
 
 class AddEntryStatefulFormWidget extends StatefulWidget {
-
   CategorySelectionCallback categorySelectionCallback;
   bool isIncome = false;
 
@@ -54,8 +51,8 @@ class AddEntryStatefulFormWidget extends StatefulWidget {
   }
 }
 
-class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerProviderStateMixin {
-
+class AddEntryState extends State<AddEntryStatefulFormWidget>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   AnimationController _controller;
   Animation<Offset> _offsetAnimation;
@@ -72,14 +69,11 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: Duration(microseconds: 500)
-    );
-    _offsetAnimation = Tween<Offset>(
-      begin: const Offset(0.0, 1),
-      end: Offset.zero
-    ).animate(CurvedAnimation(
+    _controller =
+        AnimationController(vsync: this, duration: Duration(microseconds: 500));
+    _offsetAnimation =
+        Tween<Offset>(begin: const Offset(0.0, 1), end: Offset.zero)
+            .animate(CurvedAnimation(
       parent: _controller,
       curve: Curves.ease,
     ));
@@ -87,18 +81,14 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
 
   @override
   Widget build(BuildContext context) {
-    if(!BlocProvider.of<AddEntryBloc>(context).errorSubject.hasListener) {
-      BlocProvider
-          .of<AddEntryBloc>(context)
-          .errorSubject
-          .listen((event) {
+    if (!BlocProvider.of<AddEntryBloc>(context).errorSubject.hasListener) {
+      BlocProvider.of<AddEntryBloc>(context).errorSubject.listen((event) {
         final snackBar = SnackBar(
           content: Text(
             event.toString(),
             style: TextStyle(color: Colors.white),
           ),
           backgroundColor: Colors.red,
-
         );
         Scaffold.of(context).showSnackBar(snackBar);
       });
@@ -113,25 +103,23 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                 style: TextStyle(color: Colors.white),
               ),
               backgroundColor: Colors.green,
-
             );
-            if(state is EntrySavedState) {
+            if (state is EntrySavedState) {
               Scaffold.of(context).showSnackBar(snackBar);
               BlocProvider.of<CreateEntryBloc>(context).add(EntryAddedEvent());
               view = null;
               _amountTextController.clear();
               _dateTextController.clear();
               _descriptionTextController.clear();
-              setState(() {
-
-              });
+              setState(() {});
             }
           },
           bloc: BlocProvider.of<AddEntryBloc>(context),
           child: StreamBuilder(
-            stream: BlocProvider.of<CreateEntryBloc>(context).saveButtonListener,
+            stream:
+                BlocProvider.of<CreateEntryBloc>(context).saveButtonListener,
             builder: (context, AsyncSnapshot<int> snapshot) {
-              if(snapshot.hasData && snapshot.data == 1) {
+              if (snapshot.hasData && snapshot.data == 1) {
                 BlocProvider.of<AddEntryBloc>(context).add(SaveEvent(
                     amountString: _amountTextController.text.toString(),
                     date: _dateTextController.text.toString(),
@@ -139,17 +127,20 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                     selectedWallet: _selectedWallet,
                     selectedTag: _selectedTag,
                     description: _descriptionTextController.text.toString(),
-                    isIncome: widget.isIncome
-                ));
-              } else if(view == null) {
+                    isIncome: widget.isIncome));
+              } else if (view == null) {
                 view = Stack(
                   children: [
                     NotificationListener(
-                      onNotification: (_) {
-                        if(_controller.status == AnimationStatus.completed) {
+                      onNotification: (notification) {
+                        print(notification);
+                        if (notification is ScrollUpdateNotification &&
+                            (notification.scrollDelta >= 1.0 ||
+                                notification.scrollDelta <= -1.0) &&
+                            _controller.status == AnimationStatus.completed) {
                           _controller.reverse();
                         }
-                        return true;
+                        return false;
                       },
                       child: SingleChildScrollView(
                         child: Column(
@@ -168,8 +159,7 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                                     color: Colors.black,
                                     fontSize: 16.0,
                                   ),
-                                )
-                            ),
+                                )),
                             Container(
                                 width: double.maxFinite,
                                 margin: EdgeInsets.only(
@@ -178,15 +168,16 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                                     right: 10.0,
                                     bottom: 0.0),
                                 child: StreamBuilder(
-                                  stream: BlocProvider.of<AddEntryBloc>(context).amountFormula,
+                                  stream: BlocProvider.of<AddEntryBloc>(context)
+                                      .amountFormula,
                                   builder: (context, snapshot) {
-                                    if(snapshot.hasData) {
-                                      _amountTextController.text = snapshot.data as String;
+                                    if (snapshot.hasData) {
+                                      _amountTextController.text =
+                                          snapshot.data as String;
                                       _amountTextController.selection =
-                                          TextSelection
-                                              .collapsed(
-                                              offset: _amountTextController.text.length
-                                          );
+                                          TextSelection.collapsed(
+                                              offset: _amountTextController
+                                                  .text.length);
                                     }
                                     return TextFormField(
                                       maxLines: 1,
@@ -199,45 +190,44 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                                       validator: (text) {
                                         if (text == null || text.isEmpty) {
                                           return 'Text is empty';
-                                        } else {
-
-                                        }
+                                        } else {}
                                         return null;
                                       },
                                       onChanged: (text) {
-                                        if(text.length > 1) {
+                                        if (text.length > 1) {
                                           _formKey.currentState.validate();
                                         }
                                       },
                                       decoration: InputDecoration(
                                           hintText: "Enter amount",
-                                          errorText: snapshot.error != null ? snapshot.error.toString().split(':')[1] : null,
+                                          errorText: snapshot.error != null
+                                              ? snapshot.error
+                                                  .toString()
+                                                  .split(':')[1]
+                                              : null,
                                           filled: true,
                                           fillColor: Color(0xFFD3DADD),
                                           hintStyle: TextStyle(
-                                              color: Color(0xFF263238)
-                                          ),
+                                              color: Color(0xFF263238)),
                                           errorBorder: UnderlineInputBorder(
                                               borderSide: BorderSide.none,
-                                              borderRadius: BorderRadius.all(Radius.circular(3.0))
-                                          ),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(3.0))),
                                           focusedErrorBorder: UnderlineInputBorder(
                                               borderSide: BorderSide.none,
-                                              borderRadius: BorderRadius.all(Radius.circular(3.0))
-                                          ),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(3.0))),
                                           enabledBorder: UnderlineInputBorder(
                                               borderSide: BorderSide.none,
-                                              borderRadius: BorderRadius.all(Radius.circular(3.0))
-                                          ),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(3.0))),
                                           focusedBorder: UnderlineInputBorder(
                                               borderSide: BorderSide.none,
-                                              borderRadius: BorderRadius.all(Radius.circular(3.0))
-                                          )
-                                      ),
+                                              borderRadius:
+                                                  BorderRadius.all(Radius.circular(3.0)))),
                                     );
                                   },
-                                )
-                            ),
+                                )),
                             Container(
                                 width: double.maxFinite,
                                 margin: EdgeInsets.only(
@@ -252,8 +242,7 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                                     color: Colors.black,
                                     fontSize: 16.0,
                                   ),
-                                )
-                            ),
+                                )),
                             Container(
                                 width: double.maxFinite,
                                 margin: EdgeInsets.only(
@@ -276,7 +265,7 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                                         return null;
                                       },
                                       onChanged: (text) {
-                                        if(text.length > 1) {
+                                        if (text.length > 1) {
                                           _formKey.currentState.validate();
                                         }
                                       },
@@ -288,25 +277,24 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                                           filled: true,
                                           fillColor: Color(0xFFD3DADD),
                                           hintStyle: TextStyle(
-                                              color: Color(0xFF263238)
-                                          ),
+                                              color: Color(0xFF263238)),
                                           errorBorder: UnderlineInputBorder(
                                               borderSide: BorderSide.none,
-                                              borderRadius: BorderRadius.all(Radius.circular(3.0))
-                                          ),
-                                          focusedErrorBorder: UnderlineInputBorder(
-                                              borderSide: BorderSide.none,
-                                              borderRadius: BorderRadius.all(Radius.circular(3.0))
-                                          ),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(3.0))),
+                                          focusedErrorBorder:
+                                              UnderlineInputBorder(
+                                                  borderSide: BorderSide.none,
+                                                  borderRadius: BorderRadius.all(
+                                                      Radius.circular(3.0))),
                                           enabledBorder: UnderlineInputBorder(
                                               borderSide: BorderSide.none,
-                                              borderRadius: BorderRadius.all(Radius.circular(3.0))
-                                          ),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(3.0))),
                                           focusedBorder: UnderlineInputBorder(
                                               borderSide: BorderSide.none,
-                                              borderRadius: BorderRadius.all(Radius.circular(3.0))
-                                          )
-                                      ),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(3.0)))),
                                     ),
                                     Container(
                                       height: 48,
@@ -315,7 +303,8 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                                         fillColor: Colors.pink,
                                         padding: EdgeInsets.all(0),
                                         child: Container(
-                                          child: Image.asset("assets/images/ic_calendar.png"),
+                                          child: Image.asset(
+                                              "assets/images/ic_calendar.png"),
                                         ),
                                         onPressed: () {
                                           _showDatePicker();
@@ -323,8 +312,7 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                                       ),
                                     )
                                   ],
-                                )
-                            ),
+                                )),
                             Container(
                                 width: double.maxFinite,
                                 margin: EdgeInsets.only(
@@ -339,8 +327,7 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                                     color: Colors.black,
                                     fontSize: 16.0,
                                   ),
-                                )
-                            ),
+                                )),
                             Container(
                                 width: double.maxFinite,
                                 margin: EdgeInsets.only(
@@ -349,24 +336,37 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                                     right: 10.0,
                                     bottom: 0.0),
                                 child: StreamBuilder(
-                                  stream: BlocProvider.of<AddEntryBloc>(context).categories,
-                                  builder: (context, AsyncSnapshot<List<category>> snapshot) {
-                                    if(snapshot.hasData) {
+                                  stream: BlocProvider.of<AddEntryBloc>(context)
+                                      .categories,
+                                  builder: (context,
+                                      AsyncSnapshot<List<category>> snapshot) {
+                                    if (snapshot.hasData) {
                                       return ChipGroup(
-                                          snapshot.data.map((e) => e.name).toList(),
-                                          chipColors: snapshot.data.map((e) => e.color).toList(),
+                                          snapshot.data
+                                              .map((e) => e.name)
+                                              .toList(),
+                                          chipColors: snapshot.data
+                                              .map((e) => e.color)
+                                              .toList(),
+                                          cancelableIndexes: snapshot.data
+                                              .map((e) => e.canDelete)
+                                              .toList(),
                                           onChipSelectedCallback: (int index) {
-                                            _selectedCategory = snapshot.data[index];
-                                            this.widget.categorySelectionCallback.call(snapshot.data[index].color);
-                                            BlocProvider.of<AddEntryBloc>(context)..add(GetTagsEvent(snapshot.data[index].id));
-                                          }
-                                      );
+                                        _selectedCategory =
+                                            snapshot.data[index];
+                                        this
+                                            .widget
+                                            .categorySelectionCallback
+                                            .call(snapshot.data[index].color);
+                                        BlocProvider.of<AddEntryBloc>(context)
+                                          ..add(GetTagsEvent(
+                                              snapshot.data[index].id));
+                                      });
                                     } else {
                                       return ChipGroup([]);
                                     }
                                   },
-                                )
-                            ),
+                                )),
                             Container(
                               height: 45,
                               margin: EdgeInsets.only(
@@ -380,15 +380,13 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                                 highlightColor: Colors.white70,
                                 splashColor: Colors.blue.withOpacity(0.2),
                                 elevation: 0,
-                                onPressed: (){
+                                onPressed: () {
                                   _showAddCategoryDialog();
                                 },
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(2),
-                                  side: BorderSide(
-                                      color: Colors.blue,
-                                      width: 2
-                                  ),
+                                  side:
+                                      BorderSide(color: Colors.blue, width: 2),
                                 ),
                                 child: Row(
                                   children: [
@@ -403,9 +401,7 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                                       child: Center(
                                         child: Text(
                                           "add category".toUpperCase(),
-                                          style: TextStyle(
-                                              color: Colors.blue
-                                          ),
+                                          style: TextStyle(color: Colors.blue),
                                         ),
                                       ),
                                     )
@@ -427,8 +423,7 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                                     color: Colors.black,
                                     fontSize: 16.0,
                                   ),
-                                )
-                            ),
+                                )),
                             Container(
                                 width: double.maxFinite,
                                 margin: EdgeInsets.only(
@@ -437,26 +432,33 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                                     right: 10.0,
                                     bottom: 0.0),
                                 child: StreamBuilder(
-                                  stream: BlocProvider.of<AddEntryBloc>(context).wallets,
-                                  builder: (context, AsyncSnapshot<List<wallet>> snapshot) {
-                                    if(snapshot.hasData) {
+                                  stream: BlocProvider.of<AddEntryBloc>(context)
+                                      .wallets,
+                                  builder: (context,
+                                      AsyncSnapshot<List<wallet>> snapshot) {
+                                    if (snapshot.hasData) {
                                       return ChipGroup(
-                                          snapshot.data.map((e) => e.name).toList(),
-                                          chipColors: snapshot.data.map((e) => e.color).toList(),
+                                          snapshot.data
+                                              .map((e) => e.name)
+                                              .toList(),
+                                          chipColors: snapshot.data
+                                              .map((e) => e.color)
+                                              .toList(),
                                           onChipSelectedCallback: (int index) {
-                                            _selectedWallet = snapshot.data[index];
-                                          }
-                                      );
+                                        _selectedWallet = snapshot.data[index];
+                                      });
                                     } else {
                                       return ChipGroup([]);
                                     }
                                   },
-                                )
-                            ),
+                                )),
                             StreamBuilder(
-                              stream: BlocProvider.of<AddEntryBloc>(context).tags,
-                              builder: (context, AsyncSnapshot<List<tag>> snapshot) {
-                                if(snapshot.hasData && snapshot.data.length > 0) {
+                              stream:
+                                  BlocProvider.of<AddEntryBloc>(context).tags,
+                              builder:
+                                  (context, AsyncSnapshot<List<tag>> snapshot) {
+                                if (snapshot.hasData &&
+                                    snapshot.data.length > 0) {
                                   return Column(
                                     children: [
                                       Container(
@@ -473,8 +475,7 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                                               color: Colors.black,
                                               fontSize: 16.0,
                                             ),
-                                          )
-                                      ),
+                                          )),
                                       Container(
                                           width: double.maxFinite,
                                           margin: EdgeInsets.only(
@@ -483,13 +484,21 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                                               right: 10.0,
                                               bottom: 0.0),
                                           child: ChipGroup(
-                                            snapshot.data.map((e) => e.name).toList(),
-                                            chipColors: snapshot.data.map((e) => e.color).toList(),
-                                            onChipSelectedCallback: (int index) {
-                                              _selectedTag = snapshot.data[index];
+                                            snapshot.data
+                                                .map((e) => e.name)
+                                                .toList(),
+                                            chipColors: snapshot.data
+                                                .map((e) => e.color)
+                                                .toList(),
+                                            cancelableIndexes: snapshot.data
+                                                .map((e) => e.canDelete)
+                                                .toList(),
+                                            onChipSelectedCallback:
+                                                (int index) {
+                                              _selectedTag =
+                                                  snapshot.data[index];
                                             },
-                                          )
-                                      ),
+                                          )),
                                       Container(
                                         height: 45,
                                         margin: EdgeInsets.only(
@@ -501,17 +510,17 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                                           color: Colors.white,
                                           disabledColor: Colors.white,
                                           highlightColor: Colors.white70,
-                                          splashColor: Colors.blue.withOpacity(0.2),
+                                          splashColor:
+                                              Colors.blue.withOpacity(0.2),
                                           elevation: 0,
-                                          onPressed: (){
+                                          onPressed: () {
                                             _showAddTagDialog();
                                           },
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(2),
+                                            borderRadius:
+                                                BorderRadius.circular(2),
                                             side: BorderSide(
-                                                color: Colors.blue,
-                                                width: 2
-                                            ),
+                                                color: Colors.blue, width: 2),
                                           ),
                                           child: Row(
                                             children: [
@@ -527,8 +536,7 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                                                   child: Text(
                                                     "add tag".toUpperCase(),
                                                     style: TextStyle(
-                                                        color: Colors.blue
-                                                    ),
+                                                        color: Colors.blue),
                                                   ),
                                                 ),
                                               )
@@ -557,8 +565,7 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                                     color: Colors.black,
                                     fontSize: 16.0,
                                   ),
-                                )
-                            ),
+                                )),
                             Container(
                                 width: double.maxFinite,
                                 height: 100,
@@ -577,7 +584,7 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                                       return null;
                                     },
                                     onChanged: (text) {
-                                      if(text.length > 1) {
+                                      if (text.length > 1) {
                                         _formKey.currentState.validate();
                                       }
                                     },
@@ -585,29 +592,27 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                                         hintText: "Type your description here",
                                         filled: true,
                                         fillColor: Color(0xFFD3DADD),
-                                        hintStyle: TextStyle(
-                                            color: Color(0xFF263238)
-                                        ),
+                                        hintStyle:
+                                            TextStyle(color: Color(0xFF263238)),
                                         errorBorder: UnderlineInputBorder(
                                             borderSide: BorderSide.none,
-                                            borderRadius: BorderRadius.all(Radius.circular(3.0))
-                                        ),
-                                        focusedErrorBorder: UnderlineInputBorder(
-                                            borderSide: BorderSide.none,
-                                            borderRadius: BorderRadius.all(Radius.circular(3.0))
-                                        ),
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(3.0))),
+                                        focusedErrorBorder:
+                                            UnderlineInputBorder(
+                                                borderSide: BorderSide.none,
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(3.0))),
                                         enabledBorder: UnderlineInputBorder(
                                             borderSide: BorderSide.none,
-                                            borderRadius: BorderRadius.all(Radius.circular(3.0))
-                                        ),
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(3.0))),
                                         focusedBorder: UnderlineInputBorder(
                                             borderSide: BorderSide.none,
-                                            borderRadius: BorderRadius.all(Radius.circular(3.0))
-                                        )
-                                    ),
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(3.0)))),
                                   ),
-                                )
-                            ),
+                                )),
                           ],
                         ),
                       ),
@@ -617,7 +622,10 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                       child: CalculatorKeyBoardView(
                         textController: _amountTextController,
                         callback: (value) {
-                          BlocProvider.of<AddEntryBloc>(context).amountValidator.sink.add(value);
+                          BlocProvider.of<AddEntryBloc>(context)
+                              .amountValidator
+                              .sink
+                              .add(value);
                         },
                       ),
                     )
@@ -627,46 +635,41 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
               return view;
             },
           ),
-        )
-    );
+        ));
   }
 
   void _showAddCategoryDialog() {
     showDialog(
         context: context,
         barrierDismissible: false,
-        builder:(contextC) => CreateCategoryDialog(
-          (name, color) {
-            BlocProvider.of<AddEntryBloc>(context)..add(CreateCategoryEvent(
-                name, color, widget.isIncome
+        builder: (contextC) => CreateCategoryDialog(
+              (name, color) {
+                BlocProvider.of<AddEntryBloc>(context)
+                  ..add(CreateCategoryEvent(name, color, widget.isIncome));
+              },
             ));
-          },
-        )
-    );
   }
 
   void _showAddTagDialog() {
     showDialog(
         context: context,
         barrierDismissible: false,
-        builder:(contextC) => CreateTagDialog(
+        builder: (contextC) => CreateTagDialog(
               (name, color) {
-            BlocProvider.of<AddEntryBloc>(context)..add(CreateTagEvent(
-                name, color, _selectedCategory.id
+                BlocProvider.of<AddEntryBloc>(context)
+                  ..add(CreateTagEvent(name, color, _selectedCategory.id));
+              },
             ));
-          },
-        )
-    );
   }
 
   void _showDatePicker() {
     showModalBottomSheet(
-      context: context,
-      isDismissible: true,
-      useRootNavigator: true,
-      builder: (ctx) {
-        return Container(
-          child: Column(
+        context: context,
+        isDismissible: true,
+        useRootNavigator: true,
+        builder: (ctx) {
+          return Container(
+              child: Column(
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -679,10 +682,7 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                     disabledElevation: 0,
                     child: Text(
                       "cancel".toUpperCase(),
-                      style: TextStyle(
-                          fontSize: 15,
-                          color: Colors.red
-                      ),
+                      style: TextStyle(fontSize: 15, color: Colors.red),
                     ),
                     onPressed: () {
                       Navigator.pop(context);
@@ -696,10 +696,7 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                     disabledElevation: 0,
                     child: Text(
                       "select".toUpperCase(),
-                      style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.blue
-                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.blue),
                     ),
                     onPressed: () {
                       _setDateToDateField(_calendarController.selectedDay);
@@ -715,25 +712,19 @@ class AddEntryState extends State<AddEntryStatefulFormWidget> with SingleTickerP
                       calendarController: _calendarController,
                       rowHeight: 35,
                       headerStyle: HeaderStyle(
-                          centerHeaderTitle: true,
-                          formatButtonVisible: false
-                      ),
+                          centerHeaderTitle: true, formatButtonVisible: false),
                       calendarStyle: CalendarStyle(
-                          weekendStyle: TextStyle(
-                              color: Colors.black
-                          ),
-                          outsideDaysVisible: false
-                      ),
+                          weekendStyle: TextStyle(color: Colors.black),
+                          outsideDaysVisible: false),
                     ),
                   )
                 ],
               )
             ],
-          )
-        );
-      }
-    );
+          ));
+        });
   }
+
   void _setDateToDateField(DateTime selectedDay) {
     final formatter = DateFormat("dd-MM-yyyy");
     String date = formatter.format(selectedDay);

@@ -6,10 +6,8 @@ import 'package:expense_manager/data/datasources/localdb/WalletDao.dart';
 import 'package:expense_manager/data/repositories/EntryRepository.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
 
 class EntryRepositoryImpl extends EntryRepository {
-
   EntryRepositoryImpl(this._context) {
     _entryDao = EntryDao(_context.read<LocalDatabase>());
     _categoryDao = CategoryDao(_context.read<LocalDatabase>());
@@ -23,30 +21,31 @@ class EntryRepositoryImpl extends EntryRepository {
   AppPreference _appPreference = AppPreference();
 
   @override
-  Stream<List<category>> getAllCategories(bool isIncome) {
-    return _categoryDao.getCategories(isIncome, 0);
+  Future<List<category>> getAllCategories(bool isIncome) {
+    return _appPreference.getBook().then((value) {
+      return _categoryDao.getCategories(isIncome, value.id);
+    });
   }
 
   @override
-  Stream<int> createCategory(String name, int color) {
-    category cat = category(
-      name: name,
-      color: color,
-      canDelete: true,
-      bookId: 1,
-      isIncome: false
-    );
-    return _categoryDao.insertCategory(cat)
-        .flatMap((value) {
-          tag mTag = tag(
-            name: name,
+  Future<int> createCategory(String name, int color) {
+    return _appPreference.getBook().then((book) {
+      category cat = category(
+          name: name,
+          color: color,
+          canDelete: true,
+          bookId: book.id,
+          isIncome: false);
+      return _categoryDao.insertCategory(cat).then((value) {
+        tag mTag = tag(
+            name: "Other",
             color: color,
-            canDelete: true,
-            bookId: 1,
-            categoryId: value
-          );
-          return _categoryDao.insertTag(mTag);
-        });
+            canDelete: false,
+            bookId: book.id,
+            categoryId: value);
+        return _categoryDao.insertTag(mTag);
+      });
+    });
   }
 
   @override
@@ -55,20 +54,21 @@ class EntryRepositoryImpl extends EntryRepository {
   }
 
   @override
-  Stream<int> createTag(String name, int color, int categoryId) {
+  Future<int> createTag(String name, int color, int categoryId) {
     tag mTag = tag(
         name: name,
         color: color,
         canDelete: true,
         bookId: 1,
-        categoryId: categoryId
-    );
+        categoryId: categoryId);
     return _categoryDao.insertTag(mTag);
   }
 
   @override
-  Stream<List<wallet>> getAllWallets() {
-    return _walletDao.getWallets(0);
+  Future<List<wallet>> getAllWallets() {
+    return _appPreference.getBook().then((value) {
+      return _walletDao.getWallets(value.id);
+    });
   }
 
   @override
@@ -82,8 +82,7 @@ class EntryRepositoryImpl extends EntryRepository {
           categoryId: category.id,
           walletId: wallet.id,
           description: description,
-          tagId: tag == null ? null : tag.id
-      );
+          tagId: tag == null ? null : tag.id);
       return _entryDao.insertEntry(mEntry);
     });
   }

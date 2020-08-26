@@ -7,42 +7,48 @@ import 'package:moor_flutter/moor_flutter.dart';
 part 'CategoryDao.g.dart';
 
 @UseDao(tables: [Category, Tag])
-class CategoryDao extends DatabaseAccessor<LocalDatabase> with _$CategoryDaoMixin {
-
+class CategoryDao extends DatabaseAccessor<LocalDatabase>
+    with _$CategoryDaoMixin {
   LocalDatabase _database;
 
-  CategoryDao(LocalDatabase attachedDatabase): super(attachedDatabase) {
+  CategoryDao(LocalDatabase attachedDatabase) : super(attachedDatabase) {
     this._database = attachedDatabase;
   }
 
-  Stream<List<category>> getCategories(bool isIncome, int bookId) {
+  Future<List<category>> getCategories(bool isIncome, int bookId) {
     return (select(_database.category)
-      ..where((tbl) => tbl.isIncome.equals(isIncome)))
-        .get().asStream();
+          ..where((tbl) {
+            return tbl.isIncome.equals(isIncome) & tbl.bookId.equals(bookId);
+          }))
+        .get();
   }
 
-  Stream<List<CategoryWithTag>> getCategoriesWithTags(bool isIncome, int bookId) {
-    final query = select(_database.tag)
-        .join(
-          [leftOuterJoin(_database.category,
-              _database.category.id.equalsExp(_database.tag.categoryId))]
-        )..where(_database.tag.bookId.equals(bookId) & _database.category.isIncome.equals(isIncome));
+  Stream<List<CategoryWithTag>> getCategoriesWithTags(
+      bool isIncome, int bookId) {
+    final query = select(_database.tag).join([
+      leftOuterJoin(_database.category,
+          _database.category.id.equalsExp(_database.tag.categoryId))
+    ])
+      ..where(_database.tag.bookId.equals(bookId) &
+          _database.category.isIncome.equals(isIncome));
     return query.get().asStream().map((event) {
       return event.map((e) {
         return CategoryWithTag(
-          e.readTable(this.category as TableInfo<$CategoryTable, category>),
-          e.readTable(tag as TableInfo<$TagTable, tag>)
-        );
+            e.readTable(this.category as TableInfo<$CategoryTable, category>),
+            e.readTable(tag as TableInfo<$TagTable, tag>));
       }).toList();
     });
   }
 
   Stream<List<tag>> getTagsForACategory(int categoryId) {
-    return (select(_database.tag)..where((tbl) => tbl.categoryId.equals(categoryId))).get().asStream();
+    return (select(_database.tag)
+          ..where((tbl) => tbl.categoryId.equals(categoryId)))
+        .get()
+        .asStream();
   }
 
-  Stream<int> insertTag(tag tag) {
-    return into(_database.tag).insert(tag).asStream();
+  Future<int> insertTag(tag tag) {
+    return into(_database.tag).insert(tag);
   }
 
   Stream<void> insertTags(List<tag> tag) {
@@ -51,8 +57,8 @@ class CategoryDao extends DatabaseAccessor<LocalDatabase> with _$CategoryDaoMixi
     }).asStream();
   }
 
-  Stream<int> insertCategory(category category) {
-    return into(_database.category).insert(category).asStream();
+  Future<int> insertCategory(category category) {
+    return into(_database.category).insert(category);
   }
 
   Stream<List<int>> insertCategories(List<category> categories) {
@@ -70,18 +76,25 @@ class CategoryDao extends DatabaseAccessor<LocalDatabase> with _$CategoryDaoMixi
   }
 
   Future<category> findCategory(String name, bool isIncome, int bookId) {
-    return (select(_database.category)..limit(1)
-      ..where((tbl) => tbl.name.equals(name) &
-      tbl.isIncome.equals(isIncome) &
-      tbl.bookId.equals(bookId)))
+    return (select(_database.category)
+          ..limit(1)
+          ..where((tbl) =>
+              tbl.name.equals(name) &
+              tbl.isIncome.equals(isIncome) &
+              tbl.bookId.equals(bookId)))
         .getSingle();
   }
 
   Stream<category> getCategory(int categoryId) {
-    return (select(_database.category)..where((tbl) => tbl.id.equals(categoryId))).getSingle().asStream();
+    return (select(_database.category)
+          ..where((tbl) => tbl.id.equals(categoryId)))
+        .getSingle()
+        .asStream();
   }
 
   Stream<tag> getATag(int tagId) {
-    return (select(_database.tag)..where((tbl) => tbl.id.equals(tagId))).getSingle().asStream();
+    return (select(_database.tag)..where((tbl) => tbl.id.equals(tagId)))
+        .getSingle()
+        .asStream();
   }
 }

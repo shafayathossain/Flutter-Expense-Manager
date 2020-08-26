@@ -164,7 +164,8 @@ class AccountBookRepositoryImpl extends AccountBookRepository {
     ];
     List<Stream> streams = [];
     categories.forEach((element) {
-      streams.add(_categoryDao.insertCategory(element).flatMap((categoryId) {
+      streams.add(
+          _categoryDao.insertCategory(element).asStream().flatMap((categoryId) {
         List<tag> tags = [];
         switch (element.name) {
           case "Food":
