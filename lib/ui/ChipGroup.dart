@@ -3,14 +3,17 @@ import 'package:flutter/material.dart';
 typedef void OnChipSelected(int position);
 
 class ChipGroup extends StatefulWidget {
-  int _selectedIndex = -1;
+  int selectedIndex = -1;
   final List<String> chipTexts;
   OnChipSelected onChipSelectedCallback = (_) {};
   List<int> chipColors = [];
   List<bool> cancelableIndexes = [];
 
   ChipGroup(this.chipTexts,
-      {this.chipColors, this.onChipSelectedCallback, this.cancelableIndexes}) {}
+      {this.chipColors,
+      this.onChipSelectedCallback,
+      this.cancelableIndexes,
+      this.selectedIndex}) {}
 
   @override
   State createState() {
@@ -31,7 +34,7 @@ class ChipGroupState extends State<ChipGroup> {
         widget.chipTexts.length,
         (int index) {
           List<Widget> row = [];
-          if (widget._selectedIndex == index) {
+          if (widget.selectedIndex == index) {
             row.add(CircleAvatar(
               backgroundColor: Colors.black38,
               radius: 10,
@@ -44,7 +47,7 @@ class ChipGroupState extends State<ChipGroup> {
           }
           row.add(Container(
             margin:
-                EdgeInsets.only(left: (widget._selectedIndex == index) ? 5 : 0),
+                EdgeInsets.only(left: (widget.selectedIndex == index) ? 5 : 0),
             child: Text(
               '${widget.chipTexts[index]}',
               style: TextStyle(color: Colors.white),
@@ -64,7 +67,7 @@ class ChipGroupState extends State<ChipGroup> {
           return GestureDetector(
             onTap: () {
               setState(() {
-                widget._selectedIndex = index;
+                widget.selectedIndex = index;
                 widget.onChipSelectedCallback.call(index);
               });
             },
@@ -75,7 +78,7 @@ class ChipGroupState extends State<ChipGroup> {
                     child: Container(
                       height: 30,
                       padding: EdgeInsets.only(
-                          left: (widget._selectedIndex == index) ? 5 : 10,
+                          left: (widget.selectedIndex == index) ? 5 : 10,
                           right: 10,
                           top: 5,
                           bottom: 5),

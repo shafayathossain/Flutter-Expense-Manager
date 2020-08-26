@@ -104,4 +104,11 @@ class HomeRepositoryImpl extends HomeRepository {
           startTime, endTime, value.id);
     });
   }
+
+  @override
+  Future<int> deleteEntry(entry mEntry) {
+    return _preference.getBook().then((value) {
+      return _entryDao.deleteEntry(mEntry);
+    });
+  }
 }

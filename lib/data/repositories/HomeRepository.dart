@@ -17,4 +17,5 @@ abstract class HomeRepository {
   Future<int> createWallet(String name, int color);
   Future<List<EntryWithCategoryAndWallet>> getEntriesBetweenADateRange(
       int startTime, int endTime);
+  Future<int> deleteEntry(entry mEntry);
 }

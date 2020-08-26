@@ -7,5 +7,5 @@ abstract class EntryRepository {
   Future<int> createTag(String name, int color, int categoryId);
   Future<List<wallet>> getAllWallets();
   Future<int> addEntry(num amount, int time, category category, wallet wallet,
-      String description, tag tag);
+      String description, tag tag, int entryId);
 }

@@ -1,5 +1,6 @@
 import 'package:expense_manager/ui/accountbook/AccountBookView.dart';
 import 'package:expense_manager/ui/createentry/CreateEntry.dart';
+import 'package:expense_manager/ui/editentry/EditEntryView.dart';
 import 'package:expense_manager/ui/home/HomeView.dart';
 import 'package:expense_manager/ui/splash/splash_view.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ const String AccountBookRoute = "account_book";
 const String HomeRoute = "home";
 const String CreateEntryRout = "create_entry";
 const String EntriesRoute = "entries";
+const String EditEntry = "edit_entry";
 
 class Router {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -26,6 +28,9 @@ class Router {
       case EntriesRoute:
         return MaterialPageRoute(
             builder: (_) => EntriesView(), settings: settings);
+      case EditEntry:
+        return MaterialPageRoute(
+            builder: (_) => EditEntryView(), settings: settings);
       default:
         return MaterialPageRoute(
             builder: (_) => Scaffold(

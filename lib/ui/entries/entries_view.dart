@@ -6,6 +6,8 @@ import 'package:expense_manager/ui/entries/entries_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../Router.dart';
+
 class EntriesView extends StatelessWidget {
   int startTime;
   int endTime;
@@ -206,9 +208,14 @@ class EntriesItemState extends State<EntriesItemView> {
                     "Edit",
                     style: TextStyle(color: Colors.white),
                   ),
+                  borderSide: BorderSide(color: Colors.white),
                   highlightedBorderColor: Colors.white,
                   disabledBorderColor: Colors.white,
-                  onPressed: null,
+                  onPressed: () {
+                    widget.clickEvent.call();
+                    Navigator.pushNamed(context, EditEntry,
+                        arguments: widget.item.item);
+                  },
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5.0),
                   )),
@@ -217,7 +224,11 @@ class EntriesItemState extends State<EntriesItemView> {
                     "Delete",
                     style: TextStyle(color: Colors.white),
                   ),
-                  onPressed: null,
+                  onPressed: () {
+                    _showDeleteConfirmationDialog();
+                    widget.clickEvent.call();
+                  },
+                  borderSide: BorderSide(color: Colors.white),
                   highlightedBorderColor: Colors.white,
                   disabledBorderColor: Colors.white,
                   shape: new RoundedRectangleBorder(
@@ -302,5 +313,55 @@ class EntriesItemState extends State<EntriesItemView> {
         ),
       ),
     );
+  }
+
+  void _showDeleteConfirmationDialog() {
+    showDialog(
+        context: context,
+        builder: (contextB) {
+          return AlertDialog(
+            title: Text(
+              "DELETE ENTRY",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            content: Text("Do you really want to delete this entry?"),
+            actions: <Widget>[
+              RawMaterialButton(
+                elevation: 0.0,
+                highlightElevation: 0.0,
+                fillColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(3.0))),
+                child: Text(
+                  "yes".toUpperCase(),
+                  style: TextStyle(
+                    color: Colors.blue,
+                  ),
+                ),
+                onPressed: () {
+                  BlocProvider.of<EntriesBloc>(context)
+                    ..add(DeleteEntryEvent(widget.item.item));
+                  Navigator.pop(context);
+                },
+              ),
+              RawMaterialButton(
+                elevation: 0.0,
+                highlightElevation: 0.0,
+                fillColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(3.0))),
+                child: Text(
+                  "no".toUpperCase(),
+                  style: TextStyle(
+                    color: Colors.blue,
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        });
   }
 }

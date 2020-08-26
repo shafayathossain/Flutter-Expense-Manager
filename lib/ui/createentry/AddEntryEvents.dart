@@ -1,4 +1,3 @@
-
 import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 
 class AddEntryEvent {}
@@ -11,9 +10,17 @@ class SaveEvent extends AddEntryEvent {
   tag selectedTag;
   String description;
   bool isIncome;
+  int entryId;
 
-  SaveEvent({this.amountString, this.date, this.selectedCategory, this.selectedWallet,
-    this.selectedTag, this.description, this.isIncome});
+  SaveEvent(
+      {this.amountString,
+      this.date,
+      this.selectedCategory,
+      this.selectedWallet,
+      this.selectedTag,
+      this.description,
+      this.isIncome,
+      this.entryId});
 }
 
 class EntryAddedEvent extends AddEntryEvent {}

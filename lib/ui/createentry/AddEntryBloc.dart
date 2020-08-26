@@ -58,7 +58,8 @@ class AddEntryBloc extends Bloc<AddEntryEvent, AddEntryState> {
               event.selectedWallet,
               event.selectedTag,
               event.description,
-              event.isIncome)
+              event.isIncome,
+              event.entryId)
           .map((event) {
         if (event is EntryErrorState) {
           errorSubject.add(event.error);
@@ -112,7 +113,8 @@ class AddEntryBloc extends Bloc<AddEntryEvent, AddEntryState> {
       wallet selectedWallet,
       tag selectedTag,
       String description,
-      bool isIncome) async* {
+      bool isIncome,
+      int entryId) async* {
     Parser parser = Parser();
     double value;
     bool hasError = false;
@@ -142,7 +144,7 @@ class AddEntryBloc extends Bloc<AddEntryEvent, AddEntryState> {
     } else {
       value = isIncome ? value.abs() : -1 * value.abs();
       final result = await _repository.addEntry(value, time, selectedCategory,
-          selectedWallet, description, selectedTag);
+          selectedWallet, description, selectedTag, entryId);
       yield* Stream.value(EntrySavedState());
     }
   }

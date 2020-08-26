@@ -73,17 +73,32 @@ class EntryRepositoryImpl extends EntryRepository {
 
   @override
   Future<int> addEntry(num amount, int time, category category, wallet wallet,
-      String description, tag tag) {
+      String description, tag tag, int entryId) {
     return _appPreference.getBook().then((value) {
-      entry mEntry = entry(
-          amount: amount,
-          date: time,
-          bookId: value.id,
-          categoryId: category.id,
-          walletId: wallet.id,
-          description: description,
-          tagId: tag == null ? null : tag.id);
-      return _entryDao.insertEntry(mEntry);
+      if (entryId != null) {
+        entry mEntry = entry(
+            id: entryId,
+            amount: amount,
+            date: time,
+            bookId: value.id,
+            categoryId: category.id,
+            walletId: wallet.id,
+            description: description,
+            tagId: tag == null ? null : tag.id);
+        return _entryDao.updateEntry(mEntry).then((value) {
+          return Future.value(1);
+        });
+      } else {
+        entry mEntry = entry(
+            amount: amount,
+            date: time,
+            bookId: value.id,
+            categoryId: category.id,
+            walletId: wallet.id,
+            description: description,
+            tagId: tag == null ? null : tag.id);
+        return _entryDao.insertEntry(mEntry);
+      }
     });
   }
 }

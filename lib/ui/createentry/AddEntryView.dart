@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
+import 'package:expense_manager/data/models/EntryWithCategoryAndWallet.dart';
 import 'package:expense_manager/data/repositories/EntryRepositoryImpl.dart';
 import 'package:expense_manager/ui/ChipGroup.dart';
 import 'package:expense_manager/ui/createentry/AddEntryBloc.dart';
@@ -23,8 +24,10 @@ typedef void CategorySelectionCallback(int color);
 class AddEntryFormWidget extends StatelessWidget {
   CategorySelectionCallback categorySelectionCallback;
   bool isIncome = false;
+  EntryWithCategoryAndWallet entry;
 
-  AddEntryFormWidget(this.categorySelectionCallback, this.isIncome);
+  AddEntryFormWidget(this.categorySelectionCallback, this.isIncome,
+      {this.entry});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +37,11 @@ class AddEntryFormWidget extends StatelessWidget {
         BlocProvider.of<AddEntryBloc>(contextB)
           ..add(GetCategoriesEvent(isIncome));
         BlocProvider.of<AddEntryBloc>(contextB)..add(GetWalletsEvent());
-        return AddEntryStatefulFormWidget(categorySelectionCallback, isIncome);
+        return AddEntryStatefulFormWidget(
+          categorySelectionCallback,
+          isIncome,
+          entry: entry,
+        );
       }),
     );
   }
@@ -43,8 +50,10 @@ class AddEntryFormWidget extends StatelessWidget {
 class AddEntryStatefulFormWidget extends StatefulWidget {
   CategorySelectionCallback categorySelectionCallback;
   bool isIncome = false;
+  EntryWithCategoryAndWallet entry;
 
-  AddEntryStatefulFormWidget(this.categorySelectionCallback, this.isIncome);
+  AddEntryStatefulFormWidget(this.categorySelectionCallback, this.isIncome,
+      {this.entry});
 
   @override
   State createState() {
@@ -70,6 +79,13 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
   @override
   void initState() {
     super.initState();
+    if (widget.entry != null) {
+      final formatter = DateFormat("dd-MM-yyyy");
+      _amountTextController.text = widget.entry.mEntry.amount.abs().toString();
+      _dateTextController.text = formatter.format(
+          DateTime.fromMillisecondsSinceEpoch(widget.entry.mEntry.date));
+      _descriptionTextController.text = widget.entry.mEntry.description;
+    }
     _controller =
         AnimationController(vsync: this, duration: Duration(microseconds: 500));
     _offsetAnimation =
@@ -128,7 +144,9 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
                     selectedWallet: _selectedWallet,
                     selectedTag: _selectedTag,
                     description: _descriptionTextController.text.toString(),
-                    isIncome: widget.isIncome));
+                    isIncome: widget.isIncome,
+                    entryId:
+                        widget.entry == null ? null : widget.entry.mEntry.id));
               } else if (view == null) {
                 view = Stack(
                   children: [
@@ -345,6 +363,18 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
                                         AsyncSnapshot<List<category>>
                                             snapshot) {
                                       if (snapshot.hasData) {
+                                        int selectedCategoryIndex = -1;
+                                        if (widget.entry != null) {
+                                          selectedCategoryIndex = snapshot.data
+                                              .indexWhere((element) =>
+                                                  element.id ==
+                                                  widget.entry.mCategory.id);
+                                          _selectedCategory =
+                                              widget.entry.mCategory;
+                                          BlocProvider.of<AddEntryBloc>(context)
+                                            ..add(GetTagsEvent(
+                                                widget.entry.mCategory.id));
+                                        }
                                         return ChipGroup(
                                             snapshot.data
                                                 .map((e) => e.name)
@@ -355,6 +385,8 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
                                             cancelableIndexes: snapshot.data
                                                 .map((e) => e.canDelete)
                                                 .toList(),
+                                            selectedIndex:
+                                                selectedCategoryIndex,
                                             onChipSelectedCallback:
                                                 (int index) {
                                           _selectedCategory =
@@ -444,6 +476,15 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
                                     builder: (context,
                                         AsyncSnapshot<List<wallet>> snapshot) {
                                       if (snapshot.hasData) {
+                                        int selectedIndex = -1;
+                                        if (widget.entry != null) {
+                                          selectedIndex = snapshot.data
+                                              .indexWhere((element) =>
+                                                  element.id ==
+                                                  widget.entry.mWallet.id);
+                                          _selectedWallet =
+                                              widget.entry.mWallet;
+                                        }
                                         return ChipGroup(
                                             snapshot.data
                                                 .map((e) => e.name)
@@ -451,6 +492,7 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
                                             chipColors: snapshot.data
                                                 .map((e) => e.color)
                                                 .toList(),
+                                            selectedIndex: selectedIndex,
                                             onChipSelectedCallback:
                                                 (int index) {
                                           _selectedWallet =
@@ -468,6 +510,15 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
                                     AsyncSnapshot<List<tag>> snapshot) {
                                   if (snapshot.hasData &&
                                       snapshot.data.length > 0) {
+                                    int selectedIndex = -1;
+                                    if (widget.entry != null &&
+                                        widget.entry.mTag != null) {
+                                      selectedIndex = snapshot.data.indexWhere(
+                                          (element) =>
+                                              element.id ==
+                                              widget.entry.mTag.id);
+                                      _selectedTag = widget.entry.mTag;
+                                    }
                                     return Column(
                                       children: [
                                         Container(
@@ -502,6 +553,7 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
                                               cancelableIndexes: snapshot.data
                                                   .map((e) => e.canDelete)
                                                   .toList(),
+                                              selectedIndex: selectedIndex,
                                               onChipSelectedCallback:
                                                   (int index) {
                                                 _selectedTag =
