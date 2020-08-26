@@ -1,6 +1,7 @@
 import 'package:date_range_picker/date_range_picker.dart' as DateRagePicker;
 import 'package:expense_manager/data/models/CashFlowOfDay.dart';
 import 'package:expense_manager/data/models/ExpenseOfCategory.dart';
+import 'package:expense_manager/ui/Router.dart';
 import 'package:expense_manager/ui/home/DayRangeChip.dart';
 import 'package:expense_manager/ui/home/HomeBloc.dart';
 import 'package:expense_manager/ui/home/HomeEvent.dart';
@@ -39,6 +40,12 @@ import 'package:mp_chart/mp/core/utils/color_utils.dart';
 import 'package:mp_chart/mp/core/value_formatter/value_formatter.dart';
 
 class CashFlowView extends StatefulWidget {
+  int startTime = DateTime(DateTime.now().year, DateTime.now().month, 1)
+      .millisecondsSinceEpoch;
+  int endTime = DateTime(DateTime.now().year, DateTime.now().month + 1, 1)
+      .subtract(Duration(days: 1))
+      .millisecondsSinceEpoch;
+
   @override
   State createState() {
     return _CashFlowState();
@@ -75,14 +82,15 @@ class _CashFlowState extends State<CashFlowView> {
                   onChipSelectedCallback: (index) {
                     _selectedPosition = index;
                     if (index == 0) {
-                      BlocProvider.of<HomeBloc>(context).add(GetBalanceEvent(
-                        DateTime(DateTime.now().year, DateTime.now().month, 1)
-                            .millisecondsSinceEpoch,
-                        DateTime(DateTime.now().year, DateTime.now().month + 1,
-                                1)
-                            .subtract(Duration(days: 1))
-                            .millisecondsSinceEpoch,
-                      ));
+                      widget.startTime =
+                          DateTime(DateTime.now().year, DateTime.now().month, 1)
+                              .millisecondsSinceEpoch;
+                      widget.endTime = DateTime(
+                              DateTime.now().year, DateTime.now().month + 1, 1)
+                          .subtract(Duration(days: 1))
+                          .millisecondsSinceEpoch;
+                      BlocProvider.of<HomeBloc>(context).add(
+                          GetBalanceEvent(widget.startTime, widget.endTime));
                     } else if (index == 1) {
                       BlocProvider.of<HomeBloc>(context).add(GetBalanceEvent(
                         DateTime(DateTime.now().year, DateTime.now().month - 1,
@@ -93,21 +101,21 @@ class _CashFlowState extends State<CashFlowView> {
                             .millisecondsSinceEpoch,
                       ));
                     } else if (index == 2) {
-                      BlocProvider.of<HomeBloc>(context).add(GetBalanceEvent(
-                        DateTime(DateTime.now().year, 1, 1)
-                            .millisecondsSinceEpoch,
-                        DateTime(DateTime.now().year + 1, 1, 1)
-                            .subtract(Duration(days: 1))
-                            .millisecondsSinceEpoch,
-                      ));
+                      widget.startTime = DateTime(DateTime.now().year, 1, 1)
+                          .millisecondsSinceEpoch;
+                      widget.endTime = DateTime(DateTime.now().year + 1, 1, 1)
+                          .subtract(Duration(days: 1))
+                          .millisecondsSinceEpoch;
+                      BlocProvider.of<HomeBloc>(context).add(
+                          GetBalanceEvent(widget.startTime, widget.endTime));
                     } else if (index == 3) {
-                      BlocProvider.of<HomeBloc>(context).add(GetBalanceEvent(
-                        DateTime(DateTime.now().year - 1, 1, 1)
-                            .millisecondsSinceEpoch,
-                        DateTime(DateTime.now().year, 1, 1)
-                            .subtract(Duration(days: 1))
-                            .millisecondsSinceEpoch,
-                      ));
+                      widget.startTime = DateTime(DateTime.now().year - 1, 1, 1)
+                          .millisecondsSinceEpoch;
+                      widget.endTime = DateTime(DateTime.now().year, 1, 1)
+                          .subtract(Duration(days: 1))
+                          .millisecondsSinceEpoch;
+                      BlocProvider.of<HomeBloc>(context).add(
+                          GetBalanceEvent(widget.startTime, widget.endTime));
                     }
                     if (index == 4) {
                       _showDatePickerDialog();
@@ -399,7 +407,10 @@ class _CashFlowState extends State<CashFlowView> {
                         color: Colors.blueAccent,
                         highlightColor: Colors.blueAccent,
                         splashColor: Colors.white60,
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pushNamed(context, EntriesRoute,
+                              arguments: [widget.startTime, widget.endTime]);
+                        },
                         child: Text(
                           "See all",
                           style: TextStyle(color: Colors.white),
@@ -563,10 +574,10 @@ class _CashFlowState extends State<CashFlowView> {
         setState(() {
           _customChipName = dateString;
           _scrollToPosition(5);
-          BlocProvider.of<HomeBloc>(context).add(GetBalanceEvent(
-            pickedDates[0].millisecondsSinceEpoch,
-            pickedDates[1].millisecondsSinceEpoch,
-          ));
+          widget.startTime = pickedDates[0].millisecondsSinceEpoch;
+          widget.endTime = pickedDates[1].millisecondsSinceEpoch;
+          BlocProvider.of<HomeBloc>(context)
+              .add(GetBalanceEvent(widget.startTime, widget.endTime));
         });
       }
     }

@@ -95,4 +95,13 @@ class HomeRepositoryImpl extends HomeRepository {
       return _walletDao.insertWallet(mWallet);
     });
   }
+
+  @override
+  Future<List<EntryWithCategoryAndWallet>> getEntriesBetweenADateRange(
+      int startTime, int endTime) {
+    return _preference.getBook().then((value) {
+      return _entryDao.getEntriesBetweenADateRange(
+          startTime, endTime, value.id);
+    });
+  }
 }

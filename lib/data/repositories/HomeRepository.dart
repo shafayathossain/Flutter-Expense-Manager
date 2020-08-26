@@ -15,4 +15,6 @@ abstract class HomeRepository {
   Future<int> clearCurrentAccountBook();
   Future<int> adjustWalletBalance(double amount, int date, int walletId);
   Future<int> createWallet(String name, int color);
+  Future<List<EntryWithCategoryAndWallet>> getEntriesBetweenADateRange(
+      int startTime, int endTime);
 }

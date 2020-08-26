@@ -593,6 +593,7 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
                                         }
                                         return null;
                                       },
+                                      controller: _descriptionTextController,
                                       onChanged: (text) {
                                         if (text.length > 1) {
                                           _formKey.currentState.validate();
