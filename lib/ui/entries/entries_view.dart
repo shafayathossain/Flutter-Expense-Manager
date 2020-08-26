@@ -90,32 +90,8 @@ class EntriesView extends StatelessWidget {
                       listener: (context, state) {},
                       buildWhen: (context, state) => state is GetEntriesState,
                       builder: (context, state) {
-                        return ListView.builder(
-                            itemCount:
-                                (state as GetEntriesState).entries.length,
-                            itemBuilder: (context, index) {
-                              if ((state as GetEntriesState)
-                                      .entries[index]
-                                      .type ==
-                                  1) {
-                                return Container(
-                                  margin: EdgeInsets.only(
-                                      left: 15, right: 15, top: 10, bottom: 5),
-                                  child: Text(
-                                    (state as GetEntriesState)
-                                        .entries[index]
-                                        .date,
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.blueGrey),
-                                  ),
-                                );
-                              } else {
-                                return EntriesItemView(
-                                    (state as GetEntriesState).entries[index]);
-                              }
-                            });
+                        return EntryListView(
+                            (state as GetEntriesState).entries);
                       },
                     ),
                   ),
@@ -129,10 +105,58 @@ class EntriesView extends StatelessWidget {
   }
 }
 
+class EntryListView extends StatefulWidget {
+  List<EntryListItem> entries;
+  int _selectedIndex = -1;
+
+  EntryListView(this.entries);
+
+  @override
+  State createState() {
+    return EntryListState();
+  }
+}
+
+class EntryListState extends State<EntryListView> {
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+        itemCount: widget.entries.length,
+        itemBuilder: (context, index) {
+          if (widget.entries[index].type == 1) {
+            return Container(
+              margin: EdgeInsets.only(left: 15, right: 15, top: 10, bottom: 5),
+              child: Text(
+                widget.entries[index].date,
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blueGrey),
+              ),
+            );
+          } else {
+            return EntriesItemView(
+                widget.entries[index], index, widget._selectedIndex, () {
+              setState(() {
+                widget._selectedIndex =
+                    widget._selectedIndex == index ? -1 : index;
+              });
+            });
+          }
+        });
+  }
+}
+
+typedef onItemClick();
+
 class EntriesItemView extends StatefulWidget {
   final EntryListItem item;
+  final onItemClick clickEvent;
+  int selectedIndex = -1;
+  int currentIndex;
 
-  EntriesItemView(this.item);
+  EntriesItemView(
+      this.item, this.currentIndex, this.selectedIndex, this.clickEvent);
 
   @override
   State createState() {
@@ -145,6 +169,65 @@ class EntriesItemState extends State<EntriesItemView> {
   Widget build(BuildContext context) {
     List<Widget> firstChildren = [];
     List<Widget> lastRowChildren = [];
+    List<Widget> parentChildren = [];
+
+    parentChildren.add(Container(
+      margin: EdgeInsets.all(15),
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Flexible(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: firstChildren)),
+          Container(
+            child: Text(
+              widget.item.item.mEntry.amount.toString(),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    ));
+    if (widget.currentIndex == widget.selectedIndex) {
+      parentChildren.add(Positioned.fill(
+        child: Card(
+          color: Colors.black45,
+          margin: EdgeInsets.all(0),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(5))),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              OutlineButton(
+                  child: new Text(
+                    "Edit",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  highlightedBorderColor: Colors.white,
+                  disabledBorderColor: Colors.white,
+                  onPressed: null,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5.0),
+                  )),
+              OutlineButton(
+                  child: new Text(
+                    "Delete",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: null,
+                  highlightedBorderColor: Colors.white,
+                  disabledBorderColor: Colors.white,
+                  shape: new RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(5.0)))
+            ],
+          ),
+        ),
+      ));
+    }
+
     firstChildren.add(Text(
       widget.item.item.mCategory.name,
       style: TextStyle(
@@ -206,26 +289,15 @@ class EntriesItemState extends State<EntriesItemView> {
     ));
     return Container(
       margin: EdgeInsets.only(left: 10, right: 10),
-      child: Card(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(5))),
-        child: Container(
-          margin: EdgeInsets.all(15),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Flexible(
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: firstChildren)),
-              Container(
-                child: Text(
-                  widget.item.item.mEntry.amount.toString(),
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
+      child: GestureDetector(
+        onTap: () {
+          widget.clickEvent.call();
+        },
+        child: Card(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(5))),
+          child: Stack(
+            children: parentChildren,
           ),
         ),
       ),
