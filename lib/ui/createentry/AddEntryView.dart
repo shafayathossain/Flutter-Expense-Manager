@@ -388,16 +388,17 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
                                             selectedIndex:
                                                 selectedCategoryIndex,
                                             onChipSelectedCallback:
-                                                (int index) {
+                                                (List<int> index) {
                                           _selectedCategory =
-                                              snapshot.data[index];
+                                              snapshot.data[index[0]];
                                           this
                                               .widget
                                               .categorySelectionCallback
-                                              .call(snapshot.data[index].color);
+                                              .call(snapshot
+                                                  .data[index[0]].color);
                                           BlocProvider.of<AddEntryBloc>(context)
                                             ..add(GetTagsEvent(
-                                                snapshot.data[index].id));
+                                                snapshot.data[index[0]].id));
                                         });
                                       } else {
                                         return ChipGroup([]);
@@ -494,9 +495,9 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
                                                 .toList(),
                                             selectedIndex: selectedIndex,
                                             onChipSelectedCallback:
-                                                (int index) {
+                                                (List<int> index) {
                                           _selectedWallet =
-                                              snapshot.data[index];
+                                              snapshot.data[index[0]];
                                         });
                                       } else {
                                         return ChipGroup([]);
@@ -555,9 +556,9 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
                                                   .toList(),
                                               selectedIndex: selectedIndex,
                                               onChipSelectedCallback:
-                                                  (int index) {
+                                                  (List<int> index) {
                                                 _selectedTag =
-                                                    snapshot.data[index];
+                                                    snapshot.data[index[0]];
                                               },
                                             )),
                                         Container(

@@ -1,4 +1,5 @@
 import 'package:expense_manager/data/models/EntryWithCategoryAndWallet.dart';
+import 'package:expense_manager/data/models/category_with_tags.dart';
 import 'package:expense_manager/data/models/entry_list_item.dart';
 import 'package:expense_manager/data/repositories/HomeRepository.dart';
 import 'package:expense_manager/ui/entries/entries_event.dart';
@@ -21,6 +22,10 @@ class EntriesBloc extends Bloc<EntriesEvent, EntriesState> {
       yield* _deleteEntry(event.entry);
     } else if (event is SearchEntryEvent) {
       yield* _search(event.keyword, event.entries);
+    } else if (event is GetWalletsAndCategoriesEvent) {
+      yield* _getWalletsAndCategories();
+    } else if (event is FilterEvent) {
+      yield* _filter(event.walletIds, event.categoryIds, event.tagIds);
     }
   }
 
@@ -70,5 +75,53 @@ class EntriesBloc extends Bloc<EntriesEvent, EntriesState> {
       }
     });
     yield* Stream.value(GetEntriesState(itemsToShow, entries));
+  }
+
+  Stream<EntriesState> _getWalletsAndCategories() async* {
+    final wallets = await _repository.getWallets();
+    final categoriesAndTags = await _repository.getCategoriesWithTags();
+    int lastCategoryId = 0;
+    List<CategoryWithTags> categories = [];
+    CategoryWithTags category;
+    categoriesAndTags.forEach((element) {
+      if (element.mCategory.id != lastCategoryId) {
+        lastCategoryId = element.mCategory.id;
+        if (category != null) {
+          categories.add(category);
+          category = new CategoryWithTags(element.mCategory, [element.mTag]);
+        } else {
+          category = new CategoryWithTags(element.mCategory, [element.mTag]);
+        }
+      } else {
+        category.tags.add(element.mTag);
+      }
+    });
+    if (category != null) {
+      categories.add(category);
+    }
+    yield* Stream.value(GetWalletsAndCategoriesState(wallets, categories));
+  }
+
+  Stream<EntriesState> _filter(
+      List<int> walletIds, List<int> categoryIds, List<int> tagIds) async* {
+    this._lastStartTime = this._lastStartTime;
+    this._lastEndTime = this._lastEndTime;
+    final result = await _repository
+        .getEntriesBetweenADateRange(this._lastStartTime, this._lastEndTime,
+            walletIds: walletIds, categoryIds: categoryIds, tagIds: tagIds)
+        .timeout(Duration(seconds: 5));
+    List<EntryListItem> itemsToShow = [];
+    final dateTimeFormatter = DateFormat("dd-MM-yyyy");
+    String lastDate = "";
+    result.forEach((element) {
+      DateTime time = DateTime.fromMillisecondsSinceEpoch(element.mEntry.date);
+      String timeString = dateTimeFormatter.format(time);
+      if (lastDate != timeString) {
+        lastDate = timeString;
+        itemsToShow.add(EntryListItem(1, date: timeString));
+      }
+      itemsToShow.add(EntryListItem(2, item: element));
+    });
+    yield* Stream.value(GetEntriesState(itemsToShow, result));
   }
 }

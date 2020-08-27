@@ -221,18 +221,20 @@ class _ModalBottomSheetState<T> extends State<_ModalBottomSheet<T>> {
           final double animationValue = mediaQuery.accessibleNavigation
               ? 1.0
               : widget.route.animation.value;
-          return Semantics(
-            scopesRoute: true,
-            namesRoute: true,
-            label: routeLabel,
-            explicitChildNodes: true,
-            child: ClipRect(
-              child: CustomSingleChildLayout(
-                delegate: _ModalBottomSheetLayout(animationValue),
-                child: BottomSheet(
-                  animationController: widget.route._animationController,
-                  onClosing: () => Navigator.pop(context),
-                  builder: widget.route.builder,
+          return SafeArea(
+            child: Semantics(
+              scopesRoute: true,
+              namesRoute: true,
+              label: routeLabel,
+              explicitChildNodes: true,
+              child: ClipRect(
+                child: CustomSingleChildLayout(
+                  delegate: _ModalBottomSheetLayout(animationValue),
+                  child: BottomSheet(
+                    animationController: widget.route._animationController,
+                    onClosing: () => Navigator.pop(context),
+                    builder: widget.route.builder,
+                  ),
                 ),
               ),
             ),
@@ -283,7 +285,7 @@ class _ModalBottomSheetRoute<T> extends PopupRoute<T> {
     // and isn't exposed to the top padding of the MediaQuery.
     Widget bottomSheet = MediaQuery.removePadding(
       context: context,
-      removeTop: true,
+      removeTop: false,
       child: _ModalBottomSheet<T>(route: this),
     );
     if (theme != null) bottomSheet = Theme(data: theme, child: bottomSheet);

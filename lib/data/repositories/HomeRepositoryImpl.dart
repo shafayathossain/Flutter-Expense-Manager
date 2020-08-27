@@ -4,6 +4,7 @@ import 'package:expense_manager/data/datasources/localdb/EntryDao.dart';
 import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 import 'package:expense_manager/data/datasources/localdb/WalletDao.dart';
 import 'package:expense_manager/data/models/CashFlowOfDay.dart';
+import 'package:expense_manager/data/models/CategoryWithTag.dart';
 import 'package:expense_manager/data/models/EntryWithCategoryAndWallet.dart';
 import 'package:expense_manager/data/models/ExpenseOfCategory.dart';
 import 'package:expense_manager/data/models/WalletWithBalance.dart';
@@ -98,10 +99,11 @@ class HomeRepositoryImpl extends HomeRepository {
 
   @override
   Future<List<EntryWithCategoryAndWallet>> getEntriesBetweenADateRange(
-      int startTime, int endTime) {
+      int startTime, int endTime,
+      {List<int> walletIds, List<int> categoryIds, List<int> tagIds}) {
     return _preference.getBook().then((value) {
-      return _entryDao.getEntriesBetweenADateRange(
-          startTime, endTime, value.id);
+      return _entryDao.getEntriesBetweenADateRange(startTime, endTime, value.id,
+          walletIds: walletIds, categoryIds: categoryIds, tagIds: tagIds);
     });
   }
 
@@ -109,6 +111,20 @@ class HomeRepositoryImpl extends HomeRepository {
   Future<int> deleteEntry(entry mEntry) {
     return _preference.getBook().then((value) {
       return _entryDao.deleteEntry(mEntry);
+    });
+  }
+
+  @override
+  Future<List<CategoryWithTag>> getCategoriesWithTags() {
+    return _preference.getBook().then((value) {
+      return _categoryDao.getAllCategoriesWithTags(value.id);
+    });
+  }
+
+  @override
+  Future<List<wallet>> getWallets() {
+    return _preference.getBook().then((value) {
+      return _walletDao.getWallets(value.id);
     });
   }
 }

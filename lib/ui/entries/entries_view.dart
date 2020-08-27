@@ -1,9 +1,13 @@
+import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 import 'package:expense_manager/data/models/EntryWithCategoryAndWallet.dart';
+import 'package:expense_manager/data/models/category_with_tags.dart';
 import 'package:expense_manager/data/models/entry_list_item.dart';
 import 'package:expense_manager/data/repositories/HomeRepositoryImpl.dart';
 import 'package:expense_manager/ui/entries/entries_bloc.dart';
 import 'package:expense_manager/ui/entries/entries_event.dart';
 import 'package:expense_manager/ui/entries/entries_state.dart';
+import 'package:expense_manager/ui/entries/filter.dart';
+import 'package:expense_manager/ui/home/BottomSheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -12,6 +16,10 @@ import '../Router.dart';
 class EntriesView extends StatelessWidget {
   int startTime;
   int endTime;
+  List<wallet> wallets = [];
+  List<CategoryWithTags> categories = [];
+  List<int> selectedWalletIndexes = [];
+  List<CategoryWithTags> selectedCategories = [];
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +33,8 @@ class EntriesView extends StatelessWidget {
       child: Builder(
         builder: (contextB) {
           BlocProvider.of<EntriesBloc>(contextB)
-              .add(GetEntriesEvent(startTime, endTime));
+            ..add(GetEntriesEvent(startTime, endTime))
+            ..add(GetWalletsAndCategoriesEvent());
           return Scaffold(
             appBar: AppBar(
               title: Text(
@@ -79,7 +88,12 @@ class EntriesView extends StatelessWidget {
                         width: 60,
                         margin: EdgeInsets.only(left: 10),
                         child: RawMaterialButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            if (wallets.length > 0 && categories.length > 0) {
+                              _showFilterBottomSheet(
+                                  contextB, wallets, categories);
+                            }
+                          },
                           shape: CircleBorder(),
                           child: Icon(
                             Icons.filter_list,
@@ -94,7 +108,12 @@ class EntriesView extends StatelessWidget {
                   child: Container(
                     height: double.maxFinite,
                     child: BlocConsumer<EntriesBloc, EntriesState>(
-                      listener: (context, state) {},
+                      listener: (context, state) {
+                        if (state is GetWalletsAndCategoriesState) {
+                          this.wallets = state.wallets;
+                          this.categories = state.categories;
+                        }
+                      },
                       buildWhen: (context, state) => state is GetEntriesState,
                       builder: (context, state) {
                         if (state is GetEntriesState && state.entries != null) {
@@ -113,6 +132,37 @@ class EntriesView extends StatelessWidget {
         },
       ),
     );
+  }
+
+  void _showFilterBottomSheet(BuildContext builderContext, List<wallet> wallets,
+      List<CategoryWithTags> categories) {
+    showModalBottomSheetCustom(
+        context: builderContext,
+        builder: (contextC) {
+          return Filter(
+            wallets,
+            categories,
+            (List<int> selectedWalletIndexes,
+                List<CategoryWithTags> selectedCategories) {
+              this.selectedWalletIndexes = selectedWalletIndexes;
+              this.selectedCategories = selectedCategories;
+              List<int> tempWalletIds = [];
+              List<int> tempCategoryIds = [];
+              List<int> tempTagIds = [];
+              selectedWalletIndexes.forEach((element) {
+                tempWalletIds.add(wallets[element].id);
+              });
+              selectedCategories.forEach((element) {
+                tempCategoryIds.add(element.mCategory.id);
+                tempTagIds.addAll(element.tags.map((e) => e.id));
+              });
+              BlocProvider.of<EntriesBloc>(builderContext)
+                  .add(FilterEvent(tempWalletIds, tempCategoryIds, tempTagIds));
+            },
+            selectedWalletIndexes: selectedWalletIndexes,
+            checkedCategories: selectedCategories,
+          );
+        });
   }
 }
 

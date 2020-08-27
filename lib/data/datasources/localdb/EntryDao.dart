@@ -44,7 +44,21 @@ class EntryDao extends DatabaseAccessor<LocalDatabase> with _$EntryDaoMixin {
   }
 
   Future<List<EntryWithCategoryAndWallet>> getEntriesBetweenADateRange(
-      int startTimeInMillis, int endTimeInMillis, int bookId) {
+      int startTimeInMillis, int endTimeInMillis, int bookId,
+      {List<int> walletIds, List<int> categoryIds, List<int> tagIds}) {
+    Expression<bool> expression = _database.entry.bookId.equals(bookId) &
+        _database.entry.date
+            .isBetweenValues(startTimeInMillis, endTimeInMillis);
+    if (walletIds != null && walletIds.length > 0) {
+      expression = expression & _database.entry.walletId.isIn(walletIds);
+    }
+    if (categoryIds != null && categoryIds.length > 0) {
+      expression = expression & _database.entry.categoryId.isIn(categoryIds);
+    }
+    if (tagIds != null && tagIds.length > 0) {
+      expression = expression & _database.entry.tagId.isIn(tagIds);
+    }
+
     final query = select(_database.entry).join([
       leftOuterJoin(_database.wallet,
           _database.entry.walletId.equalsExp(_database.wallet.id)),
@@ -53,9 +67,7 @@ class EntryDao extends DatabaseAccessor<LocalDatabase> with _$EntryDaoMixin {
       leftOuterJoin(
           _database.tag, _database.tag.id.equalsExp(_database.entry.tagId))
     ])
-      ..where(_database.entry.bookId.equals(bookId) &
-          _database.entry.date
-              .isBetweenValues(startTimeInMillis, endTimeInMillis))
+      ..where(expression)
       ..orderBy([OrderingTerm.asc(_database.entry.date)]);
 
     return query.map((row) {

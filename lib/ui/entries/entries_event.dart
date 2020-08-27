@@ -21,3 +21,13 @@ class SearchEntryEvent extends EntriesEvent {
 
   SearchEntryEvent(this.keyword, this.entries);
 }
+
+class GetWalletsAndCategoriesEvent extends EntriesEvent {}
+
+class FilterEvent extends EntriesEvent {
+  List<int> walletIds;
+  List<int> categoryIds;
+  List<int> tagIds;
+
+  FilterEvent(this.walletIds, this.categoryIds, this.tagIds);
+}

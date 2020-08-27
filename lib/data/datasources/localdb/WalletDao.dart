@@ -18,8 +18,13 @@ class WalletDao extends DatabaseAccessor<LocalDatabase> with _$WalletDaoMixin {
   }
 
   Future<List<wallet>> getWallets(int bookId) {
-    return (select(_database.wallet)..where((tbl) => tbl.bookId.equals(bookId)))
-        .get();
+    final query =
+        (select(_database.wallet)..where((tbl) => tbl.bookId.equals(bookId)));
+    query
+      ..orderBy(
+          [(row) => OrderingTerm(expression: row.id, mode: OrderingMode.asc)]);
+
+    return query.get();
   }
 
   Future<List<WalletWithBalance>> getWalletsWithBalance(int bookId) {

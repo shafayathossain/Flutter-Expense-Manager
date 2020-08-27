@@ -1,12 +1,14 @@
 import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 import 'package:expense_manager/data/models/Category.dart';
 import 'package:expense_manager/data/models/CategoryWithTag.dart';
+import 'package:expense_manager/data/models/Entry.dart';
 import 'package:expense_manager/data/models/Tag.dart';
+import 'package:expense_manager/data/models/Wallet.dart';
 import 'package:moor_flutter/moor_flutter.dart';
 
 part 'CategoryDao.g.dart';
 
-@UseDao(tables: [Category, Tag])
+@UseDao(tables: [Entry, Tag, Category, Wallet])
 class CategoryDao extends DatabaseAccessor<LocalDatabase>
     with _$CategoryDaoMixin {
   LocalDatabase _database;
@@ -38,6 +40,19 @@ class CategoryDao extends DatabaseAccessor<LocalDatabase>
             e.readTable(tag as TableInfo<$TagTable, tag>));
       }).toList();
     });
+  }
+
+  Future<List<CategoryWithTag>> getAllCategoriesWithTags(int bookId) {
+    final query = select(_database.tag).join([
+      leftOuterJoin(_database.category,
+          _database.category.id.equalsExp(_database.tag.categoryId))
+    ])
+      ..where(_database.tag.bookId.equals(bookId))
+      ..orderBy([OrderingTerm.asc(_database.tag.categoryId)]);
+    return query.map((event) {
+      return CategoryWithTag(
+          event.readTable(this.category), event.readTable(this.tag));
+    }).get();
   }
 
   Stream<List<tag>> getTagsForACategory(int categoryId) {

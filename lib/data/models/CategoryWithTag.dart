@@ -1,8 +1,7 @@
-import 'package:expense_manager/data/models/Category.dart';
-import 'package:expense_manager/data/models/Tag.dart';
+import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
 
 class CategoryWithTag {
-  CategoryWithTag(this.category, this.tag);
-  Category category;
-  Tag tag;
+  CategoryWithTag(this.mCategory, this.mTag);
+  category mCategory;
+  tag mTag;
 }
