@@ -1,27 +1,22 @@
-
 import 'dart:io';
 
 import 'package:csv/csv.dart';
 import 'package:expense_manager/data/datasources/localdb/LocalDatabase.dart';
-import 'package:expense_manager/data/models/AccountBook.dart';
 import 'package:expense_manager/data/models/account_book_with_balance.dart';
 import 'package:expense_manager/data/repositories/AccountBookRepositoryImpl.dart';
 import 'package:expense_manager/ui/Router.dart';
 import 'package:expense_manager/ui/accountbook/AccountBookBloc.dart';
 import 'package:expense_manager/ui/accountbook/AccountBookEvents.dart';
 import 'package:expense_manager/ui/accountbook/AccountBookStates.dart';
-import 'package:expense_manager/ui/home/HomeBloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import 'CreateAccountBookDialog.dart';
 
 class AccountBookScreen extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -38,25 +33,23 @@ class AccountBookScreen extends StatelessWidget {
                     onPressed: () => showDialog(
                         context: contextB,
                         barrierDismissible: false,
-                        builder:(contextC) => CreateAccountBookDialog(
-                          callback: (name, color, id) {
-                            BlocProvider.of<AccountBookBloc>(contextB)..add(CreateAccountBookEvent(
-                                name: name,
-                                color: color
-                            ));
-                          },
-                        )
-                    ),
+                        builder: (contextC) => CreateAccountBookDialog(
+                              callback: (name, color, id) {
+                                BlocProvider.of<AccountBookBloc>(contextB)
+                                  ..add(CreateAccountBookEvent(
+                                      name: name, color: color));
+                              },
+                            )),
                   )
                 ],
               ),
               body: Builder(
                 builder: (context) {
-                  BlocProvider.of<AccountBookBloc>(context).add(LoadAccountBookEvent());
+                  BlocProvider.of<AccountBookBloc>(context)
+                      .add(LoadAccountBookEvent());
                   return AccountBookView();
                 },
-              )
-          );
+              ));
         },
       ),
     );
@@ -64,7 +57,6 @@ class AccountBookScreen extends StatelessWidget {
 }
 
 class AccountBookView extends StatefulWidget {
-
   List<AccountBookWithBalance> books = [];
 
   @override
@@ -74,30 +66,32 @@ class AccountBookView extends StatefulWidget {
 }
 
 class AccountBookViewStates extends State<AccountBookView> {
-
   int _currentState = 0;
   int _selectedPosition = -1;
 
   @override
   Widget build(BuildContext context) {
-
     return BlocConsumer<AccountBookBloc, AccountBookStates>(
       listenWhen: (previousState, currentState) {
-        return (currentState is ViewBookState) || (currentState is ExportEntriesState);
+        return (currentState is ViewBookState) ||
+            (currentState is ExportEntriesState);
       },
       listener: (context, state) {
-        if(state is ViewBookState) {
+        if (state is ViewBookState) {
           Navigator.pushReplacementNamed(context, HomeRoute);
-        } else if(state is ExportEntriesState) {
+        } else if (state is ExportEntriesState) {
           String csv = ListToCsvConverter().convert(state.row);
           _writeCsv(state.bookName, csv);
         }
       },
       buildWhen: (previousState, currentState) {
-        return !((currentState is ViewBookState) || (currentState is ExportEntriesState));
+        return !((currentState is ViewBookState) ||
+            (currentState is ExportEntriesState));
       },
       builder: (context, state) {
-        if(state is AccountBookLoadedState && state.accountBooks.length > 0 && state.accountBooks[0].book != null) {
+        if (state is AccountBookLoadedState &&
+            state.accountBooks.length > 0 &&
+            state.accountBooks[0].book != null) {
           widget.books = state.accountBooks;
           return ListView.builder(
             padding: EdgeInsets.symmetric(vertical: 10.0),
@@ -112,9 +106,7 @@ class AccountBookViewStates extends State<AccountBookView> {
                     accountBookWithBalance: widget.books[index],
                     callback: (position) {
                       this._selectedPosition = position;
-                      setState(() {
-
-                      });
+                      setState(() {});
                     },
                   ),
                 ),
@@ -131,38 +123,42 @@ class AccountBookViewStates extends State<AccountBookView> {
   }
 
   void _writeCsv(String bookName, String csv) async {
-      Directory appDocDir = await getExternalStorageDirectory();
-      String appDocPath = appDocDir.path;
-      String filePath = appDocPath + "/${bookName}.csv";
-      File file = File(filePath);
-      file.writeAsString(csv);
-      final snackBar = SnackBar(
-        content: Text(
-          "File saved in $filePath",
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.green,
-
-      );
-      Scaffold.of(context).showSnackBar(snackBar);
-
+    Directory appDocDir = Theme.of(context).platform == TargetPlatform.android
+        ? await getExternalStorageDirectory()
+        : await getApplicationDocumentsDirectory();
+    String appDocPath = appDocDir.path;
+    String filePath = appDocPath + "/${bookName}.csv";
+    File file = File(filePath);
+    file.writeAsString(csv);
+    final snackBar = SnackBar(
+      content: Text(
+        Theme.of(context).platform == TargetPlatform.android
+            ? "File saved in $filePath"
+            : "File saved",
+        style: TextStyle(color: Colors.white),
+      ),
+      backgroundColor: Colors.green,
+    );
+    Scaffold.of(context).showSnackBar(snackBar);
   }
 }
 
 typedef AccountBookItemCallback(int position);
 
 class AccountBookItemView extends StatelessWidget {
-
   int selectedPosition = -1;
   int currentPosition = -1;
   AccountBookWithBalance accountBookWithBalance;
   AccountBookItemCallback callback;
 
-  AccountBookItemView({this.selectedPosition, this.currentPosition,
-    this.accountBookWithBalance, this.callback});
+  AccountBookItemView(
+      {this.selectedPosition,
+      this.currentPosition,
+      this.accountBookWithBalance,
+      this.callback});
 
   Widget build(BuildContext context) {
-    if(currentPosition == selectedPosition) {
+    if (currentPosition == selectedPosition) {
       return Container(
         height: 150,
         child: GestureDetector(
@@ -183,35 +179,38 @@ class AccountBookItemView extends StatelessWidget {
                               children: <Widget>[
                                 Column(
                                   mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
                                   children: <Widget>[
                                     Text(
                                       accountBookWithBalance.book.name,
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 22,
-                                          fontWeight: FontWeight.bold
-                                      ),
+                                          fontWeight: FontWeight.bold),
                                     ),
                                     Text(
-                                      (accountBookWithBalance.income - accountBookWithBalance.expense).toString(),
+                                      (accountBookWithBalance.income -
+                                              accountBookWithBalance.expense)
+                                          .toString(),
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 22,
-                                          fontWeight: FontWeight.bold
-                                      ),
+                                          fontWeight: FontWeight.bold),
                                     )
                                   ],
                                 ),
                                 Column(
                                   mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
                                   children: <Widget>[
                                     Row(
                                       children: <Widget>[
                                         Column(
                                           mainAxisSize: MainAxisSize.max,
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
                                           children: <Widget>[
                                             Text(
                                               "Income",
@@ -220,7 +219,8 @@ class AccountBookItemView extends StatelessWidget {
                                               ),
                                             ),
                                             Text(
-                                              (accountBookWithBalance.income).toString(),
+                                              (accountBookWithBalance.income)
+                                                  .toString(),
                                               style: TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 22,
@@ -234,7 +234,8 @@ class AccountBookItemView extends StatelessWidget {
                                       children: <Widget>[
                                         Column(
                                           mainAxisSize: MainAxisSize.max,
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
                                           children: <Widget>[
                                             Text(
                                               "Expense",
@@ -243,7 +244,9 @@ class AccountBookItemView extends StatelessWidget {
                                               ),
                                             ),
                                             Text(
-                                              (accountBookWithBalance.expense.abs()).toString(),
+                                              (accountBookWithBalance.expense
+                                                      .abs())
+                                                  .toString(),
                                               style: TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 22,
@@ -261,10 +264,7 @@ class AccountBookItemView extends StatelessWidget {
                         ),
                         onTap: () {
                           callback.call(currentPosition);
-                        }
-                    )
-
-                ),
+                        })),
                 Positioned(
                   child: Container(
                     color: Colors.white60,
@@ -277,41 +277,37 @@ class AccountBookItemView extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             RawMaterialButton(
-                              fillColor: Color(accountBookWithBalance.book.color),
+                              fillColor:
+                                  Color(accountBookWithBalance.book.color),
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(3.0))
-                              ),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(3.0))),
                               child: Text(
                                 "view".toUpperCase(),
-                                style: TextStyle(
-                                    color: Colors.white
-                                ),
-                              ),
-                              onPressed: () {
-                                BlocProvider.of<AccountBookBloc>(context)..add(ViewAccountBookEvent(context.read<AccountBookWithBalance>().book));
-                              },
-                            ),
-                            RawMaterialButton(
-                              fillColor: Color(accountBookWithBalance.book.color),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(3.0))
-                              ),
-                              child: Text(
-                                "export".toUpperCase(),
-                                style: TextStyle(
-                                    color: Colors.white
-                                ),
+                                style: TextStyle(color: Colors.white),
                               ),
                               onPressed: () {
                                 BlocProvider.of<AccountBookBloc>(context)
-                                  ..add(
-                                      ExportAccountBookEvent(
-                                          context
-                                              .read<AccountBookWithBalance>()
-                                              .book
-                                      )
-                                  );
-
+                                  ..add(ViewAccountBookEvent(context
+                                      .read<AccountBookWithBalance>()
+                                      .book));
+                              },
+                            ),
+                            RawMaterialButton(
+                              fillColor:
+                                  Color(accountBookWithBalance.book.color),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(3.0))),
+                              child: Text(
+                                "export".toUpperCase(),
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              onPressed: () {
+                                BlocProvider.of<AccountBookBloc>(context)
+                                  ..add(ExportAccountBookEvent(context
+                                      .read<AccountBookWithBalance>()
+                                      .book));
                               },
                             ),
                           ],
@@ -321,55 +317,53 @@ class AccountBookItemView extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             RawMaterialButton(
-                              fillColor: Color(accountBookWithBalance.book.color),
+                              fillColor:
+                                  Color(accountBookWithBalance.book.color),
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(3.0))
-                              ),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(3.0))),
                               child: Text(
                                 "edit".toUpperCase(),
-                                style: TextStyle(
-                                    color: Colors.white
-                                ),
+                                style: TextStyle(color: Colors.white),
                               ),
                               onPressed: () {
                                 showDialog(
                                     context: context,
                                     barrierDismissible: false,
-                                    builder:(contextC) => CreateAccountBookDialog(
-                                      book: accountBookWithBalance.book,
-                                      callback: (name, color, id) {
-                                        if(id == null) {
-                                          BlocProvider.of<AccountBookBloc>(context)
-                                            ..add(CreateAccountBookEvent(
-                                                name: name,
-                                                color: color
-                                            ));
-                                        } else {
-                                          BlocProvider.of<AccountBookBloc>(context)
-                                            ..add(EditAccountBookEvent(
-                                                name: name,
-                                                color: color,
-                                                id: id
-                                            ));
-                                        }
-                                      },
-                                    )
-                                );
+                                    builder: (contextC) =>
+                                        CreateAccountBookDialog(
+                                          book: accountBookWithBalance.book,
+                                          callback: (name, color, id) {
+                                            if (id == null) {
+                                              BlocProvider.of<AccountBookBloc>(
+                                                  context)
+                                                ..add(CreateAccountBookEvent(
+                                                    name: name, color: color));
+                                            } else {
+                                              BlocProvider.of<AccountBookBloc>(
+                                                  context)
+                                                ..add(EditAccountBookEvent(
+                                                    name: name,
+                                                    color: color,
+                                                    id: id));
+                                            }
+                                          },
+                                        ));
                               },
                             ),
                             RawMaterialButton(
-                              fillColor: Color(accountBookWithBalance.book.color),
+                              fillColor:
+                                  Color(accountBookWithBalance.book.color),
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(3.0))
-                              ),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(3.0))),
                               child: Text(
                                 "delete".toUpperCase(),
-                                style: TextStyle(
-                                    color: Colors.white
-                                ),
+                                style: TextStyle(color: Colors.white),
                               ),
                               onPressed: () {
-                                _showDeleteConfirmationDialog(context, accountBookWithBalance.book);
+                                _showDeleteConfirmationDialog(
+                                    context, accountBookWithBalance.book);
                               },
                             )
                           ],
@@ -400,18 +394,18 @@ class AccountBookItemView extends StatelessWidget {
                           Text(
                             accountBookWithBalance.book.name,
                             style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold
-                            ),
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            (accountBookWithBalance.income - accountBookWithBalance.expense).toString(),
+                            (accountBookWithBalance.income -
+                                    accountBookWithBalance.expense)
+                                .toString(),
                             style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold
-                            ),
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold),
                           )
                         ],
                       ),
@@ -455,7 +449,8 @@ class AccountBookItemView extends StatelessWidget {
                                     ),
                                   ),
                                   Text(
-                                    (accountBookWithBalance.expense.abs()).toString(),
+                                    (accountBookWithBalance.expense.abs())
+                                        .toString(),
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 22,
@@ -473,70 +468,57 @@ class AccountBookItemView extends StatelessWidget {
               ),
               onTap: () {
                 callback.call(currentPosition);
-              }
-          )
-
-      );
+              }));
     }
   }
 
   void _showDeleteConfirmationDialog(BuildContext context, account_book book) {
     showDialog(
-      context: context,
-      builder: (contextB) {
-        return AlertDialog(
-          title: Text(
-            "DELETE ACCOUNT BOOK",
-            style: TextStyle(
-              fontWeight: FontWeight.bold
+        context: context,
+        builder: (contextB) {
+          return AlertDialog(
+            title: Text(
+              "DELETE ACCOUNT BOOK",
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
-          ),
-          content: Text(
-            "Do you really want to delete this account book?"
-          ),
-          actions: <Widget>[
-            RawMaterialButton(
-              elevation: 0.0,
-              highlightElevation: 0.0,
-              fillColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(3.0))
-              ),
-              child: Text(
-                "yes".toUpperCase(),
-                style: TextStyle(
+            content: Text("Do you really want to delete this account book?"),
+            actions: <Widget>[
+              RawMaterialButton(
+                elevation: 0.0,
+                highlightElevation: 0.0,
+                fillColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(3.0))),
+                child: Text(
+                  "yes".toUpperCase(),
+                  style: TextStyle(
                     color: Colors.blue,
+                  ),
                 ),
+                onPressed: () {
+                  BlocProvider.of<AccountBookBloc>(context)
+                    ..add(DeleteAccountBookEvent(book));
+                  Navigator.pop(context);
+                },
               ),
-              onPressed: () {
-                BlocProvider.of<AccountBookBloc>(context)..add(DeleteAccountBookEvent(book));
-                Navigator.pop(context);
-              },
-            ),
-            RawMaterialButton(
-              elevation: 0.0,
-              highlightElevation: 0.0,
-              fillColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(3.0))
-              ),
-              child: Text(
-                "no".toUpperCase(),
-                style: TextStyle(
-                  color: Colors.blue,
+              RawMaterialButton(
+                elevation: 0.0,
+                highlightElevation: 0.0,
+                fillColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(3.0))),
+                child: Text(
+                  "no".toUpperCase(),
+                  style: TextStyle(
+                    color: Colors.blue,
+                  ),
                 ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
               ),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      }
-    );
+            ],
+          );
+        });
   }
-
 }
-
-
-
