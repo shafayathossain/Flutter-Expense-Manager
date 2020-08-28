@@ -42,8 +42,9 @@ $ flutter run
 - [Build Runner](https://pub.dev/packages/build_runner)
 
 ### Bugs
-- Top five entries list in home is not updating when new entry added.
-- All entries list is not updating after editing an entry.
+- File name convention not followed properly
+- Top five entries list in home is not updating when new entry added
+- All entries list is not updating after editing an entry
 
 # Contribution
 1. Fork it
