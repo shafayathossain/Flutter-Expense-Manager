@@ -8,4 +8,6 @@ abstract class EntryRepository {
   Future<List<wallet>> getAllWallets();
   Future<int> addEntry(num amount, int time, category category, wallet wallet,
       String description, tag tag, int entryId);
+  Future<int> deleteCategory(category mCategory);
+  Future<int> deleteTag(tag mTag);
 }

@@ -154,7 +154,9 @@ class EntriesView extends StatelessWidget {
               });
               selectedCategories.forEach((element) {
                 tempCategoryIds.add(element.mCategory.id);
-                tempTagIds.addAll(element.tags.map((e) => e.id));
+                element.checkedTagIndexes.forEach((tagIndex) {
+                  tempTagIds.add(element.tags[tagIndex].id);
+                });
               });
               BlocProvider.of<EntriesBloc>(builderContext)
                   .add(FilterEvent(tempWalletIds, tempCategoryIds, tempTagIds));

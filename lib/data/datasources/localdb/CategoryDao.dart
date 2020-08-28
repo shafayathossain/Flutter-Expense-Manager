@@ -82,12 +82,12 @@ class CategoryDao extends DatabaseAccessor<LocalDatabase>
     }).asStream();
   }
 
-  Stream<int> deleteCategory(category category) {
-    return delete(_database.category).delete(category).asStream();
+  Future<int> deleteCategory(category category) {
+    return delete(_database.category).delete(category);
   }
 
-  Stream<int> deleteTag(tag tag) {
-    return delete(_database.tag).delete(tag).asStream();
+  Future<int> deleteTag(tag tag) {
+    return delete(_database.tag).delete(tag);
   }
 
   Future<category> findCategory(String name, bool isIncome, int bookId) {

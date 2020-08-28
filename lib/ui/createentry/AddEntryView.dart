@@ -51,6 +51,13 @@ class AddEntryStatefulFormWidget extends StatefulWidget {
   CategorySelectionCallback categorySelectionCallback;
   bool isIncome = false;
   EntryWithCategoryAndWallet entry;
+  final _formKey = GlobalKey<FormState>();
+  AnimationController _controller;
+  Animation<Offset> _offsetAnimation;
+  CalendarController _calendarController = CalendarController();
+  TextEditingController _amountTextController = TextEditingController();
+  TextEditingController _dateTextController = TextEditingController();
+  TextEditingController _descriptionTextController = TextEditingController();
 
   AddEntryStatefulFormWidget(this.categorySelectionCallback, this.isIncome,
       {this.entry});
@@ -63,13 +70,6 @@ class AddEntryStatefulFormWidget extends StatefulWidget {
 
 class AddEntryState extends State<AddEntryStatefulFormWidget>
     with SingleTickerProviderStateMixin {
-  final _formKey = GlobalKey<FormState>();
-  AnimationController _controller;
-  Animation<Offset> _offsetAnimation;
-  CalendarController _calendarController = CalendarController();
-  TextEditingController _amountTextController = TextEditingController();
-  TextEditingController _dateTextController = TextEditingController();
-  TextEditingController _descriptionTextController = TextEditingController();
   List<category> _categories = [];
   category _selectedCategory;
   wallet _selectedWallet;
@@ -81,17 +81,18 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
     super.initState();
     if (widget.entry != null) {
       final formatter = DateFormat("dd-MM-yyyy");
-      _amountTextController.text = widget.entry.mEntry.amount.abs().toString();
-      _dateTextController.text = formatter.format(
+      widget._amountTextController.text =
+          widget.entry.mEntry.amount.abs().toString();
+      widget._dateTextController.text = formatter.format(
           DateTime.fromMillisecondsSinceEpoch(widget.entry.mEntry.date));
-      _descriptionTextController.text = widget.entry.mEntry.description;
+      widget._descriptionTextController.text = widget.entry.mEntry.description;
     }
-    _controller =
+    widget._controller =
         AnimationController(vsync: this, duration: Duration(microseconds: 500));
-    _offsetAnimation =
+    widget._offsetAnimation =
         Tween<Offset>(begin: const Offset(0.0, 1), end: Offset.zero)
             .animate(CurvedAnimation(
-      parent: _controller,
+      parent: widget._controller,
       curve: Curves.ease,
     ));
   }
@@ -111,7 +112,7 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
       });
     }
     return Form(
-        key: _formKey,
+        key: widget._formKey,
         child: BlocListener(
           listener: (context, state) {
             final snackBar = SnackBar(
@@ -125,9 +126,8 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
               Scaffold.of(context).showSnackBar(snackBar);
               BlocProvider.of<CreateEntryBloc>(context).add(EntryAddedEvent());
               view = null;
-              _amountTextController.clear();
-              _dateTextController.clear();
-              _descriptionTextController.clear();
+              widget._amountTextController.clear();
+              widget._descriptionTextController.clear();
               setState(() {});
             }
           },
@@ -138,12 +138,13 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
             builder: (context, AsyncSnapshot<int> snapshot) {
               if (snapshot.hasData && snapshot.data == 1) {
                 BlocProvider.of<AddEntryBloc>(context).add(SaveEvent(
-                    amountString: _amountTextController.text.toString(),
-                    date: _dateTextController.text.toString(),
+                    amountString: widget._amountTextController.text.toString(),
+                    date: widget._dateTextController.text.toString(),
                     selectedCategory: _selectedCategory,
                     selectedWallet: _selectedWallet,
                     selectedTag: _selectedTag,
-                    description: _descriptionTextController.text.toString(),
+                    description:
+                        widget._descriptionTextController.text.toString(),
                     isIncome: widget.isIncome,
                     entryId:
                         widget.entry == null ? null : widget.entry.mEntry.id));
@@ -156,13 +157,14 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
                         if (notification is ScrollUpdateNotification &&
                             (notification.scrollDelta >= 1.0 ||
                                 notification.scrollDelta <= -1.0) &&
-                            _controller.status == AnimationStatus.completed) {
-                          _controller.reverse();
+                            widget._controller.status ==
+                                AnimationStatus.completed) {
+                          widget._controller.reverse();
                         }
                         return false;
                       },
                       child: GestureDetector(
-                        onTapDown: (_) => _controller.reverse(),
+                        onTapDown: (_) => widget._controller.reverse(),
                         child: SingleChildScrollView(
                           child: Column(
                             children: [
@@ -194,20 +196,23 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
                                             .amountFormula,
                                     builder: (context, snapshot) {
                                       if (snapshot.hasData) {
-                                        _amountTextController.text =
+                                        widget._amountTextController.text =
                                             snapshot.data as String;
-                                        _amountTextController.selection =
+                                        widget._amountTextController.selection =
                                             TextSelection.collapsed(
-                                                offset: _amountTextController
-                                                    .text.length);
+                                                offset: widget
+                                                    ._amountTextController
+                                                    .text
+                                                    .length);
                                       }
                                       return TextFormField(
                                         maxLines: 1,
                                         showCursor: true,
                                         readOnly: true,
-                                        controller: _amountTextController,
+                                        controller:
+                                            widget._amountTextController,
                                         onTap: () {
-                                          _controller.forward();
+                                          widget._controller.forward();
                                         },
                                         validator: (text) {
                                           if (text == null || text.isEmpty) {
@@ -217,7 +222,8 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
                                         },
                                         onChanged: (text) {
                                           if (text.length > 1) {
-                                            _formKey.currentState.validate();
+                                            widget._formKey.currentState
+                                                .validate();
                                           }
                                         },
                                         decoration: InputDecoration(
@@ -277,7 +283,7 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
                                         maxLines: 1,
                                         showCursor: false,
                                         readOnly: true,
-                                        controller: _dateTextController,
+                                        controller: widget._dateTextController,
                                         validator: (text) {
                                           if (text == null || text.isEmpty) {
                                             return 'Text is empty';
@@ -286,10 +292,12 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
                                         },
                                         onChanged: (text) {
                                           if (text.length > 1) {
-                                            _formKey.currentState.validate();
+                                            widget._formKey.currentState
+                                                .validate();
                                           }
                                         },
                                         onTap: () {
+                                          widget._controller.reverse();
                                           _showDatePicker();
                                         },
                                         decoration: InputDecoration(
@@ -327,6 +335,7 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
                                                 "assets/images/ic_calendar.png"),
                                           ),
                                           onPressed: () {
+                                            widget._controller.reverse();
                                             _showDatePicker();
                                           },
                                         ),
@@ -399,6 +408,11 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
                                           BlocProvider.of<AddEntryBloc>(context)
                                             ..add(GetTagsEvent(
                                                 snapshot.data[index[0]].id));
+                                        }, onChipCanceled: (int index) {
+                                          _showDeleteConfirmationDialog(
+                                              DeleteCategoryEvent(
+                                                  snapshot.data[index]),
+                                              "category");
                                         });
                                       } else {
                                         return ChipGroup([]);
@@ -560,6 +574,12 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
                                                 _selectedTag =
                                                     snapshot.data[index[0]];
                                               },
+                                              onChipCanceled: (int index) {
+                                                _showDeleteConfirmationDialog(
+                                                    DeleteTagEvent(
+                                                        snapshot.data[index]),
+                                                    "tag");
+                                              },
                                             )),
                                         Container(
                                           height: 45,
@@ -646,10 +666,12 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
                                         }
                                         return null;
                                       },
-                                      controller: _descriptionTextController,
+                                      controller:
+                                          widget._descriptionTextController,
                                       onChanged: (text) {
                                         if (text.length > 1) {
-                                          _formKey.currentState.validate();
+                                          widget._formKey.currentState
+                                              .validate();
                                         }
                                       },
                                       decoration: InputDecoration(
@@ -684,9 +706,9 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
                       ),
                     ),
                     SlideTransition(
-                      position: _offsetAnimation,
+                      position: widget._offsetAnimation,
                       child: CalculatorKeyBoardView(
-                        textController: _amountTextController,
+                        textController: widget._amountTextController,
                         callback: (value) {
                           BlocProvider.of<AddEntryBloc>(context)
                               .amountValidator
@@ -728,6 +750,56 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
             ));
   }
 
+  void _showDeleteConfirmationDialog(AddEntryEvent event, String type) {
+    showDialog(
+        context: context,
+        builder: (contextB) {
+          return AlertDialog(
+            title: Text(
+              "DELETE $type".toUpperCase(),
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            content: Text(
+                "Do you really want to delete this $type? All entries related to this $type will be saved to \"Other\" $tag"),
+            actions: <Widget>[
+              RawMaterialButton(
+                elevation: 0.0,
+                highlightElevation: 0.0,
+                fillColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(3.0))),
+                child: Text(
+                  "yes".toUpperCase(),
+                  style: TextStyle(
+                    color: Colors.blue,
+                  ),
+                ),
+                onPressed: () {
+                  BlocProvider.of<AddEntryBloc>(context).add(event);
+                  Navigator.pop(context);
+                },
+              ),
+              RawMaterialButton(
+                elevation: 0.0,
+                highlightElevation: 0.0,
+                fillColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(3.0))),
+                child: Text(
+                  "no".toUpperCase(),
+                  style: TextStyle(
+                    color: Colors.blue,
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        });
+  }
+
   void _showDatePicker() {
     showModalBottomSheetCustom(
         context: context,
@@ -763,7 +835,8 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
                       style: TextStyle(fontSize: 14, color: Colors.blue),
                     ),
                     onPressed: () {
-                      _setDateToDateField(_calendarController.selectedDay);
+                      _setDateToDateField(
+                          widget._calendarController.selectedDay);
                       Navigator.pop(context);
                     },
                   ),
@@ -773,7 +846,7 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
                 children: [
                   Expanded(
                     child: TableCalendar(
-                      calendarController: _calendarController,
+                      calendarController: widget._calendarController,
                       rowHeight: 55,
                       headerStyle: HeaderStyle(
                           centerHeaderTitle: true, formatButtonVisible: false),
@@ -792,6 +865,6 @@ class AddEntryState extends State<AddEntryStatefulFormWidget>
   void _setDateToDateField(DateTime selectedDay) {
     final formatter = DateFormat("dd-MM-yyyy");
     String date = formatter.format(selectedDay);
-    _dateTextController.text = date;
+    widget._dateTextController.text = date;
   }
 }

@@ -161,17 +161,20 @@ class AccountBookItemView extends StatelessWidget {
     if (currentPosition == selectedPosition) {
       return Container(
         height: 150,
+        margin: EdgeInsets.only(left: 10, right: 10),
         child: GestureDetector(
           onTap: () {
             callback.call(-1);
           },
           child: Card(
+            margin: EdgeInsets.all(0),
             child: Stack(
               children: [
                 Container(
                     height: 150,
                     child: GestureDetector(
                         child: Card(
+                          margin: EdgeInsets.all(0),
                           color: Color(accountBookWithBalance.book.color),
                           child: Container(
                             child: Row(
@@ -380,8 +383,10 @@ class AccountBookItemView extends StatelessWidget {
     } else {
       return Container(
           height: 150,
+          margin: EdgeInsets.only(left: 10, right: 10),
           child: GestureDetector(
               child: Card(
+                margin: EdgeInsets.all(0),
                 color: Color(accountBookWithBalance.book.color),
                 child: Container(
                   child: Row(
@@ -398,14 +403,24 @@ class AccountBookItemView extends StatelessWidget {
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold),
                           ),
-                          Text(
-                            (accountBookWithBalance.income -
-                                    accountBookWithBalance.expense)
-                                .toString(),
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold),
+                          Column(
+                            children: <Widget>[
+                              Text(
+                                "Balance",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
+                              Text(
+                                (accountBookWithBalance.income.abs() -
+                                        accountBookWithBalance.expense.abs())
+                                    .toString(),
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold),
+                              )
+                            ],
                           )
                         ],
                       ),

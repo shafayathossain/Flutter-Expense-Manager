@@ -67,6 +67,10 @@ class AddEntryBloc extends Bloc<AddEntryEvent, AddEntryState> {
 
         return event;
       });
+    } else if (event is DeleteCategoryEvent) {
+      yield* _deleteCategory(event.mCategory);
+    } else if (event is DeleteTagEvent) {
+      yield* _deleteTag(event.mTag);
     }
   }
 
@@ -147,5 +151,16 @@ class AddEntryBloc extends Bloc<AddEntryEvent, AddEntryState> {
           selectedWallet, description, selectedTag, entryId);
       yield* Stream.value(EntrySavedState());
     }
+  }
+
+  Stream<AddEntryState> _deleteCategory(category mCategory) async* {
+    final result = await _repository.deleteCategory(mCategory);
+    yield* getCategories(mCategory.isIncome)
+        .map((event) => CategoriesFetchedState(event));
+  }
+
+  Stream<AddEntryState> _deleteTag(tag mTag) async* {
+    final result = await _repository.deleteTag(mTag);
+    yield* getTags(mTag.categoryId).map((event) => TagsFetchedState(event));
   }
 }

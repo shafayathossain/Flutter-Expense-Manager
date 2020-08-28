@@ -84,6 +84,7 @@ class EntriesBloc extends Bloc<EntriesEvent, EntriesState> {
     List<CategoryWithTags> categories = [];
     CategoryWithTags category;
     categoriesAndTags.forEach((element) {
+      print(element.mTag.name);
       if (element.mCategory.id != lastCategoryId) {
         lastCategoryId = element.mCategory.id;
         if (category != null) {
@@ -113,6 +114,7 @@ class EntriesBloc extends Bloc<EntriesEvent, EntriesState> {
     List<EntryListItem> itemsToShow = [];
     final dateTimeFormatter = DateFormat("dd-MM-yyyy");
     String lastDate = "";
+    print(result.length);
     result.forEach((element) {
       DateTime time = DateTime.fromMillisecondsSinceEpoch(element.mEntry.date);
       String timeString = dateTimeFormatter.format(time);

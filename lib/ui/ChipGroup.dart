@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 typedef void OnChipSelected(List<int> position);
+typedef void OnChipCanceled(int index);
 
 class ChipGroup extends StatefulWidget {
   int selectedIndex = -1;
   List<int> selectedIndexes = [];
   final List<String> chipTexts;
   OnChipSelected onChipSelectedCallback = (_) {};
+  OnChipCanceled onChipCanceled = (_) {};
   List<int> chipColors = [];
   List<bool> cancelableIndexes = [];
   bool multipleSelectionEnabled = false;
@@ -17,7 +19,8 @@ class ChipGroup extends StatefulWidget {
       this.cancelableIndexes,
       this.selectedIndex,
       this.selectedIndexes,
-      this.multipleSelectionEnabled});
+      this.multipleSelectionEnabled,
+      this.onChipCanceled});
 
   @override
   State createState() {
@@ -66,11 +69,22 @@ class ChipGroupState extends State<ChipGroup> {
           if (widget.cancelableIndexes != null &&
               widget.cancelableIndexes[index]) {
             row.add(Container(
-              margin: EdgeInsets.only(left: 5),
-              child: Icon(
-                Icons.close,
-                size: 12,
-                color: Colors.white,
+              width: 18,
+              margin: EdgeInsets.only(left: 7, right: 0),
+              child: RawMaterialButton(
+                fillColor: Colors.white,
+                padding: EdgeInsets.all(0),
+                shape: CircleBorder(),
+                child: Container(
+                  child: Icon(
+                    Icons.close,
+                    size: 12,
+                    color: Colors.black,
+                  ),
+                ),
+                onPressed: () {
+                  widget.onChipCanceled.call(index);
+                },
               ),
             ));
           }

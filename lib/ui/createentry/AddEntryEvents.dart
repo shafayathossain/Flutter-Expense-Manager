@@ -55,3 +55,15 @@ class CreateTagEvent extends AddEntryEvent {
   int color;
   int categoryId;
 }
+
+class DeleteCategoryEvent extends AddEntryEvent {
+  category mCategory;
+
+  DeleteCategoryEvent(this.mCategory);
+}
+
+class DeleteTagEvent extends AddEntryEvent {
+  tag mTag;
+
+  DeleteTagEvent(this.mTag);
+}

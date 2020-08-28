@@ -429,7 +429,6 @@ class _CashFlowState extends State<CashFlowView> {
                           buildWhen: (contet, state) =>
                               state is TopFiveEntriesState,
                           builder: (context, state) {
-                            print("476 - $state");
                             if (state is TopFiveEntriesState &&
                                 state.entries.length > 0) {
                               final formatter = DateFormat("dd-MM-yyyy");
@@ -468,9 +467,11 @@ class _CashFlowState extends State<CashFlowView> {
                                                                   Widget>[
                                                                 CircleAvatar(
                                                                   radius: 20,
-                                                                  backgroundColor:
-                                                                      Colors
-                                                                          .red,
+                                                                  backgroundColor: Color(state
+                                                                      .entries[
+                                                                          index]
+                                                                      .mCategory
+                                                                      .color),
                                                                 ),
                                                                 Padding(
                                                                   padding: EdgeInsets

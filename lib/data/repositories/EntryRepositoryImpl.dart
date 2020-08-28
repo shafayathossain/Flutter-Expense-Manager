@@ -55,13 +55,15 @@ class EntryRepositoryImpl extends EntryRepository {
 
   @override
   Future<int> createTag(String name, int color, int categoryId) {
-    tag mTag = tag(
-        name: name,
-        color: color,
-        canDelete: true,
-        bookId: 1,
-        categoryId: categoryId);
-    return _categoryDao.insertTag(mTag);
+    return _appPreference.getBook().then((value) {
+      tag mTag = tag(
+          name: name,
+          color: color,
+          canDelete: true,
+          bookId: value.id,
+          categoryId: categoryId);
+      return _categoryDao.insertTag(mTag);
+    });
   }
 
   @override
@@ -100,5 +102,15 @@ class EntryRepositoryImpl extends EntryRepository {
         return _entryDao.insertEntry(mEntry);
       }
     });
+  }
+
+  @override
+  Future<int> deleteCategory(category mCategory) {
+    return _categoryDao.deleteCategory(mCategory);
+  }
+
+  @override
+  Future<int> deleteTag(tag mTag) {
+    return _categoryDao.deleteTag(mTag);
   }
 }
