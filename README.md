@@ -3,7 +3,7 @@
 Personal expense manager to manage your income and expense. Keep track of your income and expenses. You can create several account book to manage your seperate income and expenses. Some graphs here will help you to have a quick look on your balance flow.
 
 # Screenshots
-<img src="https://raw.githubusercontent.com/shafayathossain/Flutter-Expense-Manager/master/screenshots/screenshot_1.png" width="185" height="400">
+<img src="https://raw.githubusercontent.com/shafayathossain/Flutter-Expense-Manager/master/screenshots/screenshot_1.png" width="185" height="400"> <img src="https://raw.githubusercontent.com/shafayathossain/Flutter-Expense-Manager/master/screenshots/screenshot_2.png" width="185" height="400">
 
 ## How to run
 Run following commands after cloning this repository:
