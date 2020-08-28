@@ -1,24 +1,14 @@
-# expense_manager
+# Expense Manager
 
-A new Flutter application.
+Personal expense manager to manage your income and expense. Keep track of your income and expenses. You can create several account book to manage your seperate income and expenses. Some graphs here will help you to have a quick look on your balance flow.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+# Screenshots
+<img src="https://raw.githubusercontent.com/shafayathossain/Flutter-Expense-Manager/master/screenshots/screenshot_1.png" width="185" height="400">
 
 ## How to run
 Run following commands after cloning this repository:
 ```sh
 $ flutter pub get
-$ flutter pub build_runner build
+$ flutter pub run build_runner build
 $ flutter run
 ```
