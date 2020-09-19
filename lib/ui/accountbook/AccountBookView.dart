@@ -383,7 +383,7 @@ class AccountBookItemView extends StatelessWidget {
     } else {
       return Container(
           height: 150,
-          margin: EdgeInsets.only(left: 10, right: 10),
+          margin: EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
           child: GestureDetector(
               child: Card(
                 margin: EdgeInsets.all(0),
