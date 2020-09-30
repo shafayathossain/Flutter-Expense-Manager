@@ -21,7 +21,7 @@ class AccountBookDao extends DatabaseAccessor<LocalDatabase>
     final expense = CustomExpression<double>(
         "SUM(CASE WHEN entry.amount<=0 THEN entry.amount ELSE 0 END)");
     final query = customSelect(
-        "SELECT account_book.*, SUM(CASE WHEN entry.amount>=0 THEN entry.amount ELSE 0 END) AS income, SUM(CASE WHEN entry.amount<=0 THEN entry.amount ELSE 0 END) AS expense FROM account_book INNER JOIN entry ON account_book.id = entry.book_id UNION ALL SELECT account_book.*, 0 as income, 0 as expense FROM account_book WHERE account_book.id NOT IN (SELECT entry.book_id FROM entry) ORDER BY id",
+        "SELECT account_book.*, SUM(CASE WHEN entry.amount>=0 THEN entry.amount ELSE 0 END) AS income, SUM(CASE WHEN entry.amount<=0 THEN entry.amount ELSE 0 END) AS expense FROM account_book INNER JOIN entry ON account_book.id = entry.book_id UNION ALL SELECT account_book.*, 0 as income, 0 as expense FROM account_book WHERE account_book.id NOT IN (SELECT entry.book_id FROM entry) AND account_book.id IS NOT NULL ORDER BY id",
         readsFrom: {_database.accountBook, _database.entry});
     // final query = select(_database.accountBook).join([
     //   leftOuterJoin(_database.entry,
